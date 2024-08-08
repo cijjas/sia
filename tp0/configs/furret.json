@@ -1,4 +1,9 @@
 {
     "pokemon": "furret",
-    "pokeball": "pokeball"
+    "pokeballs": [
+    "pokeball",
+    "ultraball",
+    "heavyball",
+    "fastball"
+  ]
 }

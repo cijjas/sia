@@ -108,7 +108,7 @@ class PokemonFactory:
         with open(self._src_file, "r") as c:
             pokemon_db = json.load(c)
             if name.lower() not in pokemon_db:
-                raise ValueError("Not a valid pokemon")
+                raise ValueError("Not a valid pokemon", name)
             poke = pokemon_db[name]
 
             t1, t2 = poke["type"]
