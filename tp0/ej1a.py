@@ -73,72 +73,7 @@ def analyze_1a_bars():
     plt.tight_layout()
     plt.show()
 
-def analyze_1b_bars():
-    # we are going to make a bar plot
-    all_data = pd.DataFrame()
 
-    # Load data from all CSV files in the directory
-    for filename in os.listdir('output/1b'):
-        data = pd.read_csv(f'output/1b/{filename}')
-        pokemon_name = filename.split('.')[0]
-        data['Pokemon'] = pokemon_name
-        all_data = pd.concat([all_data, data], ignore_index=True)
-    
-    # hago la columna un booleano
-    all_data['Catch Success'] = all_data['Catch Success'].astype(bool)
-
-    # agrupo por pokeball y pokemon y saco la media de catch success
-    grouped_data = all_data.groupby(['Pokeball', 'Pokemon'])['Catch Success'].mean().unstack()
-
-    catch_success_for_pokeball = grouped_data.loc['pokeball']
-    grouped_data = grouped_data.div(catch_success_for_pokeball, axis=1)
-    print(catch_success_for_pokeball)
-
-    # Probabilidad promedio de captura por tipo de pokeball para cada pokemon
-    ax = grouped_data.plot(kind='bar', figsize=(14, 8), title="Probabilidad promedio de captura por tipo de pokeball para cada pokemon")
-    ax.set_xlabel('Pokeball')
-    ax.set_ylabel('Probabilidad de captura')
-    ax.grid(True, linestyle='--')
-    ax.legend(title='Pokemon')
-    plt.xticks(rotation=0)
-    plt.tight_layout()
-    plt.show()
-    
-
-def load_2a(pokemonName, pokeballs, noise=0):
-    with open('output/2a.csv', mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Pokeball','Pokemon', 'Probability', 'Current HP'])
-        for pokeball in pokeballs:
-            for i in range(100, 0, -1):  
-                pokemon = factory.create( pokemonName, 100, StatusEffect.NONE, i/100)
-                writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], i/100])
-
-def analyze_2a():
-    # Load data from CSV
-    data = pd.read_csv('output/2a.csv')
-    pokemon = data['Pokemon'].unique()
-    title = 'Efecto de la vida (HP) en la probabilidad de captura para ' + ', '.join(pokemon)
-    data['Probability'] = pd.to_numeric(data['Probability'], errors='coerce')
-    
-    data.set_index(['Current HP', 'Pokeball'], inplace=True)
-    hp_effect = data['Probability'].unstack()
-
-    # Plotting
-    plt.figure(figsize=(12, 8))
-    markers = ['o', '^', 's', 'p'] 
-    line_styles = ['-', '--', '-.', ':']
-    for idx, pokeball in enumerate(hp_effect.columns):
-        plt.plot(hp_effect.index, hp_effect[pokeball], 
-                 marker=markers[idx % len(markers)], 
-                 linestyle=line_styles[idx % len(line_styles)], 
-                 label=str(pokeball))
-    plt.title(title )
-    plt.xlabel('HP del pokemon')
-    plt.ylabel('Probabilidad de captura')
-    plt.legend(title='Pokeball', loc='upper right')  
-    plt.grid(True)
-    plt.show()
 
 
 if __name__ == "__main__":
@@ -151,13 +86,6 @@ if __name__ == "__main__":
 
             # 1.a Para un pokemon en especifico calcular la media y desviacion estandar de la probabilidad de captura de 1000 intentos
             load(config["pokemon"], config["pokeballs"], "output/1a", 0.15)
-            load(config["pokemon"], config["pokeballs"], "output/1b", 0, 100000)
     
     analyze_1a_bars()
-    analyze_1b_bars()
-
-    # 1.b
-
-    # 2.a Las condiciones de saludo tienen algún efecto sobre la efectividad de la captura? 
-    # load_2a(config["pokemon"], config["pokeballs"])
 
