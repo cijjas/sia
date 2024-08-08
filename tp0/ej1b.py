@@ -23,7 +23,7 @@ def load(pokemonName, pokeballs, directory, noise=0, reps=1000):
                 writer.writerow([pokeball, attempt_catch(pokemon, pokeball, noise)[0]])
 
 
-def analyze_1b_bars():
+def analyze_1b():
     # we are going to make a bar plot
     all_data = pd.DataFrame()
 
@@ -65,5 +65,5 @@ if __name__ == "__main__":
             config = json.load(f)
             load(config["pokemon"], config["pokeballs"], "output/1b", 0, 100000)
     
-    analyze_1b_bars()
+    analyze_1b()
 
