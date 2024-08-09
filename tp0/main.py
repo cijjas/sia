@@ -10,7 +10,7 @@ from src.pokemon import PokemonFactory, StatusEffect
 LEVEL_MAX = 100
 HEALTH_MAX = 1
 
-def load(pokemonName, pokeballs, directory, noise=0, reps=1000):
+def load_1(pokemonName, pokeballs, directory, noise=0, reps=1000):
 
     pokemon = factory.create( pokemonName,LEVEL_MAX, StatusEffect.NONE, HEALTH_MAX)
 
@@ -217,8 +217,8 @@ if __name__ == "__main__":
         with open(f"{config_dir}/{pokemon_json}", "r") as f:
             config = json.load(f)
 
-            load(config["pokemon"], config["pokeballs"], directory='output/1a')
-            load(config["pokemon"], config["pokeballs"], directory='output/1b', reps=10000)
+            load_1(config["pokemon"], config["pokeballs"], directory='output/1a')
+            load_1(config["pokemon"], config["pokeballs"], directory='output/1b', reps=10000)
 
             load_2a(config["pokemon"], config["pokeballs"])
             load_2b(config["pokemon"], config["pokeballs"])
