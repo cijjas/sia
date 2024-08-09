@@ -4,6 +4,7 @@ import csv
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
 from src.catching import attempt_catch
 from src.pokemon import PokemonFactory, StatusEffect
 
@@ -47,15 +48,24 @@ def analyze_1a():
     plt.show()
 
     # Promedio de captura por tipo de pokeball para todos los pokemones con error estandar 
-    mean_data = all_data.groupby('Pokeball')['Catch Success'].mean()
-    std_err_data = all_data.groupby('Pokeball')['Catch Success'].std() 
+    long_data = grouped_data.reset_index().melt(id_vars='Pokeball', var_name='Pokemon', value_name='Probability')
+
     plt.figure(figsize=(10, 6))
-    plt.bar(mean_data.index, mean_data, yerr=std_err_data, capsize=5, color='skyblue', label='Mean with SEM')
-    plt.title('1a. Promedio de captura por tipo de pokeball para todos los pokemones con error estandar')
-    plt.xlabel('Pokeball')
+    sns.violinplot(x='Pokeball', y='Probability', data=long_data, palette="Set3", hue='Pokeball')
+    plt.title('Distribución de la probabilidad de captura por tipo de Pokéball')
+    plt.xlabel('Pokéball')
     plt.ylabel('Probabilidad de captura')
     plt.grid(True, linestyle='--')
-    plt.xticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
+
+    # boxplot
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(x='Pokeball', y='Probability', data=long_data, palette="Set3")
+    plt.title('Boxplot de la probabilidad de captura por tipo de Pokéball')
+    plt.xlabel('Pokéball')
+    plt.ylabel('Probabilidad de captura')
+    plt.grid(True, linestyle='--')
     plt.tight_layout()
     plt.show()
 
@@ -90,10 +100,10 @@ def analyze_1b():
 
     catch_success_for_pokeball = grouped_data.loc['pokeball']
     grouped_data = grouped_data.div(catch_success_for_pokeball, axis=1)
-    print(catch_success_for_pokeball)
+    # print(catch_success_for_pokeball)
 
     # Probabilidad promedio de captura por tipo de pokeball para cada pokemon
-    ax = grouped_data.plot(kind='bar', figsize=(14, 8), title="Probabilidad promedio de captura por tipo de pokeball para cada pokemon")
+    ax = grouped_data.plot(kind='bar', figsize=(14, 8), title="1b. Probabilidad promedio de captura por tipo de pokeball para cada pokemon")
     ax.set_xlabel('Pokeball')
     ax.set_ylabel('Probabilidad de captura')
     ax.grid(True, linestyle='--')
@@ -209,6 +219,19 @@ def analyze_2a():
     plt.show()
 
 
+
+
+def analyze_2c():
+    all_data = pd.DataFrame()
+
+    for filename in os.listdir('output/2c'):
+        data = pd.read_csv(f'output/2c/{filename}')
+        pokemon_name = filename.split('.')[0]
+        data['Pokemon'] = pokemon_name
+        all_data = pd.concat([all_data, data], ignore_index=True)
+
+
+
 if __name__ == "__main__":
     factory = PokemonFactory("pokemon.json")
     config_dir = sys.argv[1]
@@ -219,11 +242,12 @@ if __name__ == "__main__":
 
             load_1(config["pokemon"], config["pokeballs"], directory='output/1a')
             load_1(config["pokemon"], config["pokeballs"], directory='output/1b', reps=10000)
-
             load_2a(config["pokemon"], config["pokeballs"])
             load_2b(config["pokemon"], config["pokeballs"])
+            load_2c(config["pokemon"], config["pokeballs"])
     
     analyze_1a()
     analyze_1b()
     analyze_2a()
     analyze_2b()
+    analyze_2c()
