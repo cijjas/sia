@@ -18,7 +18,7 @@ def load_1a(pokemonName, pokeballs, noise=0):
         writer = csv.writer(file)
         writer.writerow(['Pokeball','Catch Success'])
         for pokeball in pokeballs:
-            for i in range(1000, 0, -1):  
+            for i in range(10000, 0, -1):  
                 writer.writerow([pokeball, attempt_catch(pokemon, pokeball, noise)[0]])
 
 def analyze_1a():
@@ -107,6 +107,40 @@ def analyze_2b():
     plt.show()
 
 
+def load_2a(pokemonName, pokeballs, noise=0):
+    with open(f"output/2a/{pokemonName}.csv", mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Pokeball','Pokemon', 'Probability', 'Status'])
+        for pokeball in pokeballs:
+            for status in StatusEffect.__members__.values():  
+                pokemon = factory.create( pokemonName, LEVEL_MAX, status, HEALTH_MAX)
+                writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], status._name_])
+
+def analyze_2a():
+    data = pd.read_csv(f"output/2a/{os.listdir('output/2a').pop()}")
+    pokemon = data['Pokemon'].unique()
+    title = '2a. Efecto de la salud sobre la efectividad de captura ' + ', '.join(pokemon)
+    data['Probability'] = pd.to_numeric(data['Probability'], errors='coerce')
+
+    data.set_index(['Status', 'Pokeball'], inplace=True) 
+    hp_effect = data['Probability'].unstack()
+
+    plt.figure(figsize=(12, 8))
+    markers = ['o', '^', 's', 'p'] 
+    line_styles = ['-', '--', '-.', ':']
+    for idx, pokeball in enumerate(hp_effect.columns):
+        plt.plot(hp_effect.index, hp_effect[pokeball], 
+                 marker=markers[idx % len(markers)], 
+                 linestyle=line_styles[idx % len(line_styles)], 
+                 label=str(pokeball))
+    plt.title(title )
+    plt.xlabel('Estado de salud del Pokemon')
+    plt.ylabel('Probabilidad de captura')
+    plt.legend(title='Pokeball', loc='upper center')  
+    plt.grid(True)
+    plt.show()
+
+
 if __name__ == "__main__":
     factory = PokemonFactory("pokemon.json")
     config_dir = sys.argv[1]
@@ -117,8 +151,10 @@ if __name__ == "__main__":
 
             load_1a(config["pokemon"], config["pokeballs"])
 
+            load_2a(config["pokemon"], config["pokeballs"])
             load_2b(config["pokemon"], config["pokeballs"])
     
     analyze_1a()
 
+    analyze_2a()
     analyze_2b()
