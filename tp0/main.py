@@ -21,7 +21,7 @@ EJ2B = '2b'
 EJ2C = '2c'
 
 
-def load_1(pokemonName, pokeballs, directory, noise=0, reps=1000):
+def load_1(pokemonName, pokeballs, directory, noise=0, reps=100):
 
     pokemon = factory.create( pokemonName,LEVEL_MAX, StatusEffect.NONE, HEALTH_MAX)
 
@@ -44,11 +44,14 @@ def analyze_1a():
     # hago la columna un booleano
     all_data['Catch Success'] = all_data['Catch Success'].astype(bool)
 
+    # Set global font size
+    plt.rcParams.update({'font.size': 20})
+
     # agrupo por pokeball y pokemon y saco la media de catch success
     grouped_data = all_data.groupby(['Pokeball', 'Pokemon'])['Catch Success'].mean().unstack()
 
     # Probabilidad promedio de captura por tipo de pokeball para cada pokemon
-    ax = grouped_data.plot(kind='bar', figsize=(14, 8), title="1a. Probabilidad promedio de captura por tipo de pokeball para cada pokemon")
+    ax = grouped_data.plot(kind='bar', figsize=(14, 8))
     ax.set_xlabel('Pokeball')
     ax.set_ylabel('Probabilidad de captura')
     ax.grid(True, linestyle='--')
@@ -63,7 +66,6 @@ def analyze_1a():
 
     plt.figure(figsize=(10, 6))
     sns.violinplot(x='Pokeball', y='Probability', data=long_data, palette="Set3", hue='Pokeball')
-    plt.title('Distribución de la probabilidad de captura por tipo de Pokéball')
     plt.xlabel('Pokéball')
     plt.ylabel('Probabilidad de captura')
     plt.grid(True, linestyle='--')
@@ -74,7 +76,6 @@ def analyze_1a():
     # boxplot
     plt.figure(figsize=(10, 6))
     sns.boxplot(x='Pokeball', y='Probability', data=long_data, palette="Set3")
-    plt.title('Boxplot de la probabilidad de captura por tipo de Pokéball')
     plt.xlabel('Pokéball')
     plt.ylabel('Probabilidad de captura')
     plt.grid(True, linestyle='--')
@@ -86,7 +87,7 @@ def analyze_1a():
     # Varianza de las probabilidades de captura para cada pokeball
     variance_data = all_data.groupby('Pokeball')['Catch Success'].var()
     plt.figure(figsize=(10, 6))
-    variance_data.plot(kind='line', color='tomato', title='1a. Varianza de las probabilidades de captura para cada pokeball', marker='o')
+    variance_data.plot(kind='line', color='tomato', marker='o')
     plt.xlabel('Pokeball')
     plt.ylabel('Varianza')
     plt.grid(True, linestyle='--')
@@ -117,7 +118,7 @@ def analyze_1b():
     # print(catch_success_for_pokeball)
 
     # Probabilidad promedio de captura por tipo de pokeball para cada pokemon
-    ax = grouped_data.plot(kind='bar', figsize=(14, 8), title="1b. Probabilidad promedio de captura por tipo de pokeball para cada pokemon")
+    ax = grouped_data.plot(kind='bar', figsize=(14, 8))
     ax.set_xlabel('Pokeball')
     ax.set_ylabel('Probabilidad de captura')
     ax.grid(True, linestyle='--')
@@ -366,7 +367,7 @@ if __name__ == "__main__":
             pokemon = config["pokemon"]
             pokeballs = config["pokeballs"]
             load_1(pokemon, pokeballs, directory='output/1a')
-            load_1(pokemon, pokeballs, directory='output/1b', reps=10000)
+            load_1(pokemon, pokeballs, directory='output/1b', reps=100000)
             load_2a(pokemon, pokeballs)
             load_2b(pokemon, pokeballs)
             # load_2c(pokemon, pokeballs)
