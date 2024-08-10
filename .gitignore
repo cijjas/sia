@@ -167,4 +167,4 @@ cython_debug/
 
 # output directory
 
-output/.*
+tp0/output/*
