@@ -10,6 +10,7 @@ seaborn = "*"
 jupyter = "*"
 notebook = "*"
 pandas = "*"
+scipy = "*"
 
 [dev-packages]
 
