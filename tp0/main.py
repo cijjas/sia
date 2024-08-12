@@ -21,8 +21,10 @@ EJ2A = '2a'
 EJ2B = '2b'
 EJ2C = '2c'
 
+# EJ1
+ 
+def load_1(pokemonName, pokeballs, directory, noise=0, reps=10000):
 
-def load_1(pokemonName, pokeballs, directory, noise=0, reps=100):
 
     pokemon = factory.create( pokemonName,LEVEL_MAX, StatusEffect.NONE, HEALTH_MAX)
 
@@ -33,6 +35,8 @@ def load_1(pokemonName, pokeballs, directory, noise=0, reps=100):
             for i in range(reps, 0, -1):  
                 writer.writerow([pokeball, attempt_catch(pokemon, pokeball, noise)[0]])
 
+
+# EJ1A 
 def analyze_1a():
     all_data = pd.DataFrame()
 
@@ -65,22 +69,12 @@ def analyze_1a():
     # Promedio de captura por tipo de pokeball para todos los pokemones con error estandar 
     long_data = grouped_data.reset_index().melt(id_vars='Pokeball', var_name='Pokemon', value_name='Probability')
 
-    plt.figure(figsize=(10, 6))
-    sns.violinplot(x='Pokeball', y='Probability', data=long_data, palette="Set3", hue='Pokeball')
-    plt.xlabel('Pokéball')
-    plt.ylabel('Probabilidad de captura')
-    plt.grid(True, linestyle='--')
-    plt.tight_layout()
-    plt.savefig(SAVE_PATH+ EJ1A + '/promedio_captura_con_error.png')
-    plt.close()
-
     # boxplot
     plt.figure(figsize=(10, 6))
-    sns.boxplot(x='Pokeball', y='Probability', data=long_data, palette="Set3")
+    sns.boxplot(x='Pokeball', y='Probability', data=long_data, palette="Set3", hue='Pokeball')
     plt.xlabel('Pokéball')
     plt.ylabel('Probabilidad de captura')
     plt.grid(True, linestyle='--')
-    plt.tight_layout()
     plt.savefig(SAVE_PATH + EJ1A+ '/promedio_captura_boxplot.png')
     plt.close()
 
@@ -88,7 +82,7 @@ def analyze_1a():
     # Varianza de las probabilidades de captura para cada pokeball
     variance_data = all_data.groupby('Pokeball')['Catch Success'].var()
     plt.figure(figsize=(10, 6))
-    variance_data.plot(kind='line', color='tomato', marker='o')
+    variance_data.plot(kind='bar', color='skyblue' )
     plt.xlabel('Pokeball')
     plt.ylabel('Varianza')
     plt.grid(True, linestyle='--')
@@ -97,6 +91,8 @@ def analyze_1a():
     plt.savefig(SAVE_PATH + EJ1A+ '/varianza.png')
     plt.close()
 
+
+# EJ1B
 def analyze_1b():
     # we are going to make a bar plot
     all_data = pd.DataFrame()
@@ -130,6 +126,7 @@ def analyze_1b():
     plt.close()
 
 
+# EJ2A
 def load_2a_health(pokemonName, pokeballs, noise=0):
     with open('output/2a/health/2a.csv', mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -141,44 +138,6 @@ def load_2a_health(pokemonName, pokeballs, noise=0):
                 for j in range(tries):
                     pokemon = factory.create( pokemonName, LEVEL_MAX, StatusEffect.NONE, i/divisions)
                     writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], attempt_catch(pokemon, pokeball, noise)[0], i/divisions])
-
-def load_2b(pokemonName, pokeballs, noise=0):
-    with open(f"output/2b/{pokemonName}.csv", mode='w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Pokeball','Pokemon', 'Probability', 'Current HP'])
-        for pokeball in pokeballs:
-            for i in range(100, 0, -1):  
-                pokemon = factory.create( pokemonName, LEVEL_MAX, StatusEffect.NONE, i/100)
-                writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], i/100])
-
-
-def analyze_2b():
-    # Load data from CSV
-    data = pd.read_csv(f"output/2b/{os.listdir('output/2b').pop()}")
-    pokemon = data['Pokemon'].unique()
-    title = '2b. Efecto de la vida (HP) en la probabilidad de captura para ' + ', '.join(pokemon)
-    data['Probability'] = pd.to_numeric(data['Probability'], errors='coerce')
-    
-    data.set_index(['Current HP', 'Pokeball'], inplace=True)
-    hp_effect = data['Probability'].unstack()
-
-    # Plotting
-    plt.figure(figsize=(12, 8))
-    markers = ['o', '^', 's', 'p'] 
-    line_styles = ['-', '--', '-.', ':']
-    for idx, pokeball in enumerate(hp_effect.columns):
-        plt.plot(hp_effect.index, hp_effect[pokeball], 
-                 marker=markers[idx % len(markers)], 
-                 linestyle=line_styles[idx % len(line_styles)], 
-                 label=str(pokeball))
-    plt.title(title )
-    plt.xlabel('Porcentaje de HP de Pokémon')
-    plt.ylabel('Probabilidad de captura')
-    plt.legend(title='Pokeball', loc='upper right')  
-    plt.grid(True)
-    plt.savefig(SAVE_PATH + EJ2B+ '/2b.png')
-    plt.close()
-
 
 def load_2a_status(pokemonName, pokeballs, noise=0):
     with open(f"output/2a/status/{pokemonName}.csv", mode='w', newline='') as file:
@@ -227,7 +186,6 @@ def analyze_2a_health():
     capture_mean = data.groupby(['Current HP', 'Pokeball'])['Captured'].mean().unstack()
 
     plt.figure(figsize=(12, 8))
-    markers = ['o', '^', 's', 'p'] 
     line_styles = ['-', '--', '-.', ':']
     for idx, pokeball in enumerate(capture_mean.columns):
         x = capture_mean.index
@@ -242,7 +200,6 @@ def analyze_2a_health():
                  linestyle=line_styles[idx % len(line_styles)], 
                  label=str(pokeball))
         plt.scatter(x, y, 
-                    marker=markers[idx % len(markers)], 
                     label=str(pokeball))
 
     #plt.title(title, fontsize=20)
@@ -254,6 +211,44 @@ def analyze_2a_health():
     plt.yticks(fontsize=16)
     plt.tight_layout()
     plt.savefig(SAVE_PATH + EJ2A + '/2a_health.png')
+    plt.close()
+
+
+
+# EJ2B
+def load_2b(pokemonName, pokeballs, noise=0):
+    with open(f"output/2b/{pokemonName}.csv", mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Pokeball','Pokemon', 'Probability', 'Current HP'])
+        for pokeball in pokeballs:
+            for i in range(100, 0, -1):  
+                pokemon = factory.create( pokemonName, LEVEL_MAX, StatusEffect.NONE, i/100)
+                writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], i/100])
+
+
+def analyze_2b():
+    # Load data from CSV
+    data = pd.read_csv(f"output/2b/{os.listdir('output/2b').pop()}")
+    pokemon = data['Pokemon'].unique()
+    title = '2b. Efecto de la vida (HP) en la probabilidad de captura para ' + ', '.join(pokemon)
+    data['Probability'] = pd.to_numeric(data['Probability'], errors='coerce')
+    
+    data.set_index(['Current HP', 'Pokeball'], inplace=True)
+    hp_effect = data['Probability'].unstack()
+
+    # Plotting
+    plt.figure(figsize=(12, 8))
+    line_styles = ['-', '--', '-.', ':']
+    for idx, pokeball in enumerate(hp_effect.columns):
+        plt.plot(hp_effect.index, hp_effect[pokeball], 
+                 linestyle=line_styles[idx % len(line_styles)], 
+                 label=str(pokeball))
+    plt.title(title )
+    plt.xlabel('Porcentaje de HP de Pokémon')
+    plt.ylabel('Probabilidad de captura')
+    plt.legend(title='Pokeball', loc='upper right')  
+    plt.grid(True)
+    plt.savefig(SAVE_PATH + EJ2B+ '/2b.png')
     plt.close()
 
 def analyze_2c():
@@ -412,18 +407,18 @@ if __name__ == "__main__":
             config = json.load(f)
             pokemon = config["pokemon"]
             pokeballs = config["pokeballs"]
-            load_1(pokemon, pokeballs, directory='output/1a')
-            load_1(pokemon, pokeballs, directory='output/1b', reps=100000)
-            load_2a_health(pokemon, pokeballs)
-            load_2a_status(pokemon, pokeballs)
-            load_2b(pokemon, pokeballs)
-            load_2c(pokemon, pokeballs)
-            load_2c_bis(pokemon, pokeballs)
-    
-    analyze_1a()
-    analyze_1b()
-    analyze_2a_health()
-    analyze_2a_status()
-    analyze_2b()
-    analyze_2c_bis()
-    analyze_2c()
+            # load_1(pokemon, pokeballs, directory='output/1a')
+            # load_1(pokemon, pokeballs, directory='output/1b', reps=100000)
+            # load_2a_health(pokemon, pokeballs)
+            # load_2a_status(pokemon, pokeballs)
+            # load_2b(pokemon, pokeballs)
+            # load_2c(pokemon, pokeballs)
+            # load_2c_bis(pokemon, pokeballs)    
+
+    #analyze_1a()
+    # analyze_1b()
+    # analyze_2a_health()
+    # analyze_2a_status()
+    # analyze_2b()
+    # analyze_2c_bis()
+    # analyze_2c()
