@@ -26,6 +26,7 @@ para instalar las dependencias necesarias en el ambiente virtual
 
 ## Ejecución
 
+El siguiente comando agarra todos los pokemons en la carpeta `./config` (se pueden agregar más considerando que respetan el formato basico de nombre y pokebolas)
 
 ```sh
 pipenv run python main.py ./configs
