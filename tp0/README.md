@@ -7,7 +7,7 @@ Trabajo práctico orientativo para la materia Sistemas de Inteligencia Artificia
 objetivo de evaluar la función de captura de un Pokemon.
 
 [Enunciado](docs/SIA_TP0.pdf)
-
+[Informe](docs/Informe-TP0.pdf)
 ### Requisitos
 
 - Python3
