@@ -10,8 +10,10 @@ seaborn = "*"
 jupyter = "*"
 notebook = "*"
 pandas = "*"
+opencv-python = "*"
+statsmodels = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3"
+python_version = "3.10"
