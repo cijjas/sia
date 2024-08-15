@@ -26,7 +26,12 @@ para instalar las dependencias necesarias en el ambiente virtual
 
 ## Ejecución
 
-```
-pipenv run python main.py [config_file]
+
+```sh
+pipenv run python main.py ./configs
 ```
 
+>   [!Note]
+>   Actualmente está descomentado el ej1 y producirá la salida de los gráficos en el directorio ./output/1a
+>   Otros ejercicios generan gráficos de forma semejante, para ejecutarlos descomentar las lineas de invocación en el archivo main.py (buscar ACA!!!)
+>   Tener en cuenta que no cualquier combinación de load y analyze es posible ya que hay una correspondencia entre ejercicios. Si se desea ejecutar correctamente ejecutar el par correcto de load y analyze para el ejercicio en particular
