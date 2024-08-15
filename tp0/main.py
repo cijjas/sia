@@ -297,7 +297,7 @@ def analyze_2c():
     all_data = pd.DataFrame()
 
     # Cargar todos los archivos CSV del directorio output/2c
-    for filename in os.listdir('output/2c'):
+    for filename in os.listdir('output//2c'):
         data = pd.read_csv(f'output/2c/{filename}')
         all_data = pd.concat([all_data, data], ignore_index=True)
 
@@ -453,19 +453,19 @@ if __name__ == "__main__":
             config = json.load(f)
             pokemon = config["pokemon"]
             pokeballs = config["pokeballs"]
-            # load_1(pokemon, pokeballs, directory='output/1a')
+            load_1(pokemon, pokeballs, directory='output/1a')
             # ACA!!!
             # load_1(pokemon, pokeballs, directory='output/1b', reps=100000)
-            load_2a_health(pokemon, pokeballs, noise=0.2)
-            load_2a_status(pokemon, pokeballs)
+            # load_2a_health(pokemon, pokeballs, noise=0.2)
+            # load_2a_status(pokemon, pokeballs)
             # load_2b(pokemon, pokeballs)
             # load_2c(pokemon, pokeballs)
             # load_2c_bis(pokemon, pokeballs)    
 
-    # analyze_1a()
+    analyze_1a()
     # analyze_1b()
-    analyze_2a_health()
-    analyze_2a_status()
+    # analyze_2a_health()
+    # analyze_2a_status()
     # analyze_2b()
     # analyze_2c_bis()
     # analyze_2c()
