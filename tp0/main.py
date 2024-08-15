@@ -4,10 +4,13 @@ import csv
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
+import cv2
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
 import numpy as np
 import seaborn as sns
 from src.catching import attempt_catch
-from matplotlib.colors import LinearSegmentedColormap  # Add this import
+from matplotlib.colors import LinearSegmentedColormap 
 from scipy.interpolate import make_interp_spline
 
 from src.pokemon import PokemonFactory, StatusEffect
@@ -49,7 +52,6 @@ def analyze_1a():
     # hago la columna un booleano
     all_data['Catch Success'] = all_data['Catch Success'].astype(bool)
 
-    # Set global font size
     plt.rcParams.update({'font.size': 20})
 
     # agrupo por pokeball y pokemon y saco la media de catch success
@@ -94,10 +96,8 @@ def analyze_1a():
 
 # EJ1B
 def analyze_1b():
-    # we are going to make a bar plot
     all_data = pd.DataFrame()
 
-    # Load data from all CSV files in the directory
     for filename in os.listdir('output/1b'):
         data = pd.read_csv(f'output/1b/{filename}')
         pokemon_name = filename.split('.')[0]
@@ -112,7 +112,6 @@ def analyze_1b():
 
     catch_success_for_pokeball = grouped_data.loc['pokeball']
     grouped_data = grouped_data.div(catch_success_for_pokeball, axis=1)
-    # print(catch_success_for_pokeball)
 
     # Probabilidad promedio de captura por tipo de pokeball para cada pokemon
     ax = grouped_data.plot(kind='bar', figsize=(14, 8))
@@ -177,8 +176,6 @@ def load_2a_status(pokemonName, pokeballs, noise=0):
 
 def analyze_2a_status():
         data = pd.read_csv(f"output/2a/status/{os.listdir('output/2a/status').pop()}")
-        pokemon = data['Pokemon'].unique()
-        #title = '2a. Efecto de la salud sobre la efectividad de captura ' + ', '.join(pokemon)
         data['Probability'] = pd.to_numeric(data['Probability'], errors='coerce')
         
         capture_mean = data.groupby(['Status', 'Pokeball'])['Probability'].mean().unstack()
@@ -191,7 +188,6 @@ def analyze_2a_status():
                     marker=markers[idx % len(markers)], 
                     linestyle=line_styles[idx % len(line_styles)], 
                     label=str(pokeball))
-        #plt.title(title)
         plt.xlabel('Salud', fontsize=16)
         plt.ylabel('Probabilidad de captura', fontsize=16)
         plt.legend(title='Pokeball', loc='upper center', fontsize=14, title_fontsize=16)  
@@ -203,12 +199,10 @@ def analyze_2a_status():
         plt.close()
 
 def analyze_2a_health():
-    # Load data from CSV
     data = pd.read_csv(f"output/2a/health/2a.csv")
     data_noise_1 = pd.read_csv(f"output/2a/health/2a_noise_1.csv")
     data_noise_2 = pd.read_csv(f"output/2a/health/2a_noise_2.csv")
     pokemon = data['Pokemon'].unique()
-    #title = '2a. Efecto de la salud sobre la efectividad de captura ' + ', '.join(pokemon)
     
     capture_mean = data.groupby(['Current HP', 'Pokeball'])['Captured'].mean().unstack()
     capture_mean_noise_1 = data_noise_1.groupby(['Current HP', 'Pokeball'])['Captured'].mean().unstack()
@@ -272,7 +266,6 @@ def load_2b(pokemonName, pokeballs, noise=0):
                 writer.writerow([pokeball, pokemon.name,  attempt_catch(pokemon, pokeball, noise)[1], i/100])
 
 def analyze_2b():
-    # Load data from CSV
     data = pd.read_csv(f"output/2b/{os.listdir('output/2b').pop()}")
     pokemon = data['Pokemon'].unique()
     title = '2b. Efecto de la vida (HP) en la probabilidad de captura para ' + ', '.join(pokemon)
@@ -281,7 +274,6 @@ def analyze_2b():
     data.set_index(['Current HP', 'Pokeball'], inplace=True)
     hp_effect = data['Probability'].unstack()
 
-    # Plotting
     plt.figure(figsize=(12, 8))
     markers = ['o', '^', 's', 'p'] 
     line_styles = ['-', '--', '-.', ':']
@@ -299,6 +291,8 @@ def analyze_2b():
     plt.savefig(SAVE_PATH + EJ2B + '/2b.png')
     plt.close()
 
+
+# EJ 2C
 def analyze_2c():
     all_data = pd.DataFrame()
 
@@ -308,22 +302,33 @@ def analyze_2c():
         all_data = pd.concat([all_data, data], ignore_index=True)
 
     custom_cmap = LinearSegmentedColormap.from_list("color scale", ["purple", "blue", "green", "yellow"])
+    
+    # Se puede descomentar lo comentado a continuacion y comentar el triple for que le sigue para probar el ANOVA
+    
+    # all_data.rename(columns={'%HP': 'HP_percent'}, inplace=True)
+    # all_data.rename(columns={'Status Effect': 'Status_Effect'}, inplace=True)
+    # all_data.rename(columns={'Catch Success': 'Catch_Success'}, inplace=True)
+    # model = ols('Catch_Success ~ C(Level) + C(HP_percent) + C(Status_Effect) + C(Pokeball) + C(Pokemon)', data=all_data).fit()
+    # anova_table = sm.stats.anova_lm(model, typ=2)
+    # print(anova_table)
 
     # Generar un heatmap para cada combinación de Status Effect y Pokeball
-    for status in all_data['Status Effect'].unique():
-        for pokeball in all_data['Pokeball'].unique():
-            subset = all_data[(all_data['Status Effect'] == status) & (all_data['Pokeball'] == pokeball)]
-            if not subset.empty:
-                heatmap_data = subset.pivot_table(values='Catch Success', index='Level', columns='%HP', aggfunc='mean')
-
-                plt.figure(figsize=(12, 8))
-                sns.heatmap(heatmap_data, fmt=".2f", cmap=custom_cmap, vmin=0, vmax=1)
-                plt.title(f'Heatmap: Average Catch Success\nPokemon: {subset.iloc[0]["Pokemon"]}, Status Effect: {status}, Pokeball: {pokeball}')
-                plt.xlabel('%HP')
-                plt.ylabel('Level')
-                plt.tight_layout()
-                plt.savefig(SAVE_PATH + EJ2C+ f'/{pokeball}_{status}.png')
-                plt.close()
+    for pokemon in all_data['Pokemon'].unique():
+        for status in all_data['Status Effect'].unique():
+            for pokeball in all_data['Pokeball'].unique():
+                subset = all_data[(all_data['Pokemon'] == pokemon) & (all_data['Status Effect'] == status) & (all_data['Pokeball'] == pokeball)]
+                if not subset.empty:
+                    status_clean = status.replace('StatusEffect.', '')
+                    heatmap_data = subset.pivot_table(values='Catch Success', index='Level', columns='%HP', aggfunc='mean')
+                    plt.figure(figsize=(12, 8))
+                    sns.heatmap(heatmap_data, cmap=custom_cmap, vmin=0, vmax=1, fmt=".2f")
+                    plt.title(f'Heatmap: Probabilidad de captura\nPokemon: {pokemon}, Status Effect: {status_clean}, Pokeball: {pokeball}')
+                    plt.xlabel('%HP')
+                    plt.ylabel('Level')
+                    plt.tight_layout()
+                    plt.savefig(f'{SAVE_PATH}/{EJ2C}/{pokemon}_{pokeball}_{status_clean}.png')
+                    plt.close()
+                    print(f'{pokemon}_{pokeball}_{status_clean}.png')
 
 def load_2c(pokemonName, pokeballs, noise=0):
     with open(f'output/2c/{pokemonName}.csv', mode='w', newline='') as file:
@@ -379,21 +384,16 @@ def load_2c_bis(pokemonName, pokeballs, noise=0, reps=100):
                         writer.writerow([pokeball, pokemon.name, default_level, default_hp_percent, default_status, catch_success])
 
 def analyze_2c_bis():
-    # List all files in the output/2c/ directory
     files = os.listdir('output/2c/comp/')
     for file in files:
-        # Extract pokemon name and parameter from the filename
         filename_parts = file.split('-')
         pokemon = filename_parts[0]
         parameter = filename_parts[1].replace('.csv', '')
 
-        # Load the CSV file
         file_path = f'output/2c/comp/{file}'
         if os.path.exists(file_path):
             data = pd.read_csv(file_path)
-            # Generate plots based on the parameter
             if parameter == "HP":
-                # agrupo por pokeball y pokemon y saco la media de catch success
                 (hp, probability) =(data['%HP'] ,data['Catch Success']) 
                 plt.figure(figsize=(10, 6))
                 sns.lineplot(x=hp, y=probability, data=data)
@@ -418,7 +418,6 @@ def analyze_2c_bis():
                 plt.close()
 
             elif parameter == "Pokeball":
-                # agrupo por pokeball y pokemon y saco la media de catch success
                 (pokeball, probability) = (data['Pokeball'], data['Catch Success'])
                 plt.figure(figsize=(10, 6))
                 sns.barplot(x=pokeball, y=probability, data=data)
@@ -431,7 +430,6 @@ def analyze_2c_bis():
                 plt.close()
 
             elif parameter == "Status Effect":
-                # agrupo por pokeball y pokemon y saco la media de catch success
                 (status, probability) = (data['Status Effect'], data['Catch Success'])
                 plt.figure(figsize=(10, 6))
                 sns.barplot(x=status, y=probability, data=data)
@@ -456,17 +454,18 @@ if __name__ == "__main__":
             pokemon = config["pokemon"]
             pokeballs = config["pokeballs"]
             # load_1(pokemon, pokeballs, directory='output/1a')
+            # ACA!!!
             # load_1(pokemon, pokeballs, directory='output/1b', reps=100000)
             load_2a_health(pokemon, pokeballs, noise=0.2)
             load_2a_status(pokemon, pokeballs)
-            load_2b(pokemon, pokeballs)
+            # load_2b(pokemon, pokeballs)
             # load_2c(pokemon, pokeballs)
             # load_2c_bis(pokemon, pokeballs)    
 
-    #analyze_1a()
+    # analyze_1a()
     # analyze_1b()
     analyze_2a_health()
     analyze_2a_status()
-    analyze_2b()
+    # analyze_2b()
     # analyze_2c_bis()
     # analyze_2c()
