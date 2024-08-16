@@ -1,19 +1,23 @@
+import queue
 from core.node import Node
 
-def dfs(initial_state):
-    frontier = [Node(initial_state)]
-    explored = set()
+def dfs_solve(start_state):
+    initial_node = Node(start_state)
+    frontier = queue.LifoQueue()  # Use LifoQueue as a stack
+    frontier.put(initial_node)
+    seen = set([start_state])
 
-    while frontier:
-        node = frontier.pop()
+    while not frontier.empty():
+        current_node = frontier.get()
 
-        if node.state.is_goal():
-            return node.path() 
+        if current_node.is_goal():
+            print("Goal reached!")
+            return current_node.path
         
-        explored.add(node.state)
+        for successor in current_node.generate_successors():
+            if successor.state not in seen:
+                seen.add(successor.state)
+                frontier.put(successor)
 
-        for child_state in node.state.generate_children():
-            if child_state not in explored:
-                frontier.append(Node(child_state, node))
-
-    return None 
+    print("No solution found.")
+    return None
