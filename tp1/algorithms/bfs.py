@@ -1,20 +1,22 @@
-from collections import deque
+import queue
 from core.node import Node
+def bfs_solve(start_state):
+    initial_node = Node(start_state)
+    frontier = queue.Queue()
+    frontier.put(initial_node)
+    seen = set([start_state])
 
-def bfs(initial_state):
-    frontier = deque([Node(initial_state)])
-    explored = set()
+    while not frontier.empty():
+        current_node = frontier.get()
 
-    while frontier:
-        node = frontier.popleft()
+        if current_node.is_goal():
+            print("Goal reached!")
+            return current_node.path
+        
+        for successor in current_node.generate_successors():
+            if successor.state not in seen:
+                seen.add(successor.state)
+                frontier.put(successor)
 
-        if node.state.is_goal():
-            return node.path()  
-
-        explored.add(node.state)
-
-        for child_state in node.state.generate_children():
-            if child_state not in explored:
-                frontier.append(Node(child_state, node))
-
-    return None 
+    print("No solution found.")
+    return None
