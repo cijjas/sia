@@ -9,7 +9,7 @@ class State:
                 if char == '@':
                     return (x, y)
 
-    def move_player(self, dx, dy):
+    def move_player(self, dx, dy): # TODO hay que hacer más casos tipo si pasa por arriba
         x, y = self.player_position
         print(f'Moving player from ({x}, {y}) to ({x+dx}, {y+dy})')
         target = (x + dx, y + dy)
