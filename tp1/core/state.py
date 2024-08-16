@@ -1,4 +1,5 @@
 from core.action import Action
+
 class State:
     def __init__(self, board):
         self.board = board

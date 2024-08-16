@@ -4,6 +4,3 @@ class Action:
         self.target1 = target1
         self.target2 = target2
         self.player_position = player_position
-
-
-        
