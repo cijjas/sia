@@ -21,36 +21,32 @@ def draw_board(screen, game_state, images, tile_size):
             if char in images:
                 screen.blit(images[char], (x * tile_size, y * tile_size))
 
-
-
 def draw_text(screen, text, font, color, position):
     text_surface = font.render(text, True, color)
     screen.blit(text_surface, position)
 
+def read_board_from_file(file_path):
+    with open(file_path, 'r') as file:
+        return [list(line.strip()) for line in file.readlines()]
 
 def main():
     pygame.init()
-    tile_size = 64
-    width, height = 15 * tile_size, 10 * tile_size
+    tile_size = 36
+    board_file_path = 'test/test_5'
+    initial_board = read_board_from_file(board_file_path)
+    
+    num_rows = len(initial_board)
+    num_cols = max(len(row) for row in initial_board)
+    width, height = num_cols * tile_size, num_rows * tile_size
+    
     screen = pygame.display.set_mode((width, height))
     images = load_images(tile_size)
 
     font = pygame.font.Font(None, 36)  # None uses the default font, 36 is the font size
-    # Game loop setup
+    
     running = True
     clock = pygame.time.Clock()
-    initial_board = [
-        "      ###      ",
-        "      #.#      ",
-        "  #####.#####  ",
-        " ##         ## ",
-        "##  # # # #  ##",
-        "#  ##     ##  #",
-        "# ##  # #  ## #",
-        "#     $@$     #",
-        "####  ###  ####",
-        "   #### ####   ",
-    ]
+
     def reset_game():
         return State([list(row) for row in initial_board])
 
@@ -76,7 +72,6 @@ def main():
             if game_state.is_solved():
                 print('You won!')
                 running = False
-
 
         draw_board(screen, game_state, images, tile_size)
         draw_text(screen, "Press 'p' to undo, 'r' to restart", font, (255, 255, 255), (10, height - 40))
