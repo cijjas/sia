@@ -22,7 +22,12 @@ def draw_board(screen, game_state, images, tile_size):
                 screen.blit(images[char], (x * tile_size, y * tile_size))
 
 
-# TODO tambien hay que ver el tema que cuando pasa por arriba dle goal lo borra me parece
+
+def draw_text(screen, text, font, color, position):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, position)
+
+
 def main():
     pygame.init()
     tile_size = 64
@@ -30,10 +35,11 @@ def main():
     screen = pygame.display.set_mode((width, height))
     images = load_images(tile_size)
 
+    font = pygame.font.Font(None, 36)  # None uses the default font, 36 is the font size
     # Game loop setup
     running = True
     clock = pygame.time.Clock()
-    board = [
+    initial_board = [
         "      ###      ",
         "      #.#      ",
         "  #####.#####  ",
@@ -45,11 +51,14 @@ def main():
         "####  ###  ####",
         "   #### ####   ",
     ]
-    game_state = State([list(row) for row in board])
+    def reset_game():
+        return State([list(row) for row in initial_board])
+
+    game_state = reset_game()
 
     while running:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -60,8 +69,17 @@ def main():
                     game_state.move_player(0, -1)
                 elif event.key == pygame.K_DOWN:
                     game_state.move_player(0, 1)
+                elif event.key == pygame.K_r:
+                    game_state = reset_game()
+                elif event.key == pygame.K_p:
+                    game_state.undo_box_action()
+            if game_state.is_solved():
+                print('You won!')
+                running = False
+
 
         draw_board(screen, game_state, images, tile_size)
+        draw_text(screen, "Press 'p' to undo, 'r' to restart", font, (255, 255, 255), (10, height - 40))
         pygame.display.flip()
         clock.tick(60)
 
