@@ -1,8 +1,8 @@
 # Ejercicio I - 8-Puzzle
 
 ### ¿Que estructura de datos utilizarian?
-Matriz de 3x3 donde cada valor es un char, el vacio es representado por el 0.
-La igualdad de estados se realiza con un previo ordenado ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
+Matriz de 3x3 donde cada valor es un char y el vacio es representado por el '\0'. Es decir, cada número del tablero lo representamos como char (1 es '1', 2 es '2', y así)
+La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
 Por ejemplo
 3 2 1   
 4 0 6
@@ -11,6 +11,8 @@ Se reordena a la matriz a la forma canonica definida
 1 6 5 
 2 0 8
 3 4 7
+De esta manera, podemos comparar rotaciones del tablero que pueden llegar a representar el mismo estado.
+
 ### Heuristicas Admisibles
 - Sumatoria de distancias manhattan, aunque seria valido para norma = 0 (euclideana), norma supremo
 - Sumatoria del triangulo superior sea menor
@@ -18,8 +20,9 @@ Se reordena a la matriz a la forma canonica definida
 - Cantidad de posicionamientos incorrectos de los numeros
 - v siendo la lista de elementos
 $$\sum_{i = 1}^{8} \frac{v[i]}{8\cdot i }-1$$
+
 ### ¿Que Algoritmo de Busqueda usarian y con que heuristicas?
-Cuando hagamos el Sokoban vamos a tener mas idea 
+Cuando hagamos el Sokoban vamos a tener mas idea
 
 # Ejercicio II - Sokoban
 ### Definicion de Estados
