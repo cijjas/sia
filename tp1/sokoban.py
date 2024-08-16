@@ -25,8 +25,8 @@ def draw_board(screen, game_state, images, tile_size):
 # TODO tambien hay que ver el tema que cuando pasa por arriba dle goal lo borra me parece
 def main():
     pygame.init()
-    tile_size = 64  
-    width, height = 6 * tile_size, 7 * tile_size 
+    tile_size = 64
+    width, height = 15 * tile_size, 10 * tile_size
     screen = pygame.display.set_mode((width, height))
     images = load_images(tile_size)
 
@@ -34,13 +34,16 @@ def main():
     running = True
     clock = pygame.time.Clock()
     board = [
-        "######",
-        "#    #",
-        "#. $ #",
-        "#.#$##",
-        "#    #",
-        "#  @ #",
-        "######"
+        "      ###      ",
+        "      #.#      ",
+        "  #####.#####  ",
+        " ##         ## ",
+        "##  # # # #  ##",
+        "#  ##     ##  #",
+        "# ##  # #  ## #",
+        "#     $@$     #",
+        "####  ###  ####",
+        "   #### ####   ",
     ]
     game_state = State([list(row) for row in board])
 
