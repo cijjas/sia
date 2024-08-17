@@ -1,3 +1,5 @@
+from core.action import Action
+
 class State:
     def __init__(self, walls, goals, boxes, player):
         self.walls = walls
