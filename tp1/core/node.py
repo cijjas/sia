@@ -1,20 +1,18 @@
 class Node:
-    def __init__(self, state, parent=None, action=None, path=None):
+    def __init__(self, state,parent=None, path_cost=0, heuristic=0):
         self.state = state
         self.parent = parent
-        self.action = action
-        self.path = path or []
-        
-    def generate_successors(self):
-        successors = []
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # Possible directions to move
-        for direction in directions:
-            if self.state.can_move(*direction):
-                new_state = self.state.move_player(*direction)
-                if new_state:
-                    new_path = self.path + [direction]
-                    successors.append(Node(new_state, self, direction, new_path))
-        return successors
+        self.path_cost = path_cost
+        self.heuristic = heuristic
+        self.total_cost = self.path_cost + self.heuristic
 
-    def is_goal(self):
-        return self.state.goal_reached()
+    def __lt__(self, other):
+        return self.total_cost < other.total_cost
+    
+    def get_path(self):
+        node, path_back = self, []
+        while node:
+            path_back.append((node.action, node.state))
+            node = node.parent
+        return list(reversed(path_back))[1:]
+        
