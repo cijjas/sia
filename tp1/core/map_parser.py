@@ -36,6 +36,12 @@ def parse_map(map_file):
                 map_data['player'] = (x, y)
             elif char == map_object['space']:
                 map_data['spaces'].add((x, y))
+            elif char == map_object['player_on_goal']:
+                map_data['player'] = (x, y)
+                map_data['goals'].add((x, y))
+            elif char == map_object['box_on_goal']:
+                map_data['boxes'].add((x, y))
+                map_data['goals'].add((x, y))
 
     return map_data
 
@@ -53,4 +59,3 @@ def print_map(map_data):
             else:
                 print(' ', end='')
         print()
-    
