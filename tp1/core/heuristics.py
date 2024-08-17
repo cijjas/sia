@@ -24,7 +24,7 @@ class MinManhattan(Heuristic):
                     min_distance = distance
             total_distance += min_distance
         return total_distance
-    
+
 class MinEuclidean(Heuristic):
     """ Returns the sum of the euclidean distances between each box and its closest goal """
     def __call__(self, state: State) -> float:
@@ -38,6 +38,7 @@ class MinEuclidean(Heuristic):
             total_distance += min_distance
         return total_distance
 
+# Careful with tunnels to do check
 class DeadlockCorner(Heuristic):
     """ Returns the sum of the euclidean distances between each box and its closest goal """
     def __call__(self, state: State) -> float:
@@ -45,4 +46,3 @@ class DeadlockCorner(Heuristic):
             if state.is_in_corner(box[0], box[1]) and box not in state.goals:
                 return float('inf')
         return MinManhattan()(state)
-

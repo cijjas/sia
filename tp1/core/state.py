@@ -23,7 +23,7 @@ class State:
         east = self.retrieve(x + 1, y)
         west = self.retrieve(x - 1, y)
 
-        # we defina a circular list to check the corners
+        # we define a a circular list to check the corners
         neighbors = [north, east, south, west]
 
         # if there are two walls in a row, we have a corner
@@ -31,13 +31,12 @@ class State:
             if neighbors[i%4] == 'wall' and neighbors[(i + 1)%4] == 'wall':
                 return True
 
-
     def __eq__(self, other):
         return self.boxes == other.boxes and self.player == other.player
-    
+
     def __hash__(self):
         return hash((tuple(self.boxes), self.player))
-    
+
     def __str__(self):
         objects = {
             'walls': self.walls,
@@ -57,7 +56,7 @@ class State:
             if (new_box_x, new_box_y) in self.walls or (new_box_x, new_box_y) in self.boxes:
                 return False
         return True
-    
+
     def move_player(self, dx, dy):
         if not self.can_move(dx, dy):
             return None
@@ -68,25 +67,16 @@ class State:
             new_box = (new_player[0] + dx, new_player[1] + dy)
             new_boxes.add(new_box)
         return State(self.walls, self.goals, new_boxes, new_player)
-    
+
     def is_goal(self):
         return all(box in self.goals for box in self.boxes)
-    
+
     def get_actions(self):
         actions = []
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             if self.can_move(dx, dy):
                 actions.append((dx, dy))
         return actions
-    
 
-
-# corners are:
-##  ##
-#    #
-
-#    #
-##  ##
-
-        
-
+    def __str__(self):
+        return f'State (\'{self.boxes}\', {self.player})'
