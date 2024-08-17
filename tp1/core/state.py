@@ -1,9 +1,10 @@
 class State:
-    def __init__(self, walls, goals, boxes, player):
+    def __init__(self, walls, goals, boxes, player, corners):
         self.walls = walls
         self.goals = goals
         self.boxes = boxes
         self.player = player
+        self.corners = corners
 
 
     def __eq__(self, other):
@@ -18,6 +19,7 @@ class State:
             'goals': self.goals,
             'boxes': self.boxes,
             'player': self.player,
+            'corners': self.corners,
         }
         return str(objects)
 
@@ -41,7 +43,7 @@ class State:
             box_index = new_boxes.index(new_player)
             new_box = (new_player[0] + dx, new_player[1] + dy)
             new_boxes[box_index] = new_box
-        return State(self.walls, self.goals, new_boxes, new_player)
+        return State(self.walls, self.goals, new_boxes, new_player, self.corners)
     
     def is_goal(self):
         return all(box in self.goals for box in self.boxes)
@@ -52,4 +54,6 @@ class State:
             if self.can_move(dx, dy):
                 actions.append((dx, dy))
         return actions
-       
+    
+    def is_corner(self, x, y):
+        return (x, y) in self.corners

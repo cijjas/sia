@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from core.state import State
+from core.heuristics import Heuristic
 
 class Algorithm(ABC):
     @abstractmethod
@@ -51,3 +52,20 @@ class BFS(Algorithm):
     def get_frontier(self) -> list:
         return self.frontier
 
+class Greedy(Algorithm):
+    def __init__(self, heuristic: Heuristic):
+        self.frontier = []
+        self.heuristic = heuristic
+
+    def get(self) -> State:
+        self.frontier.sort(key=lambda state: self.heuristic(state))
+        return self.frontier.pop(0)
+
+    def put(self, state: State) -> None:
+        self.frontier.append(state)
+
+    def is_empty(self) -> bool:
+        return len(self.frontier) == 0
+
+    def get_frontier(self) -> list:
+        return self.frontier
