@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
-from core.state import State
 from core.heuristics import Heuristic
+from core.node import Node
 
 class Algorithm(ABC):
     @abstractmethod
-    def get(self) -> State:
+    def get(self) -> Node:
         pass
 
     @abstractmethod
-    def put(self, state: State) -> None:
+    def put(self, state: Node) -> None:
         pass
 
     @abstractmethod
@@ -24,11 +24,11 @@ class DFS(Algorithm):
     def __init__(self):
         self.frontier = []
 
-    def get(self) -> State:
+    def get(self) -> Node:
         return self.frontier.pop()
 
-    def put(self, state: State) -> None:
-        self.frontier.append(state)
+    def put(self, node: Node) -> None:
+        self.frontier.append(node)
 
     def is_empty(self) -> bool:
         return len(self.frontier) == 0
@@ -40,10 +40,10 @@ class BFS(Algorithm):
     def __init__(self):
         self.frontier = []
 
-    def get(self) -> State:
+    def get(self) -> Node:
         return self.frontier.pop(0)
 
-    def put(self, state: State) -> None:
+    def put(self, state: Node) -> None:
         self.frontier.append(state)
 
     def is_empty(self) -> bool:
@@ -57,12 +57,12 @@ class Greedy(Algorithm):
         self.frontier = []
         self.heuristic = heuristic
 
-    def get(self) -> State:
+    def get(self) -> Node:
         self.frontier.sort(key=lambda state: self.heuristic(state))
         return self.frontier.pop(0)
 
-    def put(self, state: State) -> None:
-        self.frontier.append(state)
+    def put(self, node: Node) -> None:
+        self.frontier.append(node)
 
     def is_empty(self) -> bool:
         return len(self.frontier) == 0
