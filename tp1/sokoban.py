@@ -1,6 +1,8 @@
 import pygame
 from core.state import State
 from core.map_parser import parse_map
+from core.search_engine import search
+from core.algorithms import DFS, BFS
 
 import sys
 
@@ -56,34 +58,46 @@ def main():
     images = load_images(TILE_SIZE)
     clock = pygame.time.Clock()
     running = True
-    
 
-    while running:
+    def inner_draw_board(state:State):
+        draw_board(screen, state, images, TILE_SIZE, map_width, map_height)
+        pygame.display.flip()
+    
+    search_result = search(BFS(), game_state, inner_draw_board)
+
+    draw_board(screen, search_result, images, TILE_SIZE, map_width, map_height)
+    pygame.display.flip()
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    new_state = game_state.move_player(0, 1)
-                    if new_state:
-                        game_state = new_state
-                elif event.key == pygame.K_RIGHT:
-                    new_state = game_state.move_player(1, 0)
-                    if new_state:
-                        game_state = new_state
-                elif event.key == pygame.K_UP:
-                    new_state = game_state.move_player(0, -1)
-                    if new_state:
-                        game_state = new_state
-                elif event.key == pygame.K_LEFT:
-                    new_state = game_state.move_player(-1, 0)
-                    if new_state:
-                        game_state = new_state
-                
-        draw_board(screen, game_state, images, TILE_SIZE, map_width, map_height)
-        pygame.display.flip()
-        clock.tick(60)
+                break
 
+#    while running:
+#        for event in pygame.event.get():
+#            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+#                running = False
+#            elif event.type == pygame.KEYDOWN:
+#                if event.key == pygame.K_DOWN:
+#                    new_state = game_state.move_player(0, 1)
+#                    if new_state:
+#                        game_state = new_state
+#                elif event.key == pygame.K_RIGHT:
+#                    new_state = game_state.move_player(1, 0)
+#                    if new_state:
+#                        game_state = new_state
+#                elif event.key == pygame.K_UP:
+#                    new_state = game_state.move_player(0, -1)
+#                    if new_state:
+#                        game_state = new_state
+#                elif event.key == pygame.K_LEFT:
+#                    new_state = game_state.move_player(-1, 0)
+#                    if new_state:
+#                        game_state = new_state
+#                
+#        draw_board(screen, game_state, images, TILE_SIZE, map_width, map_height)
+#        pygame.display.flip()
+#        clock.tick(60)
+    
     pygame.quit()
     
 

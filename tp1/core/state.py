@@ -1,5 +1,3 @@
-from core.action import Action
-
 class State:
     def __init__(self, walls, goals, boxes, player):
         self.walls = walls
@@ -48,5 +46,10 @@ class State:
     def is_goal(self):
         return all(box in self.goals for box in self.boxes)
     
-    
+    def get_actions(self):
+        actions = []
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+            if self.can_move(dx, dy):
+                actions.append((dx, dy))
+        return actions
        

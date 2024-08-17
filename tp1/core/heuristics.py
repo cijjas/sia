@@ -1,4 +1,8 @@
-import functions as f
+def manhattan(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def euclidean(a, b):
+    return ((a[0] - b[0])**2 + (a[1] - b[1])**2)**0.5
 
 def min_manhattan(target_positions: set):
     def heuristic(state):
@@ -6,7 +10,7 @@ def min_manhattan(target_positions: set):
         for box in state.box_positions:
             min_distance = float('inf')
             for target in target_positions:
-                distance = f.manhattan(box, target)
+                distance = manhattan(box, target)
                 if distance < min_distance:
                     min_distance = distance
             total_distance += min_distance
@@ -19,7 +23,7 @@ def min_euclidean(target_positions: set):
         for box in state.box_positions:
             min_distance = float('inf')
             for target in target_positions:
-                distance = f.euclidean(box, target)
+                distance = euclidean(box, target)
                 if distance < min_distance:
                     min_distance = distance
             total_distance += min_distance
