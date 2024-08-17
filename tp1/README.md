@@ -4,11 +4,11 @@
 Matriz de 3x3 donde cada valor es un char y el vacio es representado por el '\0'. Es decir, cada número del tablero lo representamos como char (1 es '1', 2 es '2', y así)
 La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
 Por ejemplo
-3 2 1   
+3 2 1
 4 0 6
 7 8 5
 Se reordena a la matriz a la forma canonica definida
-1 6 5 
+1 6 5
 2 0 8
 3 4 7
 De esta manera, podemos comparar rotaciones del tablero que pueden llegar a representar el mismo estado.
@@ -35,7 +35,7 @@ Matriz de NxM de posicion donde ademas se incluye el elemento en esa posicion, e
 - Caja en lugar correcto
 Se le suman estados logicos utiles para optimizar el BFS
 - Estados repetidos para no hacer loops infinitos
-- Estados bloqueados para que el BFS los descarte instantaneamente 
+- Estados bloqueados para que el BFS los descarte instantaneamente
 ### Key Points:
 - Usar arcade library para generar los mapas
 - Definir un buen equals de estados que optimize la busqueda, constantemente va a estar revisando si alguno de los posibles estados es repetido
@@ -43,3 +43,10 @@ Se le suman estados logicos utiles para optimizar el BFS
 - Comparar siempre con la respuesta optima del BFS, si no es la misma entonces es un heuristica inadmisible
 - Toda heuristica genera un trade off entre memoria y tiempo, procesas mas profundamente pero explotas menos nodos
 - Hay heuristicas inadmisibles que son muy fuertes en ciertos mapas, son interesantes para plantear
+
+
+
+
+# ISSUES
+- Problema de is_dead(), hay que tener en cuenta si es accesible y si movible, cuando se analiza una box el las otras se interpretan como paredes, hay que medio tener en cuenta todo el entorno, es liviano en comparacion con la branch enorme que estaria cortando del arbol
+- Crear algoritmos restantes

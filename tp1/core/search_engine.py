@@ -18,20 +18,20 @@ def search(algorithm: Algorithm, state: State, draw_board: Optional[callable] = 
     while not algorithm.is_empty():
 
         current = algorithm.get()
-        
+
         if current.is_goal():
             return current
-        
+
         if current not in explored:
             explored.add(current)
-            
+
             for child in get_children(current):
                 if child not in explored:
                     algorithm.put(child)
-        
+
         if draw_board is not None:
             draw_board(current)
-        
+
         #sleep(0.1)
 
     return None
