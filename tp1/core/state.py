@@ -1,10 +1,35 @@
 class State:
-    def __init__(self, walls, goals, boxes, player, corners):
+    def __init__(self, walls: set, goals: set, boxes: set, player):
         self.walls = walls
         self.goals = goals
         self.boxes = boxes
         self.player = player
-        self.corners = corners
+
+    def retrieve(self, x, y) -> str:
+        if (x, y) in self.walls: # O(1)
+            return 'wall'
+        elif (x, y) in self.goals:
+            return 'goal'
+        elif (x, y) in self.boxes:
+            return 'box'
+        elif (x, y) == self.player:
+            return 'player'
+        else:
+            return None
+
+    def is_in_corner(self, x, y):
+        north = self.retrieve(x, y - 1)
+        south = self.retrieve(x, y + 1)
+        east = self.retrieve(x + 1, y)
+        west = self.retrieve(x - 1, y)
+
+        # we defina a circular list to check the corners
+        neighbors = [north, east, south, west]
+
+        # if there are two walls in a row, we have a corner
+        for i in range(4):
+            if neighbors[i%4] == 'wall' and neighbors[(i + 1)%4] == 'wall':
+                return True
 
 
     def __eq__(self, other):
@@ -18,8 +43,7 @@ class State:
             'walls': self.walls,
             'goals': self.goals,
             'boxes': self.boxes,
-            'player': self.player,
-            'corners': self.corners,
+            'player': self.player
         }
         return str(objects)
 
@@ -40,10 +64,10 @@ class State:
         new_player = (self.player[0] + dx, self.player[1] + dy)
         new_boxes = self.boxes.copy()
         if new_player in new_boxes:
-            box_index = new_boxes.index(new_player)
+            new_boxes.remove(new_player)
             new_box = (new_player[0] + dx, new_player[1] + dy)
-            new_boxes[box_index] = new_box
-        return State(self.walls, self.goals, new_boxes, new_player, self.corners)
+            new_boxes.add(new_box)
+        return State(self.walls, self.goals, new_boxes, new_player)
     
     def is_goal(self):
         return all(box in self.goals for box in self.boxes)
@@ -55,5 +79,14 @@ class State:
                 actions.append((dx, dy))
         return actions
     
-    def is_corner(self, x, y):
-        return (x, y) in self.corners
+
+
+# corners are:
+##  ##
+#    #
+
+#    #
+##  ##
+
+        
+

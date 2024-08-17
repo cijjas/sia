@@ -52,7 +52,7 @@ def main():
     map_width = map_data['width']
     map_height = map_data['height']
 
-    game_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['corners'])
+    game_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
     screen = pygame.display.set_mode((map_width* TILE_SIZE, map_height * TILE_SIZE))
     
     

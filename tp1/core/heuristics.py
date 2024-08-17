@@ -42,7 +42,7 @@ class DeadlockCorner(Heuristic):
     """ Returns the sum of the euclidean distances between each box and its closest goal """
     def __call__(self, state: State) -> float:
         for box in state.boxes:
-            if state.is_corner(box[0], box[1]) and box not in state.goals:
+            if state.is_in_corner(box[0], box[1]) and box not in state.goals:
                 return float('inf')
         return MinManhattan()(state)
 
