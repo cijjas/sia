@@ -32,6 +32,6 @@ def search(algorithm: Algorithm, state: State, draw_board: Optional[callable] = 
         if draw_board is not None:
             draw_board(current)
         
-        sleep(0.02)
+        #sleep(0.1)
 
     return None

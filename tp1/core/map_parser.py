@@ -7,8 +7,22 @@ map_object = {
     "box": "$",
     "player_on_goal": "p",
     "box_on_goal": "*",
-    "empty": " ",
+    "space": " ",
 }
+
+def find_corners(map_data):
+    corners = []
+    for space in map_data['spaces']:
+        x, y = space
+        if (x + 1, y) in map_data['walls'] and (x, y + 1) in map_data['walls']:
+            corners.append(space)
+        elif (x - 1, y) in map_data['walls'] and (x, y + 1) in map_data['walls']:
+            corners.append(space)
+        elif (x + 1, y) in map_data['walls'] and (x, y - 1) in map_data['walls']:
+            corners.append(space)
+        elif (x - 1, y) in map_data['walls'] and (x, y - 1) in map_data['walls']:
+            corners.append(space)
+    return corners
 
 def parse_map(map_file):
     with open(f'{map_file}', 'r') as f:
@@ -20,6 +34,8 @@ def parse_map(map_file):
         'walls' : [],
         'goals' : [],
         'boxes' : [],
+        'corners' : [],
+        'spaces' : [],
         'player' : None,
     }
 
@@ -33,7 +49,10 @@ def parse_map(map_file):
                 map_data['boxes'].append((x, y))
             elif char == map_object['player']:
                 map_data['player'] = (x, y)
-           
+            elif char == map_object['space']:
+                map_data['spaces'].append((x, y))
+    
+    map_data['corners'] = find_corners(map_data)
 
     return map_data
 

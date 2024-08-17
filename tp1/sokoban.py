@@ -2,7 +2,8 @@ import pygame
 from core.state import State
 from core.map_parser import parse_map
 from core.search_engine import search
-from core.algorithms import DFS, BFS
+from core.algorithms import *
+from core.heuristics import *
 
 import sys
 
@@ -51,7 +52,7 @@ def main():
     map_width = map_data['width']
     map_height = map_data['height']
 
-    game_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
+    game_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['corners'])
     screen = pygame.display.set_mode((map_width* TILE_SIZE, map_height * TILE_SIZE))
     
     
@@ -63,7 +64,8 @@ def main():
         draw_board(screen, state, images, TILE_SIZE, map_width, map_height)
         pygame.display.flip()
     
-    search_result = search(BFS(), game_state, inner_draw_board)
+    # greedy with min manhattan
+    search_result = search(Greedy(DeadlockCorner()), game_state, inner_draw_board)
 
     draw_board(screen, search_result, images, TILE_SIZE, map_width, map_height)
     pygame.display.flip()
