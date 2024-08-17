@@ -10,20 +10,6 @@ map_object = {
     "space": " ",
 }
 
-def find_corners(map_data):
-    corners = []
-    for space in map_data['spaces']:
-        x, y = space
-        if (x + 1, y) in map_data['walls'] and (x, y + 1) in map_data['walls']:
-            corners.append(space)
-        elif (x - 1, y) in map_data['walls'] and (x, y + 1) in map_data['walls']:
-            corners.append(space)
-        elif (x + 1, y) in map_data['walls'] and (x, y - 1) in map_data['walls']:
-            corners.append(space)
-        elif (x - 1, y) in map_data['walls'] and (x, y - 1) in map_data['walls']:
-            corners.append(space)
-    return corners
-
 def parse_map(map_file):
     with open(f'{map_file}', 'r') as f:
         lines = f.readlines()
@@ -31,28 +17,25 @@ def parse_map(map_file):
     map_data = {
         'height' : len(lines),
         'width' : max(len(line) for line in lines) - 1,
-        'walls' : [],
-        'goals' : [],
-        'boxes' : [],
-        'corners' : [],
-        'spaces' : [],
+        'walls' : set(),
+        'goals' : set(),
+        'boxes' : set(),
+        'spaces' : set(),
         'player' : None,
     }
 
     for y, line in enumerate(lines):
         for x, char in enumerate(line):
             if char == map_object['wall']:
-                map_data['walls'].append((x, y))
+                map_data['walls'].add((x, y))
             elif char == map_object['goal']:
-                map_data['goals'].append((x, y))
+                map_data['goals'].add((x, y))
             elif char == map_object['box']:
-                map_data['boxes'].append((x, y))
+                map_data['boxes'].add((x, y))
             elif char == map_object['player']:
                 map_data['player'] = (x, y)
             elif char == map_object['space']:
-                map_data['spaces'].append((x, y))
-    
-    map_data['corners'] = find_corners(map_data)
+                map_data['spaces'].add((x, y))
 
     return map_data
 
