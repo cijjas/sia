@@ -7,23 +7,18 @@ def bfs(start_node=Node):
     frontier = deque([start_node])
     explored = set()
 
-
     while frontier:
         current_node = frontier.popleft()
         
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes
         
-        if current_node not in explored:
-            expanded_nodes += 1
-            explored.add(current_node)
-
-            if current_node.is_dead_end():
-                continue
-
-            for child in current_node.get_children():
-                if child not in explored:
-                    frontier.append(child)
-
+        expanded_nodes += 1
+        for child in current_node.get_children():
+            if child not in explored:
+                explored.add(child)
+                child.parent = current_node
+                frontier.append(child)
 
     return None, expanded_nodes
+
