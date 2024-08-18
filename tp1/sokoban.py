@@ -4,6 +4,8 @@ from core.node import Node
 from core.map_parser import parse_map
 from core.heuristics import *
 from algorithms.bfs import bfs
+from algorithms.greedy import global_greedy
+from algorithms.greedy import local_greedy
 import sys
 
 TILE_SIZE = 64
@@ -99,10 +101,10 @@ def main():
     # Initial Values
     map_data = parse_map(sys.argv[1])
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
-    initial_node = Node(initial_state, None, 0, 0)
+    initial_node = Node(initial_state, None, 0, 0, DeadlockCorner())
 
     # Use Search Algorithm
-    search_result, expanded_nodes = bfs(initial_node)
+    search_result, expanded_nodes = local_greedy(initial_node)
 
     # Results
     print(f"Expanded Nodes: {expanded_nodes}")
