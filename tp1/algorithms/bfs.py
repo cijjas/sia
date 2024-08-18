@@ -1,24 +1,29 @@
 from collections import deque
 from core.node import Node
 
-def bfs(start_node):
+def bfs(start_node=Node):
     # Initialize Fr and Ex
+    expanded_nodes = 0
     frontier = deque([start_node])
     explored = set()
 
-    # Check if start node is goal
-    if start_node.state.is_goal():
-        return []
 
     while frontier:
         current_node = frontier.popleft()
-        explored.add(current_node.state)
+        
+        if current_node.is_goal():
+            return current_node.get_path(), expanded_nodes
+        
+        if current_node not in explored:
+            expanded_nodes += 1
+            explored.add(current_node)
 
-        for action in current_node.state.get_actions():
-            next_state = current_node.state.move_player(*action)
-            if next_state and next_state not in explored:
-                next_node = Node(next_state, current_node, action, current_node.path_cost + 1)
-                if next_node.state.is_goal():
-                    return next_node.get_path()
-                frontier.append(next_node)
-    return None
+            if current_node.is_dead_end():
+                continue
+
+            for child in current_node.get_children():
+                if child not in explored:
+                    frontier.append(child)
+
+
+    return None, expanded_nodes

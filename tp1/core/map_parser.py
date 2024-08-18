@@ -5,7 +5,7 @@ map_object = {
     "wall": "#",
     "goal": ".",
     "box": "$",
-    "player_on_goal": "p",
+    "player_on_goal": "+",
     "box_on_goal": "*",
     "space": " ",
 }
