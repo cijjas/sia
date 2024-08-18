@@ -2,7 +2,6 @@ import pygame
 from core.state import State
 from core.node import Node
 from core.map_parser import parse_map
-from core.search_engine import search
 from core.heuristics import *
 from algorithms.bfs import bfs
 import sys
@@ -23,7 +22,7 @@ def load_images(tile_size):
         ' ': pygame.image.load('core/resources/empty.jpg').convert_alpha(),
         '.': pygame.image.load('core/resources/goal.png').convert_alpha(),
         '*': pygame.image.load('core/resources/box_on_goal.png').convert_alpha(),
-        'p': pygame.image.load('core/resources/player.jpg').convert_alpha()
+        '+': pygame.image.load('core/resources/player.jpg').convert_alpha()
     }
 
     for key in images:
@@ -48,7 +47,7 @@ def draw_board(screen, map_data, images, tile_size, map_width, map_height):
     for x, y in goals & boxes:
         screen.blit(images['*'], (x * tile_size, y * tile_size))
     for x, y in goals & {player}:
-        screen.blit(images['p'], (x * tile_size, y * tile_size))
+        screen.blit(images['+'], (x * tile_size, y * tile_size))
     screen.blit(images['@'], (player[0] * tile_size, player[1] * tile_size))
 
 def show_action_sequence(action_sequence, game_state, map_data):
@@ -69,7 +68,6 @@ def show_action_sequence(action_sequence, game_state, map_data):
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key in direction_to_key.values():
-                    # Assuming the direction is mapped directly to the event.key in direction_to_key
                     for direction, key in direction_to_key.items():
                         if key == event.key:
                             new_state = game_state.move_player(*direction)
@@ -84,9 +82,9 @@ def show_action_sequence(action_sequence, game_state, map_data):
             key_event = pygame.event.Event(pygame.KEYDOWN, key=direction_to_key[direction])
             pygame.event.post(key_event)
             path_index += 1
-            pygame.time.delay(500)  # Add delay to see each move
+            pygame.time.delay(1)
 
-        clock.tick(60)
+        clock.tick(1000)
 
     pygame.quit()
 
@@ -104,9 +102,10 @@ def main():
     initial_node = Node(initial_state, None, 0, 0)
 
     # Use Search Algorithm
-    search_result = bfs(initial_node)
+    search_result, expanded_nodes = bfs(initial_node)
 
     # Results
+    print(f"Expanded Nodes: {expanded_nodes}")
     print(search_result)
     show_action_sequence(search_result, initial_state, map_data)
 
