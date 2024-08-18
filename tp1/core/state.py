@@ -62,7 +62,7 @@ class State:
         actions = []
         states = []
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            if self.can_move(dx, dy) and not self.is_deadlock():
+            if self.can_move(dx, dy) :
                 states.append(self.move_player(dx, dy))
                 actions.append((dx, dy))
         return actions, states

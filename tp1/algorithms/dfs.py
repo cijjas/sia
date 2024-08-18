@@ -1,6 +1,10 @@
 from collections import deque
 from core.node import Node
 
+
+# Basado en 
+# https://en.wikipedia.org/wiki/Breadth-first_search#:~:text=Breadth%2Dfirst%20search%20(BFS),at%20the%20next%20depth%20level.
+
 def dfs(start_node=Node):
     # Initialize Fr and Ex
     expanded_nodes = 0
