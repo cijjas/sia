@@ -2,18 +2,14 @@ from core.state import State
 from core.heuristics import Heuristic
 
 class Node:
-    def __init__(self, state: State, parent=None, action=None, path_cost=0, heuristic: Heuristic = lambda x: 0):
+    def __init__(self, state: State, parent=None, action=None, path_cost=0):
         self.state = state
         self.parent = parent
         self.action = action  # Track the action leading to this node
-        self.action = action  # Track the action leading to this node
         self.path_cost = path_cost
-        self.heuristic = heuristic
-        self.heuristic_value = self.heuristic(state)
-        self.total_cost = self.path_cost + self.heuristic_value
 
     def __lt__(self, other):
-        return self.total_cost < other.total_cost
+        return self.path_cost < other.path_cost
 
     def get_path(self):
         actions = []
@@ -29,7 +25,7 @@ class Node:
 
     def get_children(self):
         actions, states = self.state.get_actions()
-        return [Node(state, self, action, self.path_cost + 1, self.heuristic) for action, state in zip(actions, states)]
+        return [Node(state, self, action, self.path_cost + 1) for action, state in zip(actions, states)]
 
     def is_goal(self):
         return self.state.is_goal()
