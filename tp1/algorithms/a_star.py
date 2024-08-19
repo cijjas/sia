@@ -6,11 +6,12 @@ from core.heuristics import Heuristic
 # https://en.wikipedia.org/wiki/A*_search_algorithm
 
 
-def a_star(start_node=Node, heuristic: Heuristic = lambda x: 0):
+def a_star(start_node=Node, heuristics=None):
     open_set = [] # expanded nodes
     expanded_nodes = 0
     g_score = {start_node: 0} # mapa de nodos a g_score
-    f_score = {start_node: heuristic(start_node.state)} # nodo a f_score
+    f_score = {start_node: max(heuristic(start_node.state) for heuristic in heuristics)}
+
     heapq.heappush(open_set, (f_score[start_node], start_node))
 
     while open_set:
@@ -25,7 +26,7 @@ def a_star(start_node=Node, heuristic: Heuristic = lambda x: 0):
             tentative_g_score = g_score[current_node] + 1 # asumiendo uniform cost
             if tentative_g_score < g_score.get(child, float('inf')): # si el nodo no esta en g_score, devuelve inf
                 g_score[child] = tentative_g_score
-                f_score[child] = tentative_g_score + heuristic(child.state)
+                f_score[child] = tentative_g_score + max(heuristic(child.state) for heuristic in heuristics) 
                 heapq.heappush(open_set, (f_score[child], child))
 
     return None, expanded_nodes, len(open_set)
