@@ -108,7 +108,7 @@ def main():
 
     # Use Search Algorithm
     start_time = time.time()
-    search_result, expanded_nodes, frontier_count = a_star(initial_node)
+    search_result, expanded_nodes, frontier_count = a_star(initial_node, [ DeadlockCorner()])
     end_time = time.time() - start_time
     # hay que devolver
     # - resultado (exito o fracaso)         X
