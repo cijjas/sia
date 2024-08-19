@@ -8,11 +8,10 @@ from core.heuristics import Heuristic
 
 def a_star(start_node=Node, heuristic: Heuristic = lambda x: 0):
     open_set = [] # expanded nodes
-    heapq.heappush(open_set, (0, start_node)) # (f_score, node)
     expanded_nodes = 0
     g_score = {start_node: 0} # mapa de nodos a g_score
     f_score = {start_node: heuristic(start_node.state)} # nodo a f_score
-
+    heapq.heappush(open_set, (f_score[start_node], start_node))
     while open_set:
         # heapq agarra por default el primer elemento de la tupla para comparar
         _, current_node = heapq.heappop(open_set) # Pop the smallest item off the heap, maintaining the heap invariant.

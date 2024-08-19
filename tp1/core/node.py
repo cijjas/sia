@@ -8,6 +8,8 @@ class Node:
         self.action = action  # Track the action leading to this node
         self.path_cost = path_cost
 
+    def __lt__(self, other):
+        return self.path_cost < other.path_cost
 
     def get_path(self):
         actions = []

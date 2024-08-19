@@ -11,6 +11,16 @@ from algorithms.a_star import a_star
 from algorithms.iddfs import iddfs
 import sys
 
+algorithm_descriptions = {
+    'BFS': "BFS is an algorithm for traversing or searching tree or graph data structures. It starts at a selected node (the root) and explores all of its neighboring nodes at the present depth prior to moving on to nodes at the next depth level. BFS is particularly useful for finding the shortest path on unweighted graphs.",
+    'DFS': "DFS is an algorithm for traversing or searching tree or graph data structures. It starts at the root node and explores as far as possible along each branch before backtracking. This method uses a stack data structure, either implicitly through recursive calls or explicitly using an iterative approach.",
+    'Global Greedy': "Global Greedy Search: Selects nodes based on a heuristic that estimates the cost from the start.Global Greedy Search (often simply called Greedy Best-First Search) is a search algorithm that expands the node that appears most promising by some heuristic. Unlike A*, it doesn’t consider the cost to reach the node but only the estimated cost from the node to the goal. This often makes it faster but less accurate and not guaranteed to find the shortest path.",
+    'Local Greedy': "Local Greedy Search: Chooses the next node based on local optimality conditions.Local Greedy Search, similar to global greedy search, makes the locally optimal choice at each stage with the hope of finding a global optimum. In practice, this can mean selecting a path that appears best at the moment but doesn't consider the entire path cost, potentially missing better routes available with a more comprehensive view.",
+    'A*': "A* Search: Combines BFS's completeness and DFS's optimality with a heuristic.A* is a pathfinding and graph traversal algorithm that is often used in many fields of computer science due to its efficiency and accuracy. It employs heuristics to estimate the cost of the cheapest path from the current node to the goal, thereby exploring the most promising paths first. A* is complete and optimal, given that the heuristic function is admissible.",
+    'IDDFS': "IDDFS combines the space-efficiency of Depth-First Search (DFS) with the optimal properties of Breadth-First Search (BFS). It iteratively deepens the depth at which DFS is performed. Starting with a depth of one, it incrementally increases the depth limit until the goal is found. This method is particularly useful when the depth of the solution is not known and the space is large."
+}
+
+
 TILE_SIZE = 40
 direction_to_key = {
     (0, 1): pygame.K_DOWN,   # Moving down
@@ -78,52 +88,6 @@ def show_action_sequence(action_sequence, game_state, map_data):
     return
 
 
-def main_menu(screen, font, map_name, game_state, images, map_data, algorithm_finished):
-    options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']
-    buttons = {}
-    menu_width = 300  # Width reserved for the menu
-
-    # Position algorithm buttons only if algorithm has not finished
-    if not algorithm_finished:
-        for i, option in enumerate(options):
-            buttons[option] = (50, 50 + 40 * i, 200, 35)
-
-    separator_y = 50 + 40 * len(options) + 20  # Position for the separator line
-
-    # Only show 'Reset' button if the algorithm has finished
-    if algorithm_finished:
-        buttons['Reset'] = (50, separator_y + 20, 200, 35)
-
-    while True:
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                for key, (bx, by, bw, bh) in buttons.items():
-                    if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh:
-                        return key  # Return the clicked algorithm or 'Reset'
-
-        screen.fill((6, 20, 6))  # Clear screen
-        pygame.draw.line(screen, (100, 100, 100), (menu_width, 0), (menu_width, 768), 1)  # Draw vertical line
-        
-        text = font.render(map_name, True, (255, 255, 255))
-        screen.blit(text, (50, 710))
-
-        pygame.draw.line(screen, (255, 255, 255), (40, separator_y - 10), (menu_width - 50, separator_y - 10), 1)  # Draw separator line
-
-        for key, (bx, by, bw, bh) in buttons.items():
-            text_color = (94, 242, 122) if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh else (255, 255, 255)
-            text = font.render(key, True, text_color)
-            screen.blit(text, (bx, by))
-
-        draw_board(screen, game_state, images, TILE_SIZE, 350, 150, map_data)  # Update game state view
-        pygame.display.flip()
-
-        # Wait a bit to reduce CPU usage in a busy loop
-        pygame.time.wait(100)
-
 
 def action_sequence_control(screen, initial_state, images, map_data, is_running, is_paused):
     global game_state
@@ -185,40 +149,116 @@ def run_algorithm(algorithm, initial_node):
     elif algorithm == 'IDDFS':
         return iddfs(initial_node)
 
+def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, algorithm_finished):
+    options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']
+    buttons = {}
+    menu_width = 300  # Width reserved for the menu
+
+    if not algorithm_finished:
+        for i, option in enumerate(options):
+            buttons[option] = (50, 50 + 40 * i, 200, 35)
+
+    separator_y = 50 + 40 * len(options) + 20
+
+    if algorithm_finished:
+        buttons['Reset'] = (50, separator_y + 20, 200, 35)
+
+    while True:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for key, (bx, by, bw, bh) in buttons.items():
+                    if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh:
+                        return key  # Return the clicked algorithm or 'Reset'
+
+        screen.fill((6, 20, 6))
+        pygame.draw.line(screen, (100, 100, 100), (menu_width, 0), (menu_width, 768), 1)
+
+        text = font.render(map_name, True, (255, 255, 255))
+        screen.blit(text, (50, 710))
+
+        pygame.draw.line(screen, (255, 255, 255), (40, separator_y - 10), (menu_width - 50, separator_y - 10), 1)
+
+        for key, (bx, by, bw, bh) in buttons.items():
+            text_color = (94, 242, 122) if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh else (255, 255, 255)
+            text = font.render(key, True, text_color)
+            screen.blit(text, (bx, by))
+
+        draw_board(screen, game_state, images, TILE_SIZE, 350, 150, map_data)
+        pygame.display.flip()
+
+        pygame.time.wait(100)
+
+def render_textbox(screen, text, pos, font, color, max_width):
+    words = text.split(' ')
+    x, y = pos
+    space = font.size(' ')[0]  # Width of a space.
+    current_line = []
+    current_width = 0
+
+    for word in words:
+        word_width = font.size(word)[0]
+        if current_width + word_width >= max_width:
+            # Render the current line then start a new one
+            line_surface = font.render(' '.join(current_line), True, color)
+            # Centering the text:
+            screen.blit(line_surface, (x + (max_width - line_surface.get_width()) // 2, y))
+            y += font.get_height()  # Move y to start a new line
+            current_line = [word]
+            current_width = word_width + space
+        else:
+            current_line.append(word)
+            current_width += word_width + space
+    
+    # Render the last line of text
+    if current_line:
+        line_surface = font.render(' '.join(current_line), True, color)
+        screen.blit(line_surface, (x + (max_width - line_surface.get_width()) // 2, y))
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
-    font = pygame.font.Font("core/resources/fonts/NeueHaasDisplayMediu.ttf", 24)
-    window_title = "Sokoban"
-    pygame.display.set_caption(window_title)
-    input_map = sys.argv[1]
-    map_name = input_map.split('/')[-1].split('.')[0]
-    map_data = parse_map(input_map)
+    font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
+    description_font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
+    map_name = 'Level 1'
+    map_data = parse_map('maps/lvl1.txt')
     images = load_images(TILE_SIZE)
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
 
-    algorithm_finished = False
     current_state = initial_state
+    algorithm_finished = False
+    current_algorithm = ''
 
     while True:
-        choice = main_menu(screen, font, map_name, current_state, images, map_data, algorithm_finished)
-        if choice in ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']:
+        choice = main_menu(screen, font, description_font, map_name, current_state, images, map_data, algorithm_finished)
+        if choice in algorithm_descriptions:
+            current_algorithm = choice
+            description = algorithm_descriptions[current_algorithm]
+            render_textbox(screen, description, (450, 620), description_font, (255, 255, 255), 400)
+
+            pygame.display.flip()
+
+            # Algorithm execution
             initial_node = Node(current_state, None, None, 0)
             search_result, _ = run_algorithm(choice, initial_node)
-            # Execute all actions returned by the algorithm
             for action in search_result:
                 dx, dy = action
                 new_state = current_state.move_player(dx, dy)
                 if new_state:
                     current_state = new_state
-                    draw_board(screen, current_state, images, TILE_SIZE, 350, 150, map_data)
-                    pygame.display.flip()
+                draw_board(screen, current_state, images, TILE_SIZE, 350, 150, map_data)
+                pygame.display.flip()
                 pygame.time.wait(100)
-            algorithm_finished = True  # Set this flag once the algorithm is done
+            algorithm_finished = True
+
         elif choice == 'Reset':
             current_state = initial_state
             algorithm_finished = False  # Reset the flag so algorithms can run again
-
+            current_algorithm = ''
 
 if __name__ == "__main__":
     main()
