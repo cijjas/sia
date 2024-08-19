@@ -1,0 +1,17 @@
+{
+    "data_generation": {
+        "maps": [
+            "lvl0.txt",
+            "lvl1.txt"
+        ],
+        "algorithms": [
+            "BFS",
+            "DFS"
+        ],
+        "heuristics": [
+            "deadlock",
+            "euclidean"
+        ],
+        "iterations_for_average": 10
+    }
+}
