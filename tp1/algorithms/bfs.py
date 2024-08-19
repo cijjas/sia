@@ -11,7 +11,7 @@ def bfs(start_node=Node):
         current_node = frontier.popleft()
         
         if current_node.is_goal():
-            return current_node.get_path(), expanded_nodes
+            return current_node.get_path(), expanded_nodes, len(frontier)
         
         expanded_nodes += 1
         for child in current_node.get_children():
@@ -20,5 +20,5 @@ def bfs(start_node=Node):
                 child.parent = current_node
                 frontier.append(child)
 
-    return None, expanded_nodes
+    return None, expanded_nodes, len(frontier) # No solution
 

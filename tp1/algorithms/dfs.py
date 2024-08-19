@@ -15,7 +15,7 @@ def dfs(start_node=Node):
         current_node = frontier.pop()  
         
         if current_node.is_goal():
-            return current_node.get_path(), expanded_nodes
+            return current_node.get_path(), expanded_nodes, len(frontier)
         
         expanded_nodes += 1
         explored.add(current_node)
@@ -24,4 +24,4 @@ def dfs(start_node=Node):
                 child.parent = current_node
                 frontier.append(child)  # push stack
 
-    return None, expanded_nodes
+    return None, expanded_nodes, len(frontier) 
