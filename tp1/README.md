@@ -48,5 +48,3 @@ Se le suman estados logicos utiles para optimizar el BFS
 
 
 # ISSUES
-- Problema de is_dead(), hay que tener en cuenta si es accesible y si movible, cuando se analiza una box el las otras se interpretan como paredes, hay que medio tener en cuenta todo el entorno, es liviano en comparacion con la branch enorme que estaria cortando del arbol
-- Crear algoritmos restantes

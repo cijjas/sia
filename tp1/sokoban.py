@@ -7,6 +7,7 @@ from algorithms.bfs import bfs
 from algorithms.greedy import global_greedy
 from algorithms.greedy import local_greedy
 from algorithms.iddfs import iddfs
+from algorithms.a_star import a_star
 import time
 import sys
 
@@ -107,14 +108,14 @@ def main():
 
     # Use Search Algorithm
     start_time = time.time()
-    search_result, expanded_nodes, frontier_count = iddfs(initial_node)
+    search_result, expanded_nodes, frontier_count = a_star(initial_node)
     end_time = time.time() - start_time
     # hay que devolver
     # - resultado (exito o fracaso)         X
-    # - costo de la solucion                  (canitdad de pasos?)
+    # - costo de la solucion                X
     # - cantidad de nodos expandidos        X
     # - cantidad de nodos en la frontera    X
-    # - solucion (camino)                   X (acciones tipo up down etc)
+    # - solucion (camino)                   X
     # - tiempo de procesamiento             X
 
     if(search_result is None):
