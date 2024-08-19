@@ -23,7 +23,6 @@ def iddfs(root):
     depth = 0
     total_expanded_nodes = 0  
     while True:
-        print(f"Depth: {depth}")
         found, remaining, expanded_nodes = dls(root, depth)
         total_expanded_nodes += expanded_nodes  
         if found is not None:
