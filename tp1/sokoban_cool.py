@@ -253,11 +253,11 @@ def render_textbox(screen, text, pos, font, color, max_width):
 
 def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
     x, y = pos
+    y_spacing = 20  # Vertical spacing between lines
     for text in texts:
         text_surface = font.render(text, True, color)
         screen.blit(text_surface, (x, y))
-        y += font.get_height()  # Move to the next line after each piece of text
-
+        y += y_spacing
 
 def main():
     pygame.init()
@@ -290,13 +290,12 @@ def main():
             end_time = time.time() - start_time
 
             results_text = (
-                f"Algorithm: {current_algorithm}",
-                f"Time: {end_time:.2f}s",
+                f"{current_algorithm} took {end_time:.2f}s",
                 f"Nodes Expanded: {expanded_nodes}",
                 f"Frontier Size: {frontier_count}"
             )
 
-            render_multiline_left_justified_textbox(screen, results_text, (50, 450), description_font, (255, 255, 255))
+            render_multiline_left_justified_textbox(screen, results_text, (50, 320), description_font, (255, 255, 255))
 
             for action in search_result:
                 dx, dy = action
