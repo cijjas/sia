@@ -7,6 +7,7 @@ from algorithms.bfs import bfs
 from algorithms.greedy import global_greedy
 from algorithms.greedy import local_greedy
 from algorithms.iddfs import iddfs
+import time
 import sys
 
 TILE_SIZE = 64
@@ -105,12 +106,29 @@ def main():
     initial_node = Node(initial_state, None, None, 0)
 
     # Use Search Algorithm
-    search_result, expanded_nodes = iddfs(initial_node)
+    start_time = time.time()
+    search_result, expanded_nodes, frontier_count = iddfs(initial_node)
+    end_time = time.time() - start_time
+    # hay que devolver
+    # - resultado (exito o fracaso)         X
+    # - costo de la solucion                  (canitdad de pasos?)
+    # - cantidad de nodos expandidos        X
+    # - cantidad de nodos en la frontera    X
+    # - solucion (camino)                   X (acciones tipo up down etc)
+    # - tiempo de procesamiento             X
 
-    # Results
+    if(search_result is None):
+        print("No solution found")
+    else:
+        print("Solution found")
+
+    print (f"Path: {search_result}")
     print(f"Expanded Nodes: {expanded_nodes}")
-    print(search_result)
-    show_action_sequence(search_result, initial_state, map_data)
+    print(f"Frontier Count: {frontier_count}")
+    print(f"Path Length: {len(search_result)}")
+    print(f"Time: {end_time}")
+
+    # show_action_sequence(search_result, initial_state, map_data)
 
 if __name__ == "__main__":
     main()

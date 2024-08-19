@@ -9,6 +9,7 @@ from algorithms.greedy import global_greedy
 from algorithms.greedy import local_greedy
 from algorithms.a_star import a_star
 from algorithms.iddfs import iddfs
+import time
 import sys
 
 algorithm_descriptions = {
@@ -44,6 +45,37 @@ def load_images(tile_size):
     for key in images:
         images[key] = pygame.transform.scale(images[key], (tile_size, tile_size))
     return images
+
+
+def render_left_justified_textbox(screen, text, pos, font, color, max_width):
+    words = text.split(' ')
+    x, y = pos
+    space = font.size(' ')[0]  # Width of a space.
+    current_line = []
+    current_width = 0
+
+    lines = []
+    # Split words into lines
+    for word in words:
+        word_width = font.size(word)[0]
+        if current_width + word_width >= max_width:
+            lines.append(' '.join(current_line))
+            current_line = [word]
+            current_width = word_width + space
+        else:
+            current_line.append(word)
+            current_width += word_width + space
+
+    if current_line:
+        lines.append(' '.join(current_line))
+
+    # Render each line left-justified
+    current_y = y
+    for line in lines:
+        line_surface = font.render(line, True, color)
+        screen.blit(line_surface, (x, current_y))
+        current_y += font.get_height()
+
 
 
 def show_action_sequence(action_sequence, game_state, map_data):
@@ -219,13 +251,22 @@ def render_textbox(screen, text, pos, font, color, max_width):
         screen.blit(line_surface, (x + (max_width - line_surface.get_width()) // 2, y))
 
 
+def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
+    x, y = pos
+    for text in texts:
+        text_surface = font.render(text, True, color)
+        screen.blit(text_surface, (x, y))
+        y += font.get_height()  # Move to the next line after each piece of text
+
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
     font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
     description_font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
-    map_name = 'Level 1'
-    map_data = parse_map('maps/lvl1.txt')
+    map_txt = sys.argv[1]
+    map_name = map_txt.split('/')[-1].split('.')[0]
+    map_data = parse_map(map_txt)
     images = load_images(TILE_SIZE)
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
 
@@ -244,7 +285,19 @@ def main():
 
             # Algorithm execution
             initial_node = Node(current_state, None, None, 0)
-            search_result, _ = run_algorithm(choice, initial_node)
+            start_time = time.time()
+            search_result, expanded_nodes, frontier_count  = run_algorithm(choice, initial_node)
+            end_time = time.time() - start_time
+
+            results_text = (
+                f"Algorithm: {current_algorithm}",
+                f"Time: {end_time:.2f}s",
+                f"Nodes Expanded: {expanded_nodes}",
+                f"Frontier Size: {frontier_count}"
+            )
+
+            render_multiline_left_justified_textbox(screen, results_text, (50, 450), description_font, (255, 255, 255))
+
             for action in search_result:
                 dx, dy = action
                 new_state = current_state.move_player(dx, dy)

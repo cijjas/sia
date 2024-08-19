@@ -13,7 +13,7 @@ def local_greedy(start_node: Node,  heuristic: Heuristic =lambda x: 0):
         current_node = frontier.pop(0)
 
         if current_node.is_goal():
-            return current_node.get_path(), expanded_nodes
+            return current_node.get_path(), expanded_nodes, len(frontier)
 
         if current_node not in explored:
             expanded_nodes += 1
@@ -26,7 +26,7 @@ def local_greedy(start_node: Node,  heuristic: Heuristic =lambda x: 0):
             children.sort(key=lambda x: heuristic(x.state))
             frontier = children + frontier
 
-    return None, expanded_nodes
+    return None, expanded_nodes, len(frontier) # No solution
 
 def global_greedy(start_node: Node, heuristic: Heuristic =lambda x: 0):
     """ global greedy search considers the heuristic value of all nodes in the frontier """
@@ -39,7 +39,7 @@ def global_greedy(start_node: Node, heuristic: Heuristic =lambda x: 0):
         frontier.remove(current_node)
 
         if current_node.is_goal():
-            return current_node.get_path(), expanded_nodes
+            return current_node.get_path(), expanded_nodes, len(frontier)
 
         if current_node not in explored:
             expanded_nodes += 1
@@ -51,5 +51,5 @@ def global_greedy(start_node: Node, heuristic: Heuristic =lambda x: 0):
             children = current_node.get_children()
             frontier = children + frontier
 
-    return None, expanded_nodes
+    return None, expanded_nodes, len(frontier) # No solution
 
