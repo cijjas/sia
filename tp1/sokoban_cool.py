@@ -1,25 +1,17 @@
 import pygame
-from core.state import State
-from core.node import Node
-from core.map_parser import parse_map
+from core.models.state import State
+from core.models.node import Node
+from core.utils.map_parser import parse_map
 from core.heuristics import *
-from algorithms.bfs import bfs
-from algorithms.dfs import dfs
-from algorithms.greedy import global_greedy
-from algorithms.greedy import local_greedy
-from algorithms.a_star import a_star
-from algorithms.iddfs import iddfs
+from core.algorithms.a_star import a_star
+from core.algorithms.bfs import bfs
+from core.algorithms.dfs import dfs
+from core.algorithms.greedy import local_greedy, global_greedy
+from core.algorithms.iddfs import iddfs
 import time
 import sys
+import os
 
-algorithm_descriptions = {
-    'BFS': "BFS is an algorithm for traversing or searching tree or graph data structures. It starts at a selected node (the root) and explores all of its neighboring nodes at the present depth prior to moving on to nodes at the next depth level. BFS is particularly useful for finding the shortest path on unweighted graphs.",
-    'DFS': "DFS is an algorithm for traversing or searching tree or graph data structures. It starts at the root node and explores as far as possible along each branch before backtracking. This method uses a stack data structure, either implicitly through recursive calls or explicitly using an iterative approach.",
-    'Global Greedy': "Global Greedy Search: Selects nodes based on a heuristic that estimates the cost from the start.Global Greedy Search (often simply called Greedy Best-First Search) is a search algorithm that expands the node that appears most promising by some heuristic. Unlike A*, it doesn’t consider the cost to reach the node but only the estimated cost from the node to the goal. This often makes it faster but less accurate and not guaranteed to find the shortest path.",
-    'Local Greedy': "Local Greedy Search: Chooses the next node based on local optimality conditions.Local Greedy Search, similar to global greedy search, makes the locally optimal choice at each stage with the hope of finding a global optimum. In practice, this can mean selecting a path that appears best at the moment but doesn't consider the entire path cost, potentially missing better routes available with a more comprehensive view.",
-    'A*': "A* Search: Combines BFS's completeness and DFS's optimality with a heuristic.A* is a pathfinding and graph traversal algorithm that is often used in many fields of computer science due to its efficiency and accuracy. It employs heuristics to estimate the cost of the cheapest path from the current node to the goal, thereby exploring the most promising paths first. A* is complete and optimal, given that the heuristic function is admissible.",
-    'IDDFS': "IDDFS combines the space-efficiency of Depth-First Search (DFS) with the optimal properties of Breadth-First Search (BFS). It iteratively deepens the depth at which DFS is performed. Starting with a depth of one, it incrementally increases the depth limit until the goal is found. This method is particularly useful when the depth of the solution is not known and the space is large."
-}
 
 
 TILE_SIZE = 40
@@ -31,21 +23,30 @@ direction_to_key = {
 }
 
 
-def load_images(tile_size):
-    images = {
-        '#': pygame.image.load('core/resources/wall.jpg').convert_alpha(),
-        '@': pygame.image.load('core/resources/player.jpg').convert_alpha(),
-        '$': pygame.image.load('core/resources/box.jpeg').convert_alpha(),
-        ' ': pygame.image.load('core/resources/empty.jpg').convert_alpha(),
-        '.': pygame.image.load('core/resources/goal.png').convert_alpha(),
-        '*': pygame.image.load('core/resources/box_on_goal.png').convert_alpha(),
-        '+': pygame.image.load('core/resources/player.jpg').convert_alpha()
+
+def load_images(tile_size, texture_pack='default'):
+    tiles = {
+        '#': 'wall',
+        '@': 'player',
+        '$': 'box',
+        ' ': 'empty',
+        '.': 'goal',
+        '*': 'box_on_goal',
+        '+': 'player'
     }
+    
+    images = {}
+    for key, value in tiles.items():
+        for extension in ['png', 'jpg', 'jpeg', 'gif']:
+            file_path = f'resources/texture_packs/{texture_pack}/{value}.{extension}'
+            if os.path.exists(file_path):
+                images[key] = pygame.image.load(file_path).convert_alpha()
+                break
 
     for key in images:
         images[key] = pygame.transform.scale(images[key], (tile_size, tile_size))
-    return images
 
+    return images
 
 def render_left_justified_textbox(screen, text, pos, font, color, max_width):
     words = text.split(' ')
@@ -116,7 +117,7 @@ def show_action_sequence(action_sequence, game_state, map_data):
 
     pygame.quit()
 
-    #   saerch_result, expanded_nodes = dfs(initial_node)#         
+    #   saerch_result, expanded_nodes = dfs(initial_node)#
     return
 
 
@@ -140,7 +141,7 @@ def show_action_sequence(action_sequence, game_state, images, map_data, screen, 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
-        
+
         # Assuming each action in the action_sequence is a tuple (dx, dy)
         dx, dy = action_sequence[path_index]  # Unpack the tuple into dx and dy
         game_state = game_state.move_player(dx, dy)  # Correctly pass both dx and dy
@@ -165,7 +166,7 @@ def draw_board(screen, game_state, images, tile_size, x_offset, y_offset, map_da
     for x, y in game_state.goals & {game_state.player}:
         screen.blit(images['+'], (x * tile_size + x_offset, y * tile_size + y_offset))
     screen.blit(images['@'], (game_state.player[0] * tile_size + x_offset, game_state.player[1] * tile_size + y_offset))
-    
+
 
 def run_algorithm(algorithm, initial_node):
     if algorithm == 'BFS':
@@ -173,11 +174,11 @@ def run_algorithm(algorithm, initial_node):
     elif algorithm == 'DFS':
         return dfs(initial_node)
     elif algorithm == 'Global Greedy':
-        return global_greedy(initial_node, DeadlockCorner())
+        return global_greedy(initial_node, [DeadlockCorner()])
     elif algorithm == 'Local Greedy':
-        return local_greedy(initial_node,DeadlockCorner())
+        return local_greedy(initial_node, [DeadlockCorner()])
     elif algorithm == 'A*':
-        return a_star(initial_node, DeadlockCorner())
+        return a_star(initial_node, [DeadlockCorner()])
     elif algorithm == 'IDDFS':
         return iddfs(initial_node)
 
@@ -206,7 +207,7 @@ def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, 
                     if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh:
                         return key  # Return the clicked algorithm or 'Reset'
 
-        screen.fill((6, 20, 6))
+        screen.fill((0,0,0))
         pygame.draw.line(screen, (100, 100, 100), (menu_width, 0), (menu_width, 768), 1)
 
         text = font.render(map_name, True, (255, 255, 255))
@@ -244,7 +245,7 @@ def render_textbox(screen, text, pos, font, color, max_width):
         else:
             current_line.append(word)
             current_width += word_width + space
-    
+
     # Render the last line of text
     if current_line:
         line_surface = font.render(' '.join(current_line), True, color)
@@ -262,8 +263,8 @@ def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
-    font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
-    description_font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
+    font = pygame.font.Font('resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
+    description_font = pygame.font.Font('resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
     map_txt = sys.argv[1]
     map_name = map_txt.split('/')[-1].split('.')[0]
     map_data = parse_map(map_txt)
@@ -276,11 +277,8 @@ def main():
 
     while True:
         choice = main_menu(screen, font, description_font, map_name, current_state, images, map_data, algorithm_finished)
-        if choice in algorithm_descriptions:
-            current_algorithm = choice
-            description = algorithm_descriptions[current_algorithm]
-            render_textbox(screen, description, (450, 620), description_font, (255, 255, 255), 400)
-
+        current_algorithm = choice
+        if choice in ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']:
             pygame.display.flip()
 
             # Algorithm execution

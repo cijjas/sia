@@ -1,13 +1,8 @@
 import pygame
-from core.state import State
-from core.node import Node
-from core.map_parser import parse_map
 from core.heuristics import *
-from algorithms.bfs import bfs
-from algorithms.greedy import global_greedy
-from algorithms.greedy import local_greedy
-from algorithms.iddfs import iddfs
-from algorithms.a_star import a_star
+from core.models.state import State
+from core.models.node import Node
+from core.utils.map_parser import parse_map
 from core.algorithms import *
 import time
 import sys

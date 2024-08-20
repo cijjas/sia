@@ -1,8 +1,7 @@
 from collections import deque
-from core.node import Node
+from core.models.node import Node
 
-
-# Basado en 
+# Basado en
 # https://en.wikipedia.org/wiki/Breadth-first_search#:~:text=Breadth%2Dfirst%20search%20(BFS),at%20the%20next%20depth%20level.
 
 def dfs(start_node=Node):
@@ -12,11 +11,11 @@ def dfs(start_node=Node):
     explored = set()
 
     while frontier:
-        current_node = frontier.pop()  
-        
+        current_node = frontier.pop()
+
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes, len(frontier)
-        
+
         expanded_nodes += 1
         explored.add(current_node)
         for child in current_node.get_children():
@@ -24,4 +23,4 @@ def dfs(start_node=Node):
                 child.parent = current_node
                 frontier.append(child)  # push stack
 
-    return None, expanded_nodes, len(frontier) 
+    return None, expanded_nodes, len(frontier)
