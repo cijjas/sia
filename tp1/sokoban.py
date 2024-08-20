@@ -8,6 +8,7 @@ from algorithms.greedy import global_greedy
 from algorithms.greedy import local_greedy
 from algorithms.iddfs import iddfs
 from algorithms.a_star import a_star
+from core.algorithms import *
 import time
 import sys
 
@@ -96,6 +97,11 @@ def show_action_sequence(action_sequence, game_state, map_data):
 
     return
 
+def max_heuristic_from_list(heuristics) -> Heuristic:
+    def max_heuristic(state):
+        return max([heuristic(state) for heuristic in heuristics])
+    return max_heuristic
+
 def main():
     if (len(sys.argv) != 2):
         print("Choose a map!")
@@ -106,9 +112,12 @@ def main():
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
     initial_node = Node(initial_state, None, None, 0)
 
+    heuristics = [ DeadlockCorner() ]
+    max_heuristic = max_heuristic_from_list(heuristics)
+
     # Use Search Algorithm
     start_time = time.time()
-    search_result, expanded_nodes, frontier_count = a_star(initial_node, [ DeadlockCorner()])
+    search_result, expanded_nodes, frontier_count = AStar()(initial_node, max_heuristic)
     end_time = time.time() - start_time
     # hay que devolver
     # - resultado (exito o fracaso)         X
