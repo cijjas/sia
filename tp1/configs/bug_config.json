@@ -1,10 +1,11 @@
 {
     "data_generation": {
         "maps": [
-            "lvl0.txt"
+            "lvl1.txt"
         ],
         "algorithms": [
             "BFS",
+            "A_STAR",
             "DFS"
         ],
         "heuristics": [],
