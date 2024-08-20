@@ -1,5 +1,7 @@
+from core.node import Node
+
 # basado en https://academy.finxter.com/python-iterative-deepening-depth-first-search-dfs-algorithm/
-def dls(node, depth, visited):
+def dls(node: Node, depth, visited):
     expanded_nodes = 0
     frontier_count = 0
     if node.state in visited:
@@ -26,7 +28,7 @@ def dls(node, depth, visited):
         frontier_count += 1
     return (None, any_remaining, expanded_nodes, frontier_count)
 
-def iddfs(root):
+def iddfs(root: Node):
     depth = 0
     total_expanded_nodes = 0
     total_frontier_count = 0
