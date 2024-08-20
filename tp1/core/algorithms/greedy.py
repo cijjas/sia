@@ -1,5 +1,5 @@
-from core.structure.node import Node
-from core.structure.state import State
+from core.models.node import Node
+from core.models.state import State
 from core.heuristics import Heuristic
 
 
@@ -52,4 +52,3 @@ def global_greedy(start_node: Node, heuristics=None):
             frontier = children + frontier
 
     return None, expanded_nodes, len(frontier) # No solution
-
