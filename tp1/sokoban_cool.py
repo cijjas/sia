@@ -1,14 +1,13 @@
 import pygame
-from core.state import State
-from core.node import Node
-from core.map_parser import parse_map
+from core.structure.state import State
+from core.structure.node import Node
+from core.utils.map_parser import parse_map
 from core.heuristics import *
-from algorithms.bfs import bfs
-from algorithms.dfs import dfs
-from algorithms.greedy import global_greedy
-from algorithms.greedy import local_greedy
-from algorithms.a_star import a_star
-from algorithms.iddfs import iddfs
+from core.algorithms.a_star import a_star
+from core.algorithms.bfs import bfs
+from core.algorithms.dfs import dfs
+from core.algorithms.greedy import local_greedy, global_greedy
+from core.algorithms.iddfs import iddfs
 import time
 import sys
 
@@ -31,15 +30,15 @@ direction_to_key = {
 }
 
 
-def load_images(tile_size):
+def load_images(tile_size, skin_directory='minecraft_skin'):
     images = {
-        '#': pygame.image.load('core/resources/wall.jpg').convert_alpha(),
-        '@': pygame.image.load('core/resources/player.jpg').convert_alpha(),
-        '$': pygame.image.load('core/resources/box.jpeg').convert_alpha(),
-        ' ': pygame.image.load('core/resources/empty.jpg').convert_alpha(),
-        '.': pygame.image.load('core/resources/goal.png').convert_alpha(),
-        '*': pygame.image.load('core/resources/box_on_goal.png').convert_alpha(),
-        '+': pygame.image.load('core/resources/player.jpg').convert_alpha()
+        '#': pygame.image.load(f'resources/map_skins/{skin_directory}/wall.jpg').convert_alpha(),
+        '@': pygame.image.load(f'resources/map_skins/{skin_directory}/player.jpg').convert_alpha(),
+        '$': pygame.image.load(f'resources/map_skins/{skin_directory}/box.jpeg').convert_alpha(),
+        ' ': pygame.image.load(f'resources/map_skins/{skin_directory}/empty.jpg').convert_alpha(),
+        '.': pygame.image.load(f'resources/map_skins/{skin_directory}/goal.png').convert_alpha(),
+        '*': pygame.image.load(f'resources/map_skins/{skin_directory}/box_on_goal.png').convert_alpha(),
+        '+': pygame.image.load(f'resources/map_skins/{skin_directory}/player.jpg').convert_alpha()
     }
 
     for key in images:
@@ -206,7 +205,7 @@ def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, 
                     if bx <= mouse_x <= bx + bw and by <= mouse_y <= by + bh:
                         return key  # Return the clicked algorithm or 'Reset'
 
-        screen.fill((6, 20, 6))
+        screen.fill((0,0,0))
         pygame.draw.line(screen, (100, 100, 100), (menu_width, 0), (menu_width, 768), 1)
 
         text = font.render(map_name, True, (255, 255, 255))
@@ -262,8 +261,8 @@ def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
 def main():
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
-    font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
-    description_font = pygame.font.Font('core/resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
+    font = pygame.font.Font('resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
+    description_font = pygame.font.Font('resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
     map_txt = sys.argv[1]
     map_name = map_txt.split('/')[-1].split('.')[0]
     map_data = parse_map(map_txt)

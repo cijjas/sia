@@ -1,6 +1,5 @@
 from collections import deque
-from core.node import Node
-
+from core.structure.node import Node
 def bfs(start_node=Node):
     # Initialize Fr and Ex
     expanded_nodes = 0

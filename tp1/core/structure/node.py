@@ -1,4 +1,4 @@
-from core.state import State
+from core.structure.state import State
 from core.heuristics import Heuristic
 
 class Node:
