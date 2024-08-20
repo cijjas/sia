@@ -1,7 +1,7 @@
 import pygame
 from core.heuristics import *
-from core.structure.state import State
-from core.structure.node import Node
+from core.models.state import State
+from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.algorithms.a_star import a_star
 from core.algorithms.bfs import bfs

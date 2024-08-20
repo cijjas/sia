@@ -48,3 +48,4 @@ Se le suman estados logicos utiles para optimizar el BFS
 
 
 # ISSUES
+- Expanded nodes del DFS es mayor al del BFS, imposible que ocurra practicamente (correr con bug_config.json)

@@ -1,4 +1,4 @@
-from core.structure.state import State
+from core.models.state import State
 from abc import ABC, abstractmethod
 
 def manhattan(a, b):
@@ -38,22 +38,21 @@ class MinEuclidean(Heuristic):
             total_distance += min_distance
         return total_distance
 
-# Careful with tunnels to do check
 class DeadlockCorner(Heuristic):
     """ Returns the sum of the euclidean distances between each box and its closest goal """
     def __call__(self, state: State) -> float:
         if state.is_deadlock():
             return float('inf')
-        return MinManhattan()(state)        
+        return MinManhattan()(state)
 
 # We can say that given a wall with no goals or holes, it is a deadlock if a box is next to it
 class DeadlockWall(Heuristic):
-    
+
     def __call__(self, state: State) -> float:
         # if a box is next to a wall
         if not state.any_box_next_to_wall():
             return MinManhattan()(state)
-        
+
         for box, wall in state.get_boxes_next_to_wall():
             if state.no_salvation_from_wall(box, wall):
                 return float('inf')
@@ -71,4 +70,3 @@ class MinManhattanBetweenPlayerAndBox(Heuristic):
                     min_distance = distance
             total_distance += min_distance
         return total_distance
-    
