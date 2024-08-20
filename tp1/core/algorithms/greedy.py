@@ -1,9 +1,9 @@
-from core.node import Node
-from core.state import State
+from core.structure.node import Node
+from core.structure.state import State
 from core.heuristics import Heuristic
 
 
-def local_greedy(start_node: Node,  heuristic: Heuristic =lambda x: 0):
+def local_greedy(start_node: Node, heuristics=None):
     """ local greedy search considers the heuristic value of most recently expanded node's children """
     expanded_nodes = 0
     frontier = [start_node]
@@ -23,19 +23,19 @@ def local_greedy(start_node: Node,  heuristic: Heuristic =lambda x: 0):
                 continue
 
             children = current_node.get_children()
-            children.sort(key=lambda x: heuristic(x.state))
+            children.sort(key=lambda child: max(heuristic(child.state) for heuristic in heuristics))
             frontier = children + frontier
 
-    return None, expanded_nodes, len(frontier) # No solution
+    return None, expanded_nodes, len(frontier)
 
-def global_greedy(start_node: Node, heuristic: Heuristic =lambda x: 0):
+def global_greedy(start_node: Node, heuristics=None):
     """ global greedy search considers the heuristic value of all nodes in the frontier """
     expanded_nodes = 0
     frontier = [start_node]
     explored = set()
 
     while frontier:
-        current_node = min(frontier, key=lambda x: heuristic(x.state)) 
+        current_node = min(frontier, key=lambda node: max(heuristic(node.state) for heuristic in heuristics))
         frontier.remove(current_node)
 
         if current_node.is_goal():

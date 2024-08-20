@@ -1,5 +1,5 @@
 import heapq
-from core.node import Node
+from core.structure.node import Node
 from core.heuristics import Heuristic
 
 # Basado en 

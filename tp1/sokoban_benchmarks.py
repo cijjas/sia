@@ -2,8 +2,8 @@ import json
 import csv
 import sys
 import os
-from core.state import State
-from core.node import Node
+from tp1.core.structure.state import State
+from tp1.core.structure.node import Node
 from sokoban import parse_map
 from algorithms.bfs import bfs
 from algorithms.dfs import dfs
