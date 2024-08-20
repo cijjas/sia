@@ -5,12 +5,10 @@
             "lvl1.txt"
         ],
         "algorithms": [
-            "BFS",
-            "DFS"
+            "A_STAR"
         ],
         "heuristics": [
-            "deadlock",
-            "euclidean"
+            "DeadlockCorner"
         ],
         "iterations_for_average": 10
     }

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from core.heuristics import Heuristic
-from core.node import Node
+from core.models.node import Node
 from typing import Optional
 from typing import Callable
 from typing import List
@@ -152,7 +152,7 @@ class IDDFS(Algorithm):
         
         any_remaining = False
         for child in node.get_children():
-            found, remaining, child_expanded, child_frontier_count = dls(child, depth - 1, visited)
+            found, remaining, child_expanded, child_frontier_count = IDDFS.dls(child, depth - 1, visited)
             expanded_nodes += child_expanded
             frontier_count += child_frontier_count
             if found:
