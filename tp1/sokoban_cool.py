@@ -1,6 +1,6 @@
 import pygame
-from core.structure.state import State
-from core.structure.node import Node
+from core.models.state import State
+from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.heuristics import *
 from core.algorithms.a_star import a_star
@@ -117,7 +117,7 @@ def show_action_sequence(action_sequence, game_state, map_data):
 
     pygame.quit()
 
-    #   saerch_result, expanded_nodes = dfs(initial_node)#         
+    #   saerch_result, expanded_nodes = dfs(initial_node)#
     return
 
 
@@ -141,7 +141,7 @@ def show_action_sequence(action_sequence, game_state, images, map_data, screen, 
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
-        
+
         # Assuming each action in the action_sequence is a tuple (dx, dy)
         dx, dy = action_sequence[path_index]  # Unpack the tuple into dx and dy
         game_state = game_state.move_player(dx, dy)  # Correctly pass both dx and dy
@@ -166,7 +166,7 @@ def draw_board(screen, game_state, images, tile_size, x_offset, y_offset, map_da
     for x, y in game_state.goals & {game_state.player}:
         screen.blit(images['+'], (x * tile_size + x_offset, y * tile_size + y_offset))
     screen.blit(images['@'], (game_state.player[0] * tile_size + x_offset, game_state.player[1] * tile_size + y_offset))
-    
+
 
 def run_algorithm(algorithm, initial_node):
     if algorithm == 'BFS':
@@ -245,7 +245,7 @@ def render_textbox(screen, text, pos, font, color, max_width):
         else:
             current_line.append(word)
             current_width += word_width + space
-    
+
     # Render the last line of text
     if current_line:
         line_surface = font.render(' '.join(current_line), True, color)

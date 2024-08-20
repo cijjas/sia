@@ -1,5 +1,5 @@
 from collections import deque
-from core.structure.node import Node
+from core.models.node import Node
 def bfs(start_node=Node):
     # Initialize Fr and Ex
     expanded_nodes = 0
@@ -8,10 +8,10 @@ def bfs(start_node=Node):
 
     while frontier:
         current_node = frontier.popleft()
-        
+
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes, len(frontier)
-        
+
         expanded_nodes += 1
         for child in current_node.get_children():
             if child not in explored:
@@ -20,4 +20,3 @@ def bfs(start_node=Node):
                 frontier.append(child)
 
     return None, expanded_nodes, len(frontier) # No solution
-

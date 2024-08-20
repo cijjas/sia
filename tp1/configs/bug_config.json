@@ -1,0 +1,13 @@
+{
+    "data_generation": {
+        "maps": [
+            "lvl0.txt"
+        ],
+        "algorithms": [
+            "BFS",
+            "DFS"
+        ],
+        "heuristics": [],
+        "iterations_for_average": 1
+    }
+}
