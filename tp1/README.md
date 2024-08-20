@@ -49,3 +49,11 @@ Se le suman estados logicos utiles para optimizar el BFS
 
 # ISSUES
 - Expanded nodes del DFS es mayor al del BFS, imposible que ocurra practicamente (correr con bug_config.json)
+
+
+- backtracking como lo implementamos
+- que hacemos con repetidos
+- detalles de implementación
+- dfs importante como decidis el siguiente estado (no trivial) hay algunos tableros que dependen de esta decisión.
+- checkeo de deadlocks
+- a* debería dar óptimo para todas las heurisiticas admisibles
