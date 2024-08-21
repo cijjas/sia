@@ -1,16 +1,22 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_comparison.csv",
+            "output_file": "manhattan_vs_manhattan2.csv",
             "data_generation": {
                 "maps": [
-                    "lvl4.txt"
+                    "lvl0.txt"
                 ],
                 "algorithms": [
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MinManhattanBetweenPlayerAndBox"
+                            "MinManhattan2"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "MinManhattan"
                         ]
                     }
                 ],
