@@ -1,4 +1,4 @@
-from core.node import Node
+from core.models.node import Node
 
 # basado en https://academy.finxter.com/python-iterative-deepening-depth-first-search-dfs-algorithm/
 def dls(node: Node, depth, visited):
