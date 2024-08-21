@@ -1,0 +1,23 @@
+{
+    "executions": [
+        {
+            "output_file": "bfs_vs_dfs.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        }
+    ]
+}
