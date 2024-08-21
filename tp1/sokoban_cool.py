@@ -275,6 +275,9 @@ def main():
     font = pygame.font.Font('resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
     description_font = pygame.font.Font('resources/fonts/NeueHaasDisplayRoman.ttf', 14)  # Smaller font for descriptions
     map_txt = sys.argv[1]
+
+    winow_title = 'Sokoban Solver'
+    pygame.display.set_caption(winow_title)
     map_name = map_txt.split('/')[-1].split('.')[0]
     map_data = parse_map(map_txt)
     images = load_images(TILE_SIZE)
@@ -298,6 +301,7 @@ def main():
 
             results_text = (
                 f"{current_algorithm} took {end_time:.2f}s",
+                f"Solution Steps: {len(search_result)}",
                 f"Nodes Expanded: {expanded_nodes}",
                 f"Frontier Size: {frontier_count}"
             )

@@ -16,15 +16,20 @@ def local_greedy(start_node: Node, heuristics=None):
             return current_node.get_path(), expanded_nodes, len(frontier)
 
         if current_node not in explored:
-            expanded_nodes += 1
             explored.add(current_node)
 
-            if current_node.is_dead_end():
+            if current_node.is_dead_end(): # TODO franfer deadend no era una heurística
                 continue
 
             children = current_node.get_children()
-            children.sort(key=lambda child: max(heuristic(child.state) for heuristic in heuristics))
-            frontier = children + frontier
+            children.sort(key=lambda child: max(heuristic(child.state) for heuristic in heuristics)) # TODO faltaba chequear que no esten en explored
+            for child in children:
+                if child not in explored and child not in frontier:
+                    frontier.append(child)
+
+
+        
+        expanded_nodes += 1
 
     return None, expanded_nodes, len(frontier)
 
@@ -42,13 +47,16 @@ def global_greedy(start_node: Node, heuristics=None):
             return current_node.get_path(), expanded_nodes, len(frontier)
 
         if current_node not in explored:
-            expanded_nodes += 1
             explored.add(current_node)
 
             if current_node.is_dead_end():
                 continue
 
             children = current_node.get_children()
-            frontier = children + frontier
+            for child in children:
+                if child not in explored and child not in frontier:
+                    frontier.append(child)
+
+        expanded_nodes += 1
 
     return None, expanded_nodes, len(frontier) # No solution
