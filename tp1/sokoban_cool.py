@@ -7,7 +7,6 @@ from core.methods import *
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
 from core.algorithms.greedy import global_greedy
-from core.algorithms.iddfs import iddfs
 from core.algorithms.greedy import local_greedy
 from core.algorithms.a_star import a_star
 import time
@@ -36,7 +35,7 @@ def load_images(tile_size, texture_pack='default'):
         '*': 'box_on_goal',
         '+': 'player'
     }
-    
+
     images = {}
     for key, value in tiles.items():
         for extension in ['png', 'jpg', 'jpeg', 'gif']:
@@ -188,11 +187,9 @@ def run_algorithm(algorithm, initial_node):
         return LocalGreedy()(initial_node, max_heuristic)
     elif algorithm == 'A*':
         return AStar()(initial_node, max_heuristic)
-    elif algorithm == 'IDDFS':
-        return IDDFS()(initial_node)
 
 def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, algorithm_finished):
-    options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']
+    options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*']
     buttons = {}
     menu_width = 300  # Width reserved for the menu
 
@@ -290,7 +287,7 @@ def main():
     while True:
         choice = main_menu(screen, font, description_font, map_name, current_state, images, map_data, algorithm_finished)
         current_algorithm = choice
-        if choice in ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']:
+        if choice in ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*']:
             pygame.display.flip()
 
             # Algorithm execution
