@@ -53,7 +53,14 @@ Se le suman estados logicos utiles para optimizar el BFS
 
 - backtracking como lo implementamos
 - que hacemos con repetidos
-- detalles de implementación
+- detalles de implementación izq der
 - dfs importante como decidis el siguiente estado (no trivial) hay algunos tableros que dependen de esta decisión.
 - checkeo de deadlocks
 - a* debería dar óptimo para todas las heurisiticas admisibles
+
+
+
+# REF
+
+- [Experto en Heuristicas](https://www.reddit.com/r/algorithms/comments/fedzu1/pathfinding_heuristic_for_indirect_movement_like/)
+- IDA*
