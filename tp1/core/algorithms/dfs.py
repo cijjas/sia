@@ -3,9 +3,12 @@ from core.models.node import Node
 
 # Preference left, down, right, up
 def dfs(start_node=Node):
-    expanded_nodes = 0
-    frontier = [start_node]  # stack
+    frontier = []
     explored = set()
+    expanded_nodes = 0
+
+    frontier.append(start_node)
+    explored.add(start_node)
 
     while frontier:
         current_node = frontier.pop()
@@ -13,11 +16,10 @@ def dfs(start_node=Node):
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes, len(frontier)
 
-        explored.add(current_node)  # marcar como explorado
-
         for child in current_node.get_children():
-            if child not in explored and child not in frontier:
+            if child not in explored:
                 frontier.append(child)
+                explored.add(child)  # marcar como explorado
 
         expanded_nodes += 1
 

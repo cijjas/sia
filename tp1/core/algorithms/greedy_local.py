@@ -1,30 +1,32 @@
 from core.models.node import Node
 from core.models.state import State
 from core.heuristics import Heuristic
+from core.heuristics import heuristic_combinator
+from collections import deque
 
-
+# Similar to a DFS but the decision on which to expand next is based on a Heuristic instead of having position preference
 def greedy_local(start_node: Node, heuristics=None):
-    expanded_nodes = 0
-    frontier = [start_node]
+    frontier = deque()
     explored = set()
+    expanded_nodes = 0
+
+    frontier.append(start_node)
+    explored.add(start_node)
 
     while frontier:
-        current_node = frontier.pop(0)
+        current_node = frontier.pop()
 
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes, len(frontier)
 
-        if current_node not in explored:
-            explored.add(current_node)
+        # Sorting before insertion, so the order is amongst childrens and not globally
+        children = current_node.get_children()
+        children.sort(key=lambda child: heuristic_combinator(child, heuristics), reverse = True)
+        for child in children:
+            if child not in explored:
+                frontier.append(child)
+                explored.add(child)
 
-            children = current_node.get_children()
-            children.sort(key=lambda child: max(heuristic(child.state) for heuristic in heuristics)) # TODO faltaba chequear que no esten en explored
-            for child in children:
-                if child not in explored and child not in frontier:
-                    frontier.append(child)
-
-
-        
         expanded_nodes += 1
 
     return None, expanded_nodes, len(frontier)

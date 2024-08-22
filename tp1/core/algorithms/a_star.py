@@ -8,11 +8,13 @@ from core.heuristics import heuristic_combinator
 
 def a_star(start_node=Node, heuristics=[]):
     frontier = []
+    g_score = {} # costo de llegar a ese nodo, sin tener en cuenta la heuristica
+    f_score = {} # suma del g_score con la heuristica
     expanded_nodes = 0
-    g_score = {start_node: 0} # costo de llegar a ese nodo, sin tener en cuenta la heuristica
-    f_score = {start_node: 0} # suma del g_score con la heuristica
 
     heapq.heappush(frontier, (0, start_node))
+    g_score[start_node] = 0
+    f_score[start_node] = 0
 
     while frontier:
         # heapq agarra por default el primer elemento de la tupla para comparar
