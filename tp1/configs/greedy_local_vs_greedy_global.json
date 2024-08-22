@@ -1,16 +1,22 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_comparison.csv",
+            "output_file": "greedy_local_vs_greedy_global.csv",
             "data_generation": {
                 "maps": [
                     "lvl4.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "A_STAR",
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "MinManhattanBetweenPlayerAndBox"
+                            "Manhattan2"
+                        ]
+                    },
+                    {
+                        "name": "GREEDY_GLOBAL",
+                        "heuristics": [
+                            "Manhattan2"
                         ]
                     }
                 ],

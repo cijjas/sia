@@ -17,7 +17,7 @@ class State:
             self._hash_value = hash((tuple(self.boxes), self.player))
         return self._hash_value
 
-    
+
 
     def print_state(self):
         for y in range(0, 6):
@@ -87,7 +87,7 @@ class State:
         if (x, y + 1) in self.walls:
             return (x, y + 1)
         return None
-    
+
     def get_boxes_next_to_wall(self) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
         """ Returns a tuple with the box and the wall next to it. None if there is no box next to a wall """
         boxes = []
@@ -128,32 +128,31 @@ class State:
         """Returns True if there is no route to escape the box from the wall"""
         x, y = box
         wall_x, wall_y = wall
-        
+
         dir_perpendicular_to_wall = (wall_x - x, wall_y - y)
         dir_parallel_to_wall = (dir_perpendicular_to_wall[1], dir_perpendicular_to_wall[0])
-        
+
         # Check for goals along the wall in both directions
         if self.check_goals_along_wall(x, y, dir_parallel_to_wall):
             return False
         if self.check_goals_along_wall(x, y, (-dir_parallel_to_wall[0], -dir_parallel_to_wall[1])):
             return False
-        
+
         # Check for walls along the wall in both directions
         if self.check_walls_along_wall(wall_x, wall_y, dir_parallel_to_wall, dir_perpendicular_to_wall):
             return True
         if self.check_walls_along_wall(wall_x, wall_y, (-dir_parallel_to_wall[0], -dir_parallel_to_wall[1]), dir_perpendicular_to_wall):
             return True
-        
+
         return False
 
     def __str__(self):
         return f'State (\'{self.boxes}\', {self.player})'
-    
+
     def is_deadlock(self):
         return self._corner_deadlock()
 
     def _corner_deadlock(self):
-        
         for box in self.boxes:
             if box not in self.goals:
                 x, y = box
@@ -161,4 +160,3 @@ class State:
                    ((x, y - 1) in self.walls or (x, y + 1) in self.walls):
                     return True
         return False
-    
