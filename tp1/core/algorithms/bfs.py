@@ -17,12 +17,12 @@ def bfs(start_node=Node):
         if current_node.is_goal():
             return current_node.get_path(), expanded_nodes, len(frontier)
 
-        expanded_nodes += 1
         explored.add(current_node)
 
         for child in current_node.get_children():
             if child not in explored and child not in frontier:
                 frontier.append(child)
 
+        expanded_nodes += 1
 
     return None, expanded_nodes, len(frontier) # No solution

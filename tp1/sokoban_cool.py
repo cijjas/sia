@@ -6,9 +6,9 @@ from core.heuristics import *
 from core.methods import *
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
-from core.algorithms.greedy import global_greedy
-from core.algorithms.greedy import local_greedy
 from core.algorithms.a_star import a_star
+from core.algorithms.greedy_local import greedy_local
+from core.algorithms.greedy_global import greedy_global
 import time
 import sys
 import os
