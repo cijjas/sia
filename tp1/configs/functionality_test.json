@@ -1,31 +1,38 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_comparison.csv",
+            "output_file": "functinality_test.csv",
             "data_generation": {
                 "maps": [
-                    "lvl0.txt",
-                    "lvl1.txt",
-                    "lvl2.txt",
-                    "lvl4.txt",
-                    "lvl5.txt"
+                    "lvl1.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "A_STAR",
-                        "heuristics": [
-                            "Manhattan1"
-                        ]
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Euclidean"
+                            "Manhattan2",
+                            "DeadlockCorner"
                         ]
                     },
                     {
-                        "name": "A_STAR",
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
+                            "Manhattan2",
+                            "DeadlockCorner"
+                        ]
+                    },
+                    {
+                        "name": "GREEDY_GLOBAL",
+                        "heuristics": [
+                            "Manhattan2",
                             "DeadlockCorner"
                         ]
                     }

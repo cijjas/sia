@@ -8,7 +8,8 @@ from core.utils.map_parser import parse_map
 from core.algorithms.a_star import a_star
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
-from core.algorithms.greedy import local_greedy, global_greedy
+from core.algorithms.greedy_local import greedy_local
+from core.algorithms.greedy_global import greedy_global
 from core.models.state import State
 from core.models.node import Node
 import pandas as pd
@@ -22,21 +23,24 @@ algorithm_map = {
     "BFS": bfs,
     "DFS": dfs,
     "A_STAR": a_star,
-    "GREEDY_LOCAL": local_greedy,
-    "GREEDY_GLOBAL": global_greedy,
+    "GREEDY_LOCAL": greedy_global,
+    "GREEDY_GLOBAL": greedy_local,
 }
 
 # Map user input to the corresponding heuristic class
 heuristics_map = {
-    "MinManhattan": MinManhattan(),
-    "MinManhattan2": MinManhattan2(),
-    "MinEuclidean": MinEuclidean(),
+    "Manhattan1": ManhattanDistance1(),
+    "Manhattan2": ManhattanDistance2(),
+    "Manhattan3": ManhattanDistance3(),
+    "Euclidean": EuclideanDistance(),
     "DeadlockCorner": DeadlockCorner(),
-    "DeadlockWall": DeadlockWall(),
-    "MinManhattanBetweenPlayerAndBox": MinManhattanBetweenPlayerAndBox(),
+    "DeadlockWall": DeadlockWall()
 }
 
 def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_name):
+    total_executions = len(maps) * len(algorithm_configs) * iterations_for_average
+    current_execution = 0
+
     with open(f'{OUTPUT_DIR}/{csv_file_name}', mode='w', newline='') as file:
         writer = csv.writer(file)
         csv_header = ['map', 'algorithm', 'heuristics_used', 'iteration', 'execution_time', 'expanded_nodes', 'frontier_nodes', 'success_or_failure', 'cost', 'solution_path']
@@ -77,6 +81,9 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
                         solution_path if solution_path else "No solution"
                     ]
                     writer.writerow(row)
+
+                    current_execution += 1
+                    print(f"Progress: {current_execution}/{total_executions} executions completed ({(current_execution / total_executions) * 100:.2f}%)")
 
 def main():
     if len(sys.argv) != 2:

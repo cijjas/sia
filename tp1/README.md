@@ -64,3 +64,8 @@ Se le suman estados logicos utiles para optimizar el BFS
 
 - [Experto en Heuristicas](https://www.reddit.com/r/algorithms/comments/fedzu1/pathfinding_heuristic_for_indirect_movement_like/)
 - IDA*
+- Poner cantidad de iteraciones en los graficos, y toda la informacion fija
+- Usar otro color scheme para los graficos
+- ponerte a un escalon de la solucion y que de mas la heuristica no admisible
+- estado definido como posicion de las cajas y jugador
+- Creas Mapa entonces tenes Walls, Targets

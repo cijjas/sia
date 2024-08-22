@@ -147,7 +147,7 @@ class State:
         if (x, y + 1) in self.walls:
             return (x, y + 1)
         return None
-    
+
     def get_boxes_next_to_wall(self) -> List[Tuple[Tuple[int, int], Tuple[int, int]]]:
         """ Returns a tuple with the box and the wall next to it. None if there is no box next to a wall """
         boxes = []
@@ -179,7 +179,7 @@ class State:
 
     def __str__(self):
         return f'State (\'{self.boxes}\', {self.player})'
-    
+
     def is_deadlock(self):
         """ Returns True if the state is a deadlock by checking the deadlock areas """
         for box in self.boxes:
