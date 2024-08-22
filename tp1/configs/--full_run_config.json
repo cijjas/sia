@@ -1,0 +1,65 @@
+{
+    "executions": [
+        {
+            "output_file": "bfs_vs_dfs.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "heuristic_bad.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "DeadlockCorner"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "heuristic_good.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl4.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "DeadlockCorner"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        }
+    ]
+}

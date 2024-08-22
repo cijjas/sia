@@ -1,20 +1,24 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_comparison.csv",
+            "output_file": "heuristic_bad.csv",
             "data_generation": {
                 "maps": [
                     "lvl4.txt"
                 ],
                 "algorithms": [
                     {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MinManhattanBetweenPlayerAndBox"
+                            "MinManhattan"
                         ]
                     }
                 ],
-                "iterations_for_average": 1
+                "iterations_for_average": 2
             }
         }
     ]
