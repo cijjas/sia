@@ -7,30 +7,30 @@ from core.heuristics import heuristic_combinator
 # https://en.wikipedia.org/wiki/A*_search_algorithm
 
 def a_star(start_node=Node, heuristics=[]):
-    open_set = [] # expanded nodes o frontier
+    frontier = []
     expanded_nodes = 0
-    g_score = {start_node: 0} # mapa de nodos a g_score
-    f_score = {start_node: 0} 
-    visited = set()
+    g_score = {start_node: 0} # costo de llegar a ese nodo, sin tener en cuenta la heuristica
+    f_score = {start_node: 0} # suma del g_score con la heuristica
+    # explored = set()
 
-    heapq.heappush(open_set, (f_score[start_node], start_node))
+    heapq.heappush(frontier, (0, start_node))
 
-    while open_set:
+    while frontier:
         # heapq agarra por default el primer elemento de la tupla para comparar
-        _, current_node = heapq.heappop(open_set) # Pop the smallest item off the heap, maintaining the heap invariant.
+        _, current_node = heapq.heappop(frontier) # Pop the smallest item off the heap, maintaining the heap invariant.
 
         if current_node.is_goal():
-            return current_node.get_path(), expanded_nodes, len(open_set)
+            return current_node.get_path(), expanded_nodes, len(frontier)
 
-        visited.add(current_node)
+        expanded_nodes += 1
+        # explored.add(current_node)
+
         for child in current_node.get_children():
             tentative_g_score = g_score[current_node] + 1 # asumiendo uniform cost
             if child not in g_score or tentative_g_score < g_score.get(child, float('inf')): # si el nodo no esta en g_score, devuelve inf
-                child.parent = current_node
                 g_score[child] = tentative_g_score
                 f_score[child] = tentative_g_score + heuristic_combinator(child, heuristics)
-                heapq.heappush(open_set, (f_score[child], child))
+                heapq.heappush(frontier, (f_score[child], child))
 
-        expanded_nodes += 1
 
-    return None, expanded_nodes, len(open_set)
+    return None, expanded_nodes, len(frontier)

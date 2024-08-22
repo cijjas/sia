@@ -9,7 +9,6 @@ from core.algorithms.a_star import a_star
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
 from core.algorithms.greedy import local_greedy, global_greedy
-from core.algorithms.iddfs import iddfs
 from core.models.state import State
 from core.models.node import Node
 import pandas as pd
@@ -25,7 +24,6 @@ algorithm_map = {
     "A_STAR": a_star,
     "GREEDY_LOCAL": local_greedy,
     "GREEDY_GLOBAL": global_greedy,
-    "IDDFS": iddfs
 }
 
 # Map user input to the corresponding heuristic class

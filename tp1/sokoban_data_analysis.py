@@ -9,7 +9,6 @@ from core.algorithms.a_star import a_star
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
 from core.algorithms.greedy import local_greedy, global_greedy
-from core.algorithms.iddfs import iddfs
 from core.models.state import State
 from core.models.node import Node
 import pandas as pd
@@ -53,9 +52,7 @@ def main():
     #   3.1 BFS get optimal solution, A_STAR with admissible heuristic also , DFS does not,, etc
     #   3.2 Non Admisible Heuristics that can be really good for certain maps
     #       Preprocesamiento del mapa para elegir correctamente las heuristicas que valen la pena (Ambiente finito nose que)
-    #   3.3 Use all heuristics
-    # 4. Solution Path :
-    #   4.1 solution path bias in DFS curly thing
+    # Comparacion de manhattans
 
     # Frontier Nodes : ???
     # success_failure : ???
@@ -69,6 +66,10 @@ def main():
 
     # local_vs_global.json
     # 2. Differences in time and spatial complexity for Greedy Local and Greedy Global
+    file_path = f'{OUTPUT_DIR}/greedy_local_vs_greedy_global.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["GREEDY_LOCAL", "GREEDY_GLOBAL"])
 
     # heuristic_good.json
     # 3. Good trade off using Deadlock Corner Heuristic
@@ -91,7 +92,7 @@ def main():
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["BFS", "A_STAR"])
 
-    # 6. Comparison right preference vs left preference vs center preference (can we change an algorithm to do that?)
+    # 6. Comparison right preference vs left preference vs center preference vs random preference (can we change an algorithm to do that?)
 
 if __name__ == "__main__":
     main()
