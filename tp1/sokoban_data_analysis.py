@@ -8,7 +8,8 @@ from core.utils.map_parser import parse_map
 from core.algorithms.a_star import a_star
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
-from core.algorithms.greedy import local_greedy, global_greedy
+from core.algorithms.greedy_local import greedy_local
+from core.algorithms.greedy_global import greedy_global
 from core.models.state import State
 from core.models.node import Node
 import pandas as pd

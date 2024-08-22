@@ -1,22 +1,26 @@
 {
     "executions": [
         {
-            "output_file": "manhattan_vs_manhattan2.csv",
+            "output_file": "experimental.csv",
             "data_generation": {
                 "maps": [
-                    "lvl0.txt"
+                    "lvl0.txt",
+                    "lvl1.txt",
+                    "lvl2.txt",
+                    "lvl4.txt",
+                    "lvl5.txt"
                 ],
                 "algorithms": [
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MinManhattan2"
+                            "Manhattan1"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MinManhattan"
+                            "Euclidean"
                         ]
                     }
                 ],
