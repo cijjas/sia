@@ -278,7 +278,8 @@ def main():
     map_name = map_txt.split('/')[-1].split('.')[0]
     map_data = parse_map(map_txt)
     images = load_images(TILE_SIZE)
-    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
+    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
+    initial_state.init_deadlock_areas()
 
     current_state = initial_state
     algorithm_finished = False
