@@ -1,4 +1,5 @@
 from core.models.state import State
+from core.models.node import Node
 from abc import ABC, abstractmethod
 
 def manhattan(a, b):
@@ -70,3 +71,7 @@ class MinManhattanBetweenPlayerAndBox(Heuristic):
                     min_distance = distance
             total_distance += min_distance
         return total_distance
+
+
+def heuristic_combinator(node, heuristics):
+    return max(heuristic(node.state) for heuristic in heuristics)

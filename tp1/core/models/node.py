@@ -1,5 +1,4 @@
 from core.models.state import State
-from core.heuristics import Heuristic
 
 class Node:
     def __init__(self, state: State, parent=None, action=None, path_cost=0):
