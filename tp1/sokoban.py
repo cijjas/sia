@@ -3,7 +3,7 @@ from core.heuristics import *
 from core.models.state import State
 from core.models.node import Node
 from core.utils.map_parser import parse_map
-from core.algorithms import *
+from core.methods import *
 import time
 import sys
 

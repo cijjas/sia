@@ -1,0 +1,37 @@
+{
+    "executions": [
+        {
+            "output_file": "heuristic_comparison.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl0.txt",
+                    "lvl1.txt",
+                    "lvl2.txt",
+                    "lvl4.txt",
+                    "lvl5.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "MinManhattan"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "MinEuclidean"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "DeadlockCorner"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 1
+            }
+        }
+    ]
+}

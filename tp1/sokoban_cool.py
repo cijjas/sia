@@ -3,11 +3,13 @@ from core.models.state import State
 from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.heuristics import *
-from core.algorithms.a_star import a_star
+from core.methods import *
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
-from core.algorithms.greedy import local_greedy, global_greedy
+from core.algorithms.greedy import global_greedy
 from core.algorithms.iddfs import iddfs
+from core.algorithms.greedy import local_greedy
+from core.algorithms.a_star import a_star
 import time
 import sys
 import os
@@ -167,20 +169,27 @@ def draw_board(screen, game_state, images, tile_size, x_offset, y_offset, map_da
         screen.blit(images['+'], (x * tile_size + x_offset, y * tile_size + y_offset))
     screen.blit(images['@'], (game_state.player[0] * tile_size + x_offset, game_state.player[1] * tile_size + y_offset))
 
+def max_heuristic_from_list(heuristics) -> Heuristic:
+    def max_heuristic(state):
+        return max([heuristic(state) for heuristic in heuristics])
+    return max_heuristic
 
 def run_algorithm(algorithm, initial_node):
+    heuristics = [ DeadlockCorner() ]
+    max_heuristic = max_heuristic_from_list(heuristics)
+
     if algorithm == 'BFS':
-        return bfs(initial_node)
+        return BFS()(initial_node)
     elif algorithm == 'DFS':
-        return dfs(initial_node)
+        return DFS()(initial_node)
     elif algorithm == 'Global Greedy':
-        return global_greedy(initial_node, [MinManhattan()])
+        return GlobalGreedy()(initial_node, max_heuristic)
     elif algorithm == 'Local Greedy':
-        return local_greedy(initial_node, [MinManhattan()])
+        return LocalGreedy()(initial_node, max_heuristic)
     elif algorithm == 'A*':
-        return a_star(initial_node, [MinManhattan()])
+        return AStar()(initial_node, max_heuristic)
     elif algorithm == 'IDDFS':
-        return iddfs(initial_node)
+        return IDDFS()(initial_node)
 
 def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, algorithm_finished):
     options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*', 'IDDFS']
