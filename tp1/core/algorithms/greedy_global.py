@@ -17,9 +17,6 @@ def greedy_global(start_node: Node, heuristics=None):
         if current_node not in explored:
             explored.add(current_node)
 
-            if current_node.is_dead_end():
-                continue
-
             children = current_node.get_children()
             for child in children:
                 if child not in explored and child not in frontier:
