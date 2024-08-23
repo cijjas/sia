@@ -15,7 +15,6 @@ import os
 
 
 
-TILE_SIZE = 40
 direction_to_key = {
     (0, 1): pygame.K_DOWN,   # Moving down
     (1, 0): pygame.K_RIGHT,  # Moving right
@@ -80,14 +79,14 @@ def render_left_justified_textbox(screen, text, pos, font, color, max_width):
 
 
 
-def show_action_sequence(action_sequence, game_state, map_data):
+def show_action_sequence(action_sequence, game_state, map_data, tile_size):
     pygame.init()
-    map_width = map_data['width'] * TILE_SIZE
-    map_height = map_data['height'] * TILE_SIZE
+    map_width = map_data['width'] * tile_size
+    map_height = map_data['height'] * tile_size
 
     screen = pygame.display.set_mode((map_width, map_height))
 
-    images = load_images(TILE_SIZE)
+    images = load_images(tile_size)
     running = True
     path_index = 0
     clock = pygame.time.Clock()
@@ -104,7 +103,7 @@ def show_action_sequence(action_sequence, game_state, map_data):
                             if new_state:
                                 game_state = new_state
                                 break
-                    draw_board(screen, game_state, images, TILE_SIZE, map_width, map_height)
+                    draw_board(screen, game_state, images, tile_size, map_width, map_height)
                     pygame.display.flip()
 
         if path_index < len(action_sequence):
@@ -123,7 +122,7 @@ def show_action_sequence(action_sequence, game_state, map_data):
 
 
 
-def action_sequence_control(screen, initial_state, images, map_data, is_running, is_paused):
+def action_sequence_control(screen, initial_state, images, map_data, is_running, is_paused, tile_size):
     global game_state
     game_state = initial_state
     while is_running:
@@ -132,10 +131,10 @@ def action_sequence_control(screen, initial_state, images, map_data, is_running,
             show_action_sequence(screen, game_state, images, map_data)
         else:
             # Draw the current state of the board, but do not proceed in the sequence
-            draw_board(screen, game_state, images, TILE_SIZE, 350, 150, map_data)
+            draw_board(screen, game_state, images, tile_size, 350, 150, map_data)
 
 
-def show_action_sequence(action_sequence, game_state, images, map_data, screen, x_offset, y_offset):
+def show_action_sequence(action_sequence, game_state, images, map_data, screen, x_offset, y_offset, tile_size):
     path_index = 0
     while path_index < len(action_sequence):
         for event in pygame.event.get():
@@ -147,7 +146,7 @@ def show_action_sequence(action_sequence, game_state, images, map_data, screen, 
         dx, dy = action_sequence[path_index]  # Unpack the tuple into dx and dy
         game_state = game_state.move_player(dx, dy)  # Correctly pass both dx and dy
 
-        draw_board(screen, game_state, images, TILE_SIZE, x_offset, y_offset, map_data)
+        draw_board(screen, game_state, images, tile_size, x_offset, y_offset, map_data)
         path_index += 1
         pygame.time.wait(100)  # Slow down the animation for visibility
         pygame.display.flip()
@@ -175,20 +174,19 @@ def max_heuristic_from_list(heuristics) -> Heuristic:
 
 def run_algorithm(algorithm, initial_node):
     heuristics = [ DeadlockCorner() ]
-    max_heuristic = max_heuristic_from_list(heuristics)
 
     if algorithm == 'BFS':
-        return BFS()(initial_node)
+        return bfs(initial_node)
     elif algorithm == 'DFS':
-        return DFS()(initial_node)
+        return dfs(initial_node)
     elif algorithm == 'Global Greedy':
-        return GlobalGreedy()(initial_node, max_heuristic)
+        return greedy_global(initial_node, heuristics) 
     elif algorithm == 'Local Greedy':
-        return LocalGreedy()(initial_node, max_heuristic)
+        return greedy_local(initial_node, heuristics)
     elif algorithm == 'A*':
-        return AStar()(initial_node, max_heuristic)
+        return a_star(initial_node, heuristics)
 
-def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, algorithm_finished):
+def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, algorithm_finished, tile_size):
     options = ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*']
     buttons = {}
     menu_width = 300  # Width reserved for the menu
@@ -226,7 +224,13 @@ def main_menu(screen, font, hover_font, map_name, game_state, images, map_data, 
             text = font.render(key, True, text_color)
             screen.blit(text, (bx, by))
 
-        draw_board(screen, game_state, images, TILE_SIZE, 350, 150, map_data)
+        map_w = map_data['width'] 
+        map_h = map_data['height'] 
+        map_center_x = (map_w) // 2
+        map_center_y = (map_h) // 2
+        screen_center_x = (300 + 362)
+        screen_center_y = (384)
+        draw_board(screen, game_state, images, tile_size, screen_center_x - map_center_x * tile_size, screen_center_y - map_center_y * tile_size, map_data)
         pygame.display.flip()
 
         pygame.time.wait(100)
@@ -266,7 +270,15 @@ def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
         screen.blit(text_surface, (x, y))
         y += y_spacing
 
+def think_tile_size(map_width, map_height):
+    if(map_width > 20 or map_height > 20):
+        return 20
+    return 40
+
+
+
 def main():
+
     pygame.init()
     screen = pygame.display.set_mode((1024, 768))
     font = pygame.font.Font('resources/fonts/NeueHaasDisplayMediu.ttf', 26)  # Larger font for algorithm buttons and map name
@@ -277,7 +289,9 @@ def main():
     pygame.display.set_caption(winow_title)
     map_name = map_txt.split('/')[-1].split('.')[0]
     map_data = parse_map(map_txt)
-    images = load_images(TILE_SIZE)
+    default_tile_size = think_tile_size(map_data['width'], map_data['height'])
+
+    images = load_images(default_tile_size)
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
     initial_state.init_deadlock_areas()
 
@@ -285,8 +299,9 @@ def main():
     algorithm_finished = False
     current_algorithm = ''
 
+
     while True:
-        choice = main_menu(screen, font, description_font, map_name, current_state, images, map_data, algorithm_finished)
+        choice = main_menu(screen, font, description_font, map_name, current_state, images, map_data, algorithm_finished, default_tile_size)
         current_algorithm = choice
         if choice in ['BFS', 'DFS', 'Global Greedy', 'Local Greedy', 'A*']:
             pygame.display.flip()
@@ -311,7 +326,14 @@ def main():
                 new_state = current_state.move_player(dx, dy)
                 if new_state:
                     current_state = new_state
-                draw_board(screen, current_state, images, TILE_SIZE, 350, 150, map_data)
+                
+                map_w = map_data['width'] 
+                map_h = map_data['height'] 
+                map_center_x = (map_w) // 2
+                map_center_y = (map_h) // 2
+                screen_center_x = (300 + 362)
+                screen_center_y = (384)
+                draw_board(screen, current_state, images, default_tile_size, screen_center_x - map_center_x * default_tile_size, screen_center_y - map_center_y * default_tile_size, map_data)
                 pygame.display.flip()
                 pygame.time.wait(100)
             algorithm_finished = True

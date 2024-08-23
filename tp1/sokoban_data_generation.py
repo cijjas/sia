@@ -23,8 +23,8 @@ algorithm_map = {
     "BFS": bfs,
     "DFS": dfs,
     "A_STAR": a_star,
-    "GREEDY_LOCAL": greedy_global,
-    "GREEDY_GLOBAL": greedy_local,
+    "GREEDY_LOCAL": greedy_local,
+    "GREEDY_GLOBAL": greedy_global,
 }
 
 # Map user input to the corresponding heuristic class
@@ -43,7 +43,8 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
 
     with open(f'{OUTPUT_DIR}/{csv_file_name}', mode='w', newline='') as file:
         writer = csv.writer(file)
-        csv_header = ['map', 'algorithm', 'heuristics_used', 'iteration', 'execution_time', 'expanded_nodes', 'frontier_nodes', 'success_or_failure', 'cost', 'solution_path']
+        csv_header = ['map', 'algorithm', 'heuristics_used', 'iteration', 'execution_time', 'expanded_nodes', 'frontier_nodes', 'success_or_failure', 'cost']
+
         writer.writerow(csv_header)
 
         for m in maps:
@@ -77,8 +78,7 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
                         expanded_nodes,
                         frontier_nodes,
                         "SUCCESS" if solution_path is not None else "FAILURE",
-                        len(solution_path) if solution_path else 0,
-                        solution_path if solution_path else "No solution"
+                        len(solution_path) if solution_path else 0
                     ]
                     writer.writerow(row)
 
