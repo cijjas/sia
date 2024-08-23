@@ -58,7 +58,7 @@ Se le suman estados logicos utiles para optimizar el BFS
 - checkeo de deadlocks
 - a* debería dar óptimo para todas las heurisiticas admisibles
 
-[a star level 2](resources/gifs/a_star_2.gif)
+![a star level 2](resources/gifs/a_star_2.gif)
 
 # REF
 
