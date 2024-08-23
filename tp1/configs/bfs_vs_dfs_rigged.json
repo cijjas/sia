@@ -4,7 +4,7 @@
             "output_file": "bfs_vs_dfs.csv",
             "data_generation": {
                 "maps": [
-                    "lvl1.txt"
+                    "lvl3.txt"
                 ],
                 "algorithms": [
                     {

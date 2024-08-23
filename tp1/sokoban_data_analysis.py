@@ -12,6 +12,7 @@ from core.algorithms.greedy_local import greedy_local
 from core.algorithms.greedy_global import greedy_global
 from core.models.state import State
 from core.models.node import Node
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -48,55 +49,63 @@ def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre")
     plt.close()
 
 def main():
-    # Generate analytics
+    # all_algorithms.json
+    # Differences in time and spatial complexity for all algorithms
+    # Conclusion : BFS takes longer and expands more nodes than BFS but get to optimal, heuristics seem to be good...
+    file_path = f'{OUTPUT_DIR}/all_algorithms.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR", "DFS", "GREEDY_LOCAL"])
 
-    # Issues
-
-    # 3. Cost :
-    #   3.1 BFS get optimal solution, A_STAR with admissible heuristic also , DFS does not,, etc
-    #   3.2 Non Admisible Heuristics that can be really good for certain maps
-    #       Preprocesamiento del mapa para elegir correctamente las heuristicas que valen la pena (Ambiente finito nose que)
-    # Comparacion de manhattans
-
-    # Frontier Nodes : ???
-    # success_failure : ???
-
-    # bfs_vs_dfs.json
-    # 1. Differences in time and spatial complexity for BFS and DFS
-    file_path = f'{OUTPUT_DIR}/bfs_vs_dfs.csv'
+    # bfs_vs_dfs_rigged.json
+    # Differences in time and spatial complexity for BFS and DFS in maps that ruin DFS preference
+    # Conclusion : En ciertos casos expanden los mismos nodos e incluso DFS puede ser mas lento debido a la preference
+    file_path = f'{OUTPUT_DIR}/bfs_vs_dfs_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
 
-    # local_vs_global.json
-    # 2. Differences in time and spatial complexity for Greedy Local and Greedy Global
-    file_path = f'{OUTPUT_DIR}/greedy_local_vs_greedy_global.csv'
+    # bfs_vs_global_vs_a_star.json
+    # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
+    # Conclusion : heuristics seems to be the way to go
+    file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["GREEDY_LOCAL", "GREEDY_GLOBAL"])
+        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR"])
 
-    # heuristic_good.json
-    # 3. Good trade off using Deadlock Corner Heuristic
-    file_path = f'{OUTPUT_DIR}/heuristic_good.csv'
+    # bfs_vs_global_vs_a_star_bad_trade_off.json
+    # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
+    # Conclusion : heuristic's added time complexity is not worth the spatial savings
+    file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star_bad_trade_off.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "A_STAR"])
+        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR"])
 
-    # heuristic_bad.json
-    # 4. Bad trade off using Deadlock Corner Heuristic
-    file_path = f'{OUTPUT_DIR}/heuristic_bad.csv'
+    # dfs_vs_local.json
+    # Differences in time and spatial complexity for DFS and LOCAL
+    # Good trade off using Deadlock Corner Heuristic DFS
+    # Conclusion : heuristics seems to be the way to go
+    file_path = f'{OUTPUT_DIR}/dfs_vs_local.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "A_STAR"])
+        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
 
-    # heuristic_comparison.json
-    # 5. Compare the efficiency of the heuristics in different maps
-    file_path = f'{OUTPUT_DIR}/heuristic_comparison.csv'
+    # dfs_vs_local_bad_trade_off.json
+    # Differences in time and spatial complexity for DFS and LOCAL
+    # Conclusion : heuristic's added time complexity is not worth the spatial savings
+    file_path = f'{OUTPUT_DIR}/dfs_vs_local_bad_trade_off.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "A_STAR"])
+        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
 
-    # 6. Comparison right preference vs left preference vs center preference vs random preference (can we change an algorithm to do that?)
+    # ------------------------------------------------------------
+
+    # compare heuristics in different maps => some are better in some cases
+    # inadmissible heuristic being really good => can be really good
+    # compare all types of manhattans => which is better in which maps
+    # combine heuristics, which combination is better
+    # preprocesamiento FTW
+
 
 if __name__ == "__main__":
     main()

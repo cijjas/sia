@@ -25,6 +25,7 @@ algorithm_map = {
     "A_STAR": a_star,
     "GREEDY_LOCAL": greedy_local,
     "GREEDY_GLOBAL": greedy_global,
+
 }
 
 # Map user input to the corresponding heuristic class
