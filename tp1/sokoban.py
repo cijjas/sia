@@ -107,7 +107,7 @@ def main():
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
     initial_node = Node(initial_state, None, None, 0)
 
-    heuristics = [ DeadlockCorner() ]
+    heuristics = [ Deadlock() ]
     max_heuristic = max_heuristic_from_list(heuristics)
 
     # Use Search Algorithm
