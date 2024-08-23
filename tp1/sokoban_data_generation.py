@@ -49,7 +49,7 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
 
         for m in maps:
             map_data = parse_map(f'{MAPS_PATH}/{m}')
-            initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
+            initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
             initial_node = Node(initial_state, None, None, 0)
 
             for algo_config in algorithm_configs:

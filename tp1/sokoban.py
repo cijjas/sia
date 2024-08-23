@@ -104,7 +104,7 @@ def main():
 
     # Initial Values
     map_data = parse_map(sys.argv[1])
-    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'])
+    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
     initial_node = Node(initial_state, None, None, 0)
 
     heuristics = [ DeadlockCorner() ]
