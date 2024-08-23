@@ -96,11 +96,6 @@ class DeadlockCorner(Heuristic):
 class DeadlockWall(Heuristic):
 
     def __call__(self, state: State) -> float:
-        # if a box is next to a wall
-        if not state.any_box_next_to_wall():
-            return
-
-        for box, wall in state.get_boxes_next_to_wall():
-            if state.no_salvation_from_wall(box, wall):
-                return float('inf')
-        return 0
+        if state.is_deadlock():
+            return float('inf')
+        return ManhattanDistance1()(state)
