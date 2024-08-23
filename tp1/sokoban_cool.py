@@ -173,7 +173,7 @@ def max_heuristic_from_list(heuristics) -> Heuristic:
     return max_heuristic
 
 def run_algorithm(algorithm, initial_node):
-    heuristics = [ DeadlockCorner() ]
+    heuristics = [ ManhattanDistance2() ]
 
     if algorithm == 'BFS':
         return bfs(initial_node)
@@ -271,7 +271,7 @@ def render_multiline_left_justified_textbox(screen, texts, pos, font, color):
         y += y_spacing
 
 def think_tile_size(map_width, map_height):
-    if(map_width > 20 or map_height > 20):
+    if(map_width > 19 or map_height > 19):
         return 20
     return 40
 
@@ -291,7 +291,7 @@ def main():
     map_data = parse_map(map_txt)
     default_tile_size = think_tile_size(map_data['width'], map_data['height'])
 
-    images = load_images(default_tile_size)
+    images = load_images(default_tile_size, "minecraft")
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
     initial_state.init_deadlock_areas()
 
