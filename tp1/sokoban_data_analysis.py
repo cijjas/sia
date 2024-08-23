@@ -17,7 +17,9 @@ import matplotlib.pyplot as plt
 
 OUTPUT_DIR = "output"
 
-def show_comparison_graphs(df, algorithms_to_compare):
+def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre"):
+    os.makedirs('output/graphs', exist_ok=True)
+    
     filtered_df = df[df['algorithm'].isin(algorithms_to_compare)]
     grouped_df = filtered_df.groupby(['algorithm']).agg({
         'expanded_nodes': 'mean',
@@ -26,23 +28,24 @@ def show_comparison_graphs(df, algorithms_to_compare):
 
     grouped_df.columns = ['algorithm', 'expanded_nodes_mean', 'execution_time_mean', 'execution_time_std']
 
-    # Bar Chart for Expanded Nodes
+    # https://matplotlib.org/stable/users/explain/colors/colormaps.html
+
     plt.figure(figsize=(10, 6))
-    plt.bar(grouped_df['algorithm'], grouped_df['expanded_nodes_mean'], color=['blue', 'green'])
+    plt.bar(grouped_df['algorithm'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
     plt.title(f'Expanded Nodes for {", ".join(algorithms_to_compare)}')
     plt.xlabel('Algorithm')
     plt.ylabel('Expanded Nodes')
-    plt.show()
+    plt.savefig(f'output/graphs/en_{output_file}.png')
+    plt.close()
 
-    # Bar Chart for Execution Time
     plt.figure(figsize=(10, 6))
     plt.bar(grouped_df['algorithm'], grouped_df['execution_time_mean'],
-            yerr=grouped_df['execution_time_std'], color=['red', 'orange'], capsize=5)
+            yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
     plt.title(f'Execution Time for {", ".join(algorithms_to_compare)}')
     plt.xlabel('Algorithm')
     plt.ylabel('Execution Time (s)')
-    plt.show()
-
+    plt.savefig(f'output/graphs/t_{output_file}.png')
+    plt.close()
 
 def main():
     # Generate analytics
@@ -63,7 +66,7 @@ def main():
     file_path = f'{OUTPUT_DIR}/bfs_vs_dfs.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "DFS"])
+        show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
 
     # local_vs_global.json
     # 2. Differences in time and spatial complexity for Greedy Local and Greedy Global
