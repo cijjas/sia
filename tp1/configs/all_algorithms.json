@@ -1,0 +1,41 @@
+{
+    "executions": [
+        {
+            "output_file": "all_algorithms.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl6.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_GLOBAL",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        }
+    ]
+}

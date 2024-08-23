@@ -1,7 +1,7 @@
 {
     "executions": [
         {
-            "output_file": "functinality_test.csv",
+            "output_file": "functionality_test.csv",
             "data_generation": {
                 "maps": [
                     "lvl1.txt"
@@ -18,21 +18,30 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
+                            "Manhattan1",
                             "Manhattan2",
+                            "Manhattan3",
+                            "Euclidean",
                             "DeadlockCorner"
                         ]
                     },
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
+                            "Manhattan1",
                             "Manhattan2",
+                            "Manhattan3",
+                            "Euclidean",
                             "DeadlockCorner"
                         ]
                     },
                     {
                         "name": "GREEDY_GLOBAL",
                         "heuristics": [
+                            "Manhattan1",
                             "Manhattan2",
+                            "Manhattan3",
+                            "Euclidean",
                             "DeadlockCorner"
                         ]
                     }
