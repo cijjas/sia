@@ -48,6 +48,34 @@ def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre")
     plt.savefig(f'output/graphs/t_{output_file}.png')
     plt.close()
 
+def show_heuristics_comparison_graphs(df, algorithm, heuristics_to_compare, output_file="pone_nombre"):
+    os.makedirs('output/graphs', exist_ok=True)
+    
+    filtered_df = df[(df['algorithm'] == algorithm) & (df['heuristics_used'].isin(heuristics_to_compare))]
+    grouped_df = filtered_df.groupby(['heuristics_used']).agg({
+        'expanded_nodes': 'mean',
+        'execution_time': ['mean', 'std']
+    }).reset_index()
+
+    grouped_df.columns = ['heuristics_used', 'expanded_nodes_mean', 'execution_time_mean', 'execution_time_std']
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(grouped_df['heuristics_used'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
+    plt.title(f'Expanded Nodes for {", ".join(heuristics_to_compare)} in {algorithm}')
+    plt.xlabel('Heuristic')
+    plt.ylabel('Expanded Nodes')
+    plt.savefig(f'output/graphs/en_{output_file}.png')
+    plt.close()
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(grouped_df['heuristics_used'], grouped_df['execution_time_mean'],
+            yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
+    plt.title(f'Execution Time for {", ".join(heuristics_to_compare)} in {algorithm}')
+    plt.xlabel('Heuristic')
+    plt.ylabel('Execution Time (s)')
+    plt.savefig(f'output/graphs/t_{output_file}.png')
+    plt.close()
+
 def main():
     # all_algorithms.json
     # Differences in time and spatial complexity for all algorithms
@@ -97,6 +125,14 @@ def main():
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
+
+    # deadlock_cmp_a_star.json
+    # Differences in time and spatial complexity for A_STAR with corner deadlocks vs corner deadlocks + wall deadlocks
+    # Conclusion : The maps which have wall deadlock areas perform better with the added heuristic
+    file_path = f'{OUTPUT_DIR}/deadlock_cmp_a_star.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_heuristics_comparison_graphs(df, "A_STAR", ["Deadlock", "DeadlockCorner"])
 
     # ------------------------------------------------------------
 
