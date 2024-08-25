@@ -66,6 +66,47 @@ Dado que el objetivo de este tp no era tener una interfaz super perfecta (sino q
 
 Para usar data generation se debe definir un archivo de configuración con especificaciones de los métodos de corrida como el mapa, los algoritmos, las heurísticas y las iteraciones. También se define un archivo de salida en formato csv que es donde se vuelcan los resultados de las ejecuciones con información como el tiempo de ejecución, cantidad de nodos expandidos, solución, costo de la solución entre otros. En [configs](configs/) se encuentran varios de los usados para el análisis y la presentación.
 
+
+Por ejemplo:
+```json
+{
+    "executions": [
+        {
+            "output_file": "name_of_the_output_file.csv",
+            "data_generation": {
+                "maps": [ "map1.txt", "map2.txt"]
+                "algorithms": [
+                    {
+                        "name": "ALGORITHM_1",
+                        "heuristics": ["Heuristic_1", "Heuristic_2"]
+                    },
+                    {
+                        "name": "ALGORITHM_2",
+                        "heuristics": ["Heuristic_1"]
+                    }
+                ],
+                "iterations_for_average": NUMBER_OF_ITERATIONS
+            }
+        }
+    ]
+}
+
+```
+donde todas las configuraciones deben ser de esta forma.
+
+|campo | opciones|
+|--|--|
+| output_file| cualquier nombre seguido de .csv|
+| maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)| 
+| algorithms | array de algoritmos |
+| name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
+| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean|
+| iterations_for_average | cantidad de ejecuciones de los algorítmos \*|
+
+\* notar que esto sólo debería cambiar el tiempo de ejecución dado que es el único parámetro no determinístico para una ejecución
+
+
+
 ```sh
 python3 sokoban_data_generation.py configs/my_configuration.json
 ```
