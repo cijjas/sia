@@ -4,7 +4,7 @@
             "output_file": "all_algorithms.csv",
             "data_generation": {
                 "maps": [
-                    "lvl6.txt"
+                    "lvl1.txt"
                 ],
                 "algorithms": [
                     {
@@ -14,13 +14,15 @@
                     {
                         "name": "GREEDY_GLOBAL",
                         "heuristics": [
-                            "Manhattan3"
+                            "Manhattan1",
+                            "DeadlockCorner"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan3"
+                            "Manhattan1",
+                            "DeadlockCorner"
                         ]
                     },
                     {
@@ -30,7 +32,8 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan3"
+                            "Manhattan1",
+                            "DeadlockCorner"
                         ]
                     }
                 ],

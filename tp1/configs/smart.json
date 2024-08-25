@@ -10,28 +10,27 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MANHATTAN1"
+                            "Manhattan1"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MANHATTAN2"
+                            "Manhattan2"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "MANHATTAN3"
+                            "Manhattan3"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "SMARTHATTAN"
+                            "Smarthattan"
                         ]
                     }
-                    
                 ],
                 "iterations_for_average": 100
             }

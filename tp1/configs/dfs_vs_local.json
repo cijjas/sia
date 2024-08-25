@@ -1,24 +1,24 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_good.csv",
+            "output_file": "dfs_vs_local.csv",
             "data_generation": {
                 "maps": [
-                    "lvl2.txt"
+                    "lvl1.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "BFS",
+                        "name": "DFS",
                         "heuristics": []
                     },
                     {
-                        "name": "A_STAR",
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan"
+                            "Manhattan1"
                         ]
                     }
                 ],
-                "iterations_for_average": 2
+                "iterations_for_average": 10
             }
         }
     ]
