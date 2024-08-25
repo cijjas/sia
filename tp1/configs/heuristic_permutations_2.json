@@ -1,12 +1,26 @@
 {
     "executions": [
         {
-            "output_file": "admissible_vs_inadmissible.csv",
+            "output_file": "heuristic_permutation.csv",
             "data_generation": {
                 "maps": [
                     "lvl5.txt"
                 ],
                 "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1",
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock"
+                        ]
+                    },
                     {
                         "name": "A_STAR",
                         "heuristics": [
@@ -16,29 +30,32 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan2"
+                            "Basic"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan3"
+                            "Basic",
+                            "Manhattan1"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Smarthattan"
+                            "Basic",
+                            "Deadlock"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Inadmissible"
+                            "Deadlock",
+                            "Manhattan1"
                         ]
                     }
                 ],
-                "iterations_for_average": 3
+                "iterations_for_average": 10
             }
         }
     ]
