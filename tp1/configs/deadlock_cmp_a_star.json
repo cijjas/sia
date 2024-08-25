@@ -10,7 +10,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Deadlock", "DeadlockCorner"
+                            "Deadlock"
                         ]
                     }
                 ],
