@@ -20,7 +20,7 @@ OUTPUT_DIR = "output"
 
 def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre"):
     os.makedirs('output/graphs', exist_ok=True)
-    
+
     filtered_df = df[df['algorithm'].isin(algorithms_to_compare)]
     grouped_df = filtered_df.groupby(['algorithm']).agg({
         'expanded_nodes': 'mean',
@@ -50,7 +50,7 @@ def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre")
 
 def show_heuristics_comparison_graphs(df, algorithm, heuristics_to_compare, output_file="pone_nombre"):
     os.makedirs('output/graphs', exist_ok=True)
-    
+
     filtered_df = df[(df['algorithm'] == algorithm) & (df['heuristics_used'].isin(heuristics_to_compare))]
     grouped_df = filtered_df.groupby(['heuristics_used']).agg({
         'expanded_nodes': 'mean',
@@ -85,6 +85,14 @@ def main():
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR", "DFS", "GREEDY_LOCAL"])
 
+    # bfs_vs_dfs.json
+    # Differences in time and spatial complexity for BFS and DFS in maps that ruin DFS preference
+    # Conclusion : Usual case where BFS expands more nodes and takes more time than DFS
+    file_path = f'{OUTPUT_DIR}/bfs_vs_dfs.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
+
     # bfs_vs_dfs_rigged.json
     # Differences in time and spatial complexity for BFS and DFS in maps that ruin DFS preference
     # Conclusion : En ciertos casos expanden los mismos nodos e incluso DFS puede ser mas lento debido a la preference
@@ -93,7 +101,7 @@ def main():
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
 
-    # bfs_vs_global_vs_a_star.json
+    # bfs_vs_a_star.json
     # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristics seems to be the way to go
     file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star.csv'
@@ -101,7 +109,7 @@ def main():
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR"])
 
-    # bfs_vs_global_vs_a_star_bad_trade_off.json
+    # bfs_vs_a_star_rigged.json
     # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristic's added time complexity is not worth the spatial savings
     file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star_bad_trade_off.csv'
