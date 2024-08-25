@@ -24,43 +24,75 @@ $$\sum_{i = 1}^{8} \frac{v[i]}{8\cdot i }-1$$
 ### ¿Que Algoritmo de Busqueda usarian y con que heuristicas?
 Cuando hagamos el Sokoban vamos a tener mas idea
 
+
 # Ejercicio II - Sokoban
-### Definicion de Estados
-Matriz de NxM de posicion donde ademas se incluye el elemento en esa posicion, el elemento puede ser:
-- Jugador
-- Pared
-- Libre
-- Caja
-- Posicion objetivo de la caja
-- Caja en lugar correcto
-Se le suman estados logicos utiles para optimizar el BFS
-- Estados repetidos para no hacer loops infinitos
-- Estados bloqueados para que el BFS los descarte instantaneamente
-### Key Points:
-- Usar arcade library para generar los mapas
-- Definir un buen equals de estados que optimize la busqueda, constantemente va a estar revisando si alguno de los posibles estados es repetido
-### Heuristicas
-- Comparar siempre con la respuesta optima del BFS, si no es la misma entonces es un heuristica inadmisible
-- Toda heuristica genera un trade off entre memoria y tiempo, procesas mas profundamente pero explotas menos nodos
-- Hay heuristicas inadmisibles que son muy fuertes en ciertos mapas, son interesantes para plantear
+
+Para instalar las dependencias usar pipenv
+
+```sh
+pipenv install
+```
+
+## Sokoban
+
+Todos los códigos para el funcionamiento escencial de las estructuras y algorítmos se encuentran en la carpeta core.
+
+El tp1 contiene el código necesario para poder probar distintos algorítmos de búsqueda (algunos desinformados como otros informados). En este repo se encuentran BFS, DFS, A*, Local Greedy y Global Greedy, ver: [directorio de algorítmos](core/algorithms/). Para los informados (que requieren de una heurística) se pueden usar las heurísticas definidas en el [archivo de heuristicas](core/heuristics.py). Dentro de la carpeta [models](core/models/) se encuentra la definición de estado y nodo.
 
 
+La carpeta maps permite definir mapas como se definen en [este página](http://www.game-sokoban.com/index.php?mode=level&lid=200) que son parseados por el [map parser](core/utils/map_parser.py).
+
+Hay varias formas de ejecución para el sokoban.
+
+1. Modo interactivo [SOKBAN COOL](sokoban_cool.py)
+2. Modo de generación de data [GENERATION](sokoban_data_generation.py)
+3. Modo análsis [ANALYSIS](sokoban_data_analysis.py)
+
+### Sokoban cool
+
+Interfaz gráfica simple, hecha con pygame para probar distintos algorítmos y ver sus soluciones propuestas.
+
+![bfs 1 gif](resources/gifs/bfs_1.gif)
+
+para ejecutarlo 
+
+```sh
+python3 sokoban_cool.py path/to/map.txt
+```
+
+Dado que el objetivo de este tp no era tener una interfaz super perfecta (sino que obtener soluciones de mapas de sokoban) dejamos algunas configuraciones a hacer manualmente como por ejemplo elegir las heurísticas a usar para los algoritmos informados. Por default estan Manhattan1 y Deadlocks. Para cambiar esto se puede configurar en la función de `run_algorithm` de [sokoban_cool.py](sokoban_cool.py) donde se pueden quitar o introducir nuevas heurísticas definidas en el archivo de heurísticas. También es posible cambiar el texture pack agregando el parámetro en la función `load_images` mencionando el nombre de la carpeta que se quiera que está en [texture_packs](resources/texture_packs/).
+
+### Sokoban data generation
+
+Para usar data generation se debe definir un archivo de configuración con especificaciones de los métodos de corrida como el mapa, los algoritmos, las heurísticas y las iteraciones. También se define un archivo de salida en formato csv que es donde se vuelcan los resultados de las ejecuciones con información como el tiempo de ejecución, cantidad de nodos expandidos, solución, costo de la solución entre otros. En [configs](configs/) se encuentran varios de los usados para el análisis y la presentación.
+
+```sh
+python3 sokoban_data_generation.py configs/my_configuration.json
+```
+
+El output csv de esta ejecución se guarda en la carpeta [output](output/) que está configurada para no commitearse.
+
+### Sokoban data analysis
+
+Esta ejecución nos permite hacer el análisis del paso previo (data generation) para generar gráficos comparativos de las distintas ejecuciones. Su propósito es ser configurado y perfeccionado a medida del que hace el análisis. 
+
+## Q&A sobre la implementación
+
+### ¿Cómo implementamos backtracking?
+Depende del algoritmo a usar pero sepuede ver en las implementaciones en el directorio de algoritmos que se usan setructuras tipo colas y stacks (algunos ordenados) como para mantener nodos con sus estados a la espera de ser popeados y explorados. De esta forma garantizando backtracking.
 
 
-# ISSUES
-- Expanded nodes del DFS es mayor al del BFS, imposible que ocurra practicamente (correr con bug_config.json)
+### ¿Qué hacemos con repetidos estados?
 
+Nos aseguramos de no visitar nodos repetidos manteniendo un set paralelo a la ejecutción que garantiza evitar la repetición y evita entrar en loops infinitos.
 
-- backtracking como lo implementamos
-- que hacemos con repetidos
-- detalles de implementación izq der
 - dfs importante como decidis el siguiente estado (no trivial) hay algunos tableros que dependen de esta decisión.
 - checkeo de deadlocks
 - a* debería dar óptimo para todas las heurisiticas admisibles
 
-![a star level 2](resources/gifs/a_star_2.gif)
 
-# REF
+
+# Referencias
 
 - [Experto en Heuristicas](https://www.reddit.com/r/algorithms/comments/fedzu1/pathfinding_heuristic_for_indirect_movement_like/)
 - IDA*
