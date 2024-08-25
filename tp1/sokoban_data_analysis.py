@@ -107,5 +107,58 @@ def main():
     # preprocesamiento FTW
 
 
+    file_path = f'{OUTPUT_DIR}/smarthattan.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        # Group data by heuristics and calculate mean and standard deviation
+        grouped = df.groupby('heuristics_used').agg(
+            mean_execution_time=pd.NamedAgg(column='execution_time', aggfunc='mean'),
+            std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std'),
+        ).reset_index()
+
+        # Create a figure with subplots for bar charts
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+        expanded_nodes = df.groupby('heuristics_used')['expanded_nodes'].first().reset_index()
+
+
+        new_names = {
+            "ManhattanDistance1": "M1",
+            "ManhattanDistance2": "M2",
+            "ManhattanDistance3": "M3",
+            "Smarthattan": "Smarthattan",
+        }
+        # Bar plot for Expanded Nodes
+        bars1 = ax1.bar(grouped['heuristics_used'],expanded_nodes['expanded_nodes'],
+                capsize=5, color='blue', alpha=0.7)
+        ax1.set_title('Nodos Expandidos vs Heurísticas')
+        ax1.set_xlabel('Heurísticas')
+        ax1.set_ylabel('Nodos Expandidos')
+        ax1.set_xticks(range(len(grouped['heuristics_used'])))
+        ax1.set_xticklabels([new_names[name] for name in grouped['heuristics_used']])
+        ax1.set_ylim(32000, max(expanded_nodes['expanded_nodes']) + 1000)  # Set y-axis to start at 30000
+
+        # Adding text labels on bars
+        for bar in bars1:
+            yval = bar.get_height()
+            ax1.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 2), va='bottom')  # va: vertical alignment
+
+        # Bar plot for Execution Time
+        bars2 = ax2.bar(grouped['heuristics_used'], grouped['mean_execution_time'],
+                yerr=grouped['std_execution_time'], capsize=5, color='red', alpha=0.7)
+        ax2.set_title('Tiempo Promedio de Ejecución vs Heurísticas')
+        ax2.set_xlabel('Heurísticas')
+        ax2.set_ylabel('Tiempo de Ejecución (s)')
+        ax2.set_xticks(range(len(grouped['heuristics_used'])))
+        ax2.set_xticklabels([new_names[name] for name in grouped['heuristics_used']])
+
+        # Adding text labels on bars
+        for bar in bars2:
+            yval = bar.get_height()
+            ax2.text(bar.get_x() + bar.get_width()/2, yval, round(yval, 4), va='bottom')  # Format for more precision
+
+        plt.tight_layout()
+        plt.show()
+
 if __name__ == "__main__":
     main()
