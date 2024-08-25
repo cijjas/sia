@@ -129,10 +129,11 @@ def main():
     # deadlock_cmp_a_star.json
     # Differences in time and spatial complexity for A_STAR with corner deadlocks vs corner deadlocks + wall deadlocks
     # Conclusion : The maps which have wall deadlock areas perform better with the added heuristic
-    file_path = f'{OUTPUT_DIR}/deadlock_cmp_a_star.csv'
-    if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-        show_heuristics_comparison_graphs(df, "A_STAR", ["Deadlock", "DeadlockCorner"])
+    
+    #file_path = f'{OUTPUT_DIR}/deadlock_cmp_a_star.csv'
+    #if os.path.exists(file_path):
+    #    df = pd.read_csv(file_path)
+    #    show_heuristics_comparison_graphs(df, "A_STAR", ["Deadlock", "DeadlockCorner"])
 
     # ------------------------------------------------------------
 
