@@ -34,8 +34,9 @@ heuristics_map = {
     "Manhattan2": ManhattanDistance2(),
     "Manhattan3": ManhattanDistance3(),
     "Euclidean": EuclideanDistance(),
-    "DeadlockCorner": DeadlockCorner(),
-    "Deadlock": Deadlock()
+    "Deadlock": Deadlock(),
+    "Smarthattan": Smarthattan(),
+    "Inadmissible": Inadmissible(),
 }
 
 def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_name):

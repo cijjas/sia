@@ -1,21 +1,24 @@
 {
     "executions": [
         {
-            "output_file": "deadlock_cmp_a_star.csv",
+            "output_file": "inadmissible.csv",
             "data_generation": {
                 "maps": [
-                    "lvl2.txt"
+                    "lvl5.txt"
                 ],
                 "algorithms": [
                     {
                         "name": "A_STAR",
+                        "heuristics": [ "Manhattan1" ]
+                    },
+                    {
+                        "name": "A_STAR",
                         "heuristics": [
-                            "Deadlock"
+                            "Inadmissible"
                         ]
                     }
                 ],
-                "iterations_for_average": 100,
-                "compare": true
+                "iterations_for_average": 10
             }
         }
     ]

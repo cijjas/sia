@@ -130,14 +130,29 @@ class Deadlock(Heuristic):
         return 0
 
 # We can say that given a wall with no goals or holes, it is a deadlock if a box is next to it
-class DeadlockCorner(Heuristic):
-    def __call__(self, state: State) -> float:
-        if state.is_deadlock_corner():
-            return float('inf')
-        return 0
+#class DeadlockCorner(Heuristic):
+#    def __call__(self, state: State) -> float:
+#        if state.is_deadlock_corner():
+#            return float('inf')
+#        return 0
 
 
 class BasicHeuristic(Heuristic):
     def __call__(self, state: State) -> float:
         #  returns the amount of boxes that are not in the correct position
         return len([box for box in state.boxes if box not in state.goals])
+    
+
+class Inadmissible(Heuristic):
+    def __call__(self, state: State) -> float:
+        total_distance = 0
+
+        for box in state.boxes:
+            total_distance += manhattan(box, state.player)
+           
+
+        for box in state.boxes:
+            for goal in state.goals:
+                total_distance += manhattan(box, goal)
+
+        return total_distance
