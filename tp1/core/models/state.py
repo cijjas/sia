@@ -1,7 +1,7 @@
 from typing import List, Tuple
 
 class State:
-    def __init__(self, walls: set, goals: set, boxes: set, player: tuple, spaces: set, deadlock_areas: set = set(), corner_deadlock_areas: set = set()):
+    def __init__(self, walls: set, goals: set, boxes: set, player: tuple, spaces: set, deadlock_areas: set = set()):
         self.walls = walls
         self.goals = goals
         self.boxes = boxes
@@ -9,7 +9,7 @@ class State:
         self.spaces = spaces
         self._hash_value = None
         self.deadlock_areas: set = deadlock_areas
-        self.corner_deadlock_areas: set = corner_deadlock_areas
+#        self.corner_deadlock_areas: set = corner_deadlock_areas
 
 
     def __eq__(self, other):
@@ -22,7 +22,7 @@ class State:
 
     def init_deadlock_areas(self):
         corner_deadlock_areas: set = self._init_corner_deadlock_areas(self.walls)
-        self.corner_deadlock_areas = corner_deadlock_areas
+        #self.corner_deadlock_areas = corner_deadlock_areas
         wall_deadlock_areas: set = self._init_wall_deadlock_areas(corner_deadlock_areas)
         self.deadlock_areas = corner_deadlock_areas.union(wall_deadlock_areas)
 
@@ -117,7 +117,7 @@ class State:
             new_boxes.remove(new_player)
             new_box = (new_player[0] + dx, new_player[1] + dy)
             new_boxes.add(new_box)
-        return State(self.walls, self.goals, new_boxes, new_player, self.spaces, self.deadlock_areas, self.corner_deadlock_areas)
+        return State(self.walls, self.goals, new_boxes, new_player, self.spaces, self.deadlock_areas)
 
     def is_goal(self):
         return all(box in self.goals for box in self.boxes)
@@ -189,10 +189,10 @@ class State:
                 return True
         return False
 
-    def is_deadlock_corner(self):
-        """ Returns True if the state is a deadlock by checking the corner deadlock areas """
-        for box in self.boxes:
-            if box in self.corner_deadlock_areas and box not in self.goals:
-                return True
-        return False
+#    def is_deadlock_corner(self):
+#        """ Returns True if the state is a deadlock by checking the corner deadlock areas """
+#        for box in self.boxes:
+#            if box in self.corner_deadlock_areas and box not in self.goals:
+#                return True
+#        return False
     
