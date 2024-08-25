@@ -85,7 +85,7 @@ Por ejemplo:
                         "heuristics": ["Heuristic_1"]
                     }
                 ],
-                "iterations_for_average": NUMBER_OF_ITERATIONS
+                "iterations_for_average": 10
             }
         }
     ]
@@ -100,12 +100,13 @@ donde todas las configuraciones deben ser de esta forma.
 | maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)| 
 | algorithms | array de algoritmos |
 | name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
-| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean|
+| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean, Inadmissible|
 | iterations_for_average | cantidad de ejecuciones de los algorítmos \*|
 
 \* notar que esto sólo debería cambiar el tiempo de ejecución dado que es el único parámetro no determinístico para una ejecución
 
 
+Correr de la siguiente manera:
 
 ```sh
 python3 sokoban_data_generation.py configs/my_configuration.json
