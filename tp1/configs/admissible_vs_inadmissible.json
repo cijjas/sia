@@ -1,18 +1,20 @@
 {
     "executions": [
         {
-            "output_file": "dfs_vs_local.csv",
+            "output_file": "bfs_vs_a_star_bad_rigged.csv",
             "data_generation": {
                 "maps": [
-                    "lvl6.txt"
+                    "lvl4.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "DFS",
-                        "heuristics": []
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
                     },
                     {
-                        "name": "GREEDY_LOCAL",
+                        "name": "A_STAR",
                         "heuristics": [
                             "Manhattan1"
                         ]

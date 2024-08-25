@@ -2,7 +2,7 @@
 
 ### ¿Que estructura de datos utilizarian?
 Matriz de 3x3 donde cada valor es un char y el vacio es representado por el '\0'. Es decir, cada número del tablero lo representamos como char (1 es '1', 2 es '2', y así)
-La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
+La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 3 posibles esquinas.
 Por ejemplo
 3 2 1
 4 0 6
@@ -54,7 +54,7 @@ Interfaz gráfica simple, hecha con pygame para probar distintos algorítmos y v
 
 ![bfs 1 gif](resources/gifs/bfs_1.gif)
 
-para ejecutarlo 
+para ejecutarlo
 
 ```sh
 python3 sokoban_cool.py path/to/map.txt
@@ -97,7 +97,7 @@ donde todas las configuraciones deben ser de esta forma.
 |campo | opciones|
 |--|--|
 | output_file| cualquier nombre seguido de .csv|
-| maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)| 
+| maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)|
 | algorithms | array de algoritmos |
 | name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
 | heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean|
@@ -115,7 +115,7 @@ El output csv de esta ejecución se guarda en la carpeta [output](output/) que e
 
 ### Sokoban data analysis
 
-Esta ejecución nos permite hacer el análisis del paso previo (data generation) para generar gráficos comparativos de las distintas ejecuciones. Su propósito es ser configurado y perfeccionado a medida del que hace el análisis. 
+Esta ejecución nos permite hacer el análisis del paso previo (data generation) para generar gráficos comparativos de las distintas ejecuciones. Su propósito es ser configurado y perfeccionado a medida del que hace el análisis.
 
 ## Q&A sobre la implementación
 
