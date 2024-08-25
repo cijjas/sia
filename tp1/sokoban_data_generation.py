@@ -34,7 +34,6 @@ heuristics_map = {
     "Manhattan2": ManhattanDistance2(),
     "Manhattan3": ManhattanDistance3(),
     "Euclidean": EuclideanDistance(),
-    "DeadlockCorner": DeadlockCorner(),
     "Deadlock": Deadlock(),
     "Smarthattan": Smarthattan(),
     "Inadmissible": Inadmissible(),
