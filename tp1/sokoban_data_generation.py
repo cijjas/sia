@@ -134,7 +134,7 @@ def create_comparison_data_set(map, algorithm_config, heuristics, iterations_for
 
                 current_execution += 1
                 print(f"Progress: {current_execution}/{total_executions} executions completed ({(current_execution / total_executions) * 100:.2f}%)")
-    
+
 
 def main():
     if len(sys.argv) != 2:
@@ -160,7 +160,7 @@ def main():
                     create_comparison_data_set(maps[0], algorithm_configs[0], heuristics, iterations_for_average, name)
             else:
                 create_data_set(maps, algorithm_configs, iterations_for_average, name)
-        
+
     print("Data generation completed!")
 
 if __name__ == "__main__":

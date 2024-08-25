@@ -1,0 +1,39 @@
+{
+    "executions": [
+        {
+            "output_file": "smarthattan.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan2"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Smarthattan"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 100
+            }
+        }
+    ]
+}

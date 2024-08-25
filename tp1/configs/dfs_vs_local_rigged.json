@@ -1,19 +1,21 @@
 {
     "executions": [
         {
-            "output_file": "bfs_vs_dfs_rigged.csv",
+            "output_file": "dfs_vs_local_rigged.csv",
             "data_generation": {
                 "maps": [
-                    "lvl3.txt"
+                    "lvl4.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "BFS",
+                        "name": "DFS",
                         "heuristics": []
                     },
                     {
-                        "name": "DFS",
-                        "heuristics": []
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
                     }
                 ],
                 "iterations_for_average": 10

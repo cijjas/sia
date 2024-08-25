@@ -1,26 +1,24 @@
 {
     "executions": [
         {
-            "output_file": "greedy_local_vs_greedy_global.csv",
+            "output_file": "bfs_vs_a_star_bad_rigged.csv",
             "data_generation": {
                 "maps": [
                     "lvl4.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "GREEDY_LOCAL",
-                        "heuristics": [
-                            "Manhattan2"
-                        ]
+                        "name": "BFS",
+                        "heuristics": []
                     },
                     {
-                        "name": "GREEDY_GLOBAL",
+                        "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan2"
+                            "Manhattan1"
                         ]
                     }
                 ],
-                "iterations_for_average": 1
+                "iterations_for_average": 10
             }
         }
     ]
