@@ -1,0 +1,22 @@
+{
+    "executions": [
+        {
+            "output_file": "deadlock_cmp_a_star.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl2.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock", "DeadlockCorner"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 100,
+                "compare": true
+            }
+        }
+    ]
+}

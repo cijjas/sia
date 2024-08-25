@@ -121,21 +121,20 @@ class EuclideanDistance(Heuristic):
             total_distance += min_distance
         return total_distance
 
-#
-class DeadlockCorner(Heuristic):
-    """ Returns the sum of the euclidean distances between each box and its closest goal """
+# Calculates whether the state is a deadlock or not
+class Deadlock(Heuristic):
+    """ Heuristic that returns infinity if the state is a deadlock, 0 otherwise """
     def __call__(self, state: State) -> float:
         if state.is_deadlock():
             return float('inf')
         return 0
 
 # We can say that given a wall with no goals or holes, it is a deadlock if a box is next to it
-class DeadlockWall(Heuristic):
-
+class DeadlockCorner(Heuristic):
     def __call__(self, state: State) -> float:
-        if state.is_deadlock():
+        if state.is_deadlock_corner():
             return float('inf')
-        return ManhattanDistance1()(state)
+        return 0
 
 
 class BasicHeuristic(Heuristic):

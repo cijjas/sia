@@ -22,7 +22,7 @@
                             "Manhattan2",
                             "Manhattan3",
                             "Euclidean",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     },
                     {
@@ -32,7 +32,7 @@
                             "Manhattan2",
                             "Manhattan3",
                             "Euclidean",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     },
                     {
@@ -42,7 +42,7 @@
                             "Manhattan2",
                             "Manhattan3",
                             "Euclidean",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     }
                 ],
