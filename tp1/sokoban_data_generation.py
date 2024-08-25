@@ -30,12 +30,13 @@ algorithm_map = {
 
 # Map user input to the corresponding heuristic class
 heuristics_map = {
-    "Manhattan1": ManhattanDistance1(),
-    "Manhattan2": ManhattanDistance2(),
-    "Manhattan3": ManhattanDistance3(),
-    "Euclidean": EuclideanDistance(),
-    "DeadlockCorner": DeadlockCorner(),
-    "DeadlockWall": DeadlockWall()
+    "MANHATTAN1": ManhattanDistance1(),
+    "MANHATTAN2": ManhattanDistance2(),
+    "MANHATTAN3": ManhattanDistance3(),
+    "SMARTHATTAN": Smarthattan(),
+    "EUCLIDEAN": EuclideanDistance(),
+    "DEADLOCK_CORNER": DeadlockCorner(),
+    "DEADLOCK_WALL": DeadlockWall()
 }
 
 def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_name):
