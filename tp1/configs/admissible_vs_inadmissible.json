@@ -1,0 +1,45 @@
+{
+    "executions": [
+        {
+            "output_file": "admissible_vs_inadmissible.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl5.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan2"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Smarthattan"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Inadmissible"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 3
+            }
+        }
+    ]
+}

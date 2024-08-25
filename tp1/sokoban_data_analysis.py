@@ -104,18 +104,18 @@ def main():
     # bfs_vs_a_star.json
     # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristics seems to be the way to go
-    file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star.csv'
+    file_path = f'{OUTPUT_DIR}/bfs_vs_a_star.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR"])
+        show_comparison_graphs(df, ["BFS", "A_STAR"])
 
     # bfs_vs_a_star_rigged.json
     # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristic's added time complexity is not worth the spatial savings
-    file_path = f'{OUTPUT_DIR}/bfs_vs_global_vs_a_star_bad_trade_off.csv'
+    file_path = f'{OUTPUT_DIR}/bfs_vs_a_star_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR"])
+        show_comparison_graphs(df, ["BFS", "A_STAR"])
 
     # dfs_vs_local.json
     # Differences in time and spatial complexity for DFS and LOCAL
@@ -126,10 +126,10 @@ def main():
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
 
-    # dfs_vs_local_bad_trade_off.json
+    # dfs_vs_local_rigged.json
     # Differences in time and spatial complexity for DFS and LOCAL
     # Conclusion : heuristic's added time complexity is not worth the spatial savings
-    file_path = f'{OUTPUT_DIR}/dfs_vs_local_bad_trade_off.csv'
+    file_path = f'{OUTPUT_DIR}/dfs_vs_local_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
         show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
@@ -137,20 +137,13 @@ def main():
     # deadlock_cmp_a_star.json
     # Differences in time and spatial complexity for A_STAR with corner deadlocks vs corner deadlocks + wall deadlocks
     # Conclusion : The maps which have wall deadlock areas perform better with the added heuristic
-    
+
     #file_path = f'{OUTPUT_DIR}/deadlock_cmp_a_star.csv'
     #if os.path.exists(file_path):
     #    df = pd.read_csv(file_path)
     #    show_heuristics_comparison_graphs(df, "A_STAR", ["Deadlock", "DeadlockCorner"])
 
     # ------------------------------------------------------------
-
-    # compare heuristics in different maps => some are better in some cases
-    # inadmissible heuristic being really good => can be really good
-    # compare all types of manhattans => which is better in which maps
-    # combine heuristics, which combination is better
-    # preprocesamiento FTW
-
 
     file_path = f'{OUTPUT_DIR}/smarthattan.csv'
     if os.path.exists(file_path):
