@@ -1,6 +1,25 @@
 import heapq
-from collections import deque
 import time
+
+class State:
+    def __init__(self, state):
+        self.state = state
+
+    def __eq__(self, other):
+        if isinstance(other, State):
+            return order_min_corner(self.state) == order_min_corner(other.state)
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, State):
+            return order_min_corner(self.state) < order_min_corner(other.state)
+        return False
+
+    def __hash__(self):
+        return hash(order_min_corner(self.state))
+
+    def __repr__(self):
+        return str(self.state)
 
 class PriorityQueue:
     def __init__(self):
@@ -16,34 +35,34 @@ class PriorityQueue:
         return heapq.heappop(self.elements)[1]
 
 def misplaced_tiles(state, goal):
-    return sum(s != g for s, g in zip(state, goal))
+    return sum(s != g for s, g in zip(state.state, goal.state))
 
 def manhattan_distance(state, goal):
     distance = 0
     for i in range(1, 9):  # 1 through 8
-        x1, y1 = divmod(state.index(i), 3)
-        x2, y2 = divmod(goal.index(i), 3)
+        x1, y1 = divmod(state.state.index(i), 3)
+        x2, y2 = divmod(goal.state.index(i), 3)
         distance += abs(x1 - x2) + abs(y1 - y2)
     return distance
 
 def neighbors(state):
     neighbors = []
-    index = state.index(0)  # Find the empty space
-    x, y = divmod(index, 3)
-    moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+    empty_index = state.state.index(0)
+    empty_x, empty_y = divmod(empty_index, 3)
 
-    for move in moves:
-        new_x, new_y = x + move[0], y + move[1]
+    for i, (dx, dy) in enumerate(((0, 1), (1, 0), (0, -1), (-1, 0))):
+        new_x, new_y = empty_x + dx, empty_y + dy
         if 0 <= new_x < 3 and 0 <= new_y < 3:
             new_index = new_x * 3 + new_y
-            new_state = list(state)
-            new_state[index], new_state[new_index] = new_state[new_index], new_state[index]
-            neighbors.append(tuple(new_state))
+            new_state = list(state.state)
+            new_state[empty_index], new_state[new_index] = new_state[new_index], new_state[empty_index]
+            neighbors.append(State(tuple(new_state)))
+
     return neighbors
 
 def print_board(state):
     for i in range(0, 9, 3):
-        print(state[i:i + 3])
+        print(state.state[i:i + 3])
     print()
 
 def reconstruct_path(came_from, current):
@@ -54,6 +73,8 @@ def reconstruct_path(came_from, current):
     return path[::-1]
 
 def a_star(start, goal):
+    start = State(order_min_corner(start))
+    goal = State(order_min_corner(goal))
     open_set = PriorityQueue()
     open_set.put(start, 0)
     explored = set()
@@ -67,7 +88,7 @@ def a_star(start, goal):
         current = open_set.get()
 
         if current == goal:
-            #print(f"Expanded nodes: {expanded_nodes}")
+            print(f"Expanded nodes: {expanded_nodes}")
             return reconstruct_path(came_from, current)
 
         explored.add(current)
@@ -84,20 +105,9 @@ def a_star(start, goal):
 
     return None  # No solution found
 
-def bfs(start, goal):
-    open_set = deque([start])
-    came_from = {}
-    while open_set:
-        current = open_set.popleft()
-        if current == goal:
-            return reconstruct_path(came_from, current)
-        for neighbor in neighbors(current):
-            if neighbor not in came_from:
-                came_from[neighbor] = current
-                open_set.append(neighbor)
-    return None
-
 def global_greedy(start, goal):
+    start = State(order_min_corner(start))
+    goal = State(order_min_corner(goal))
     frontier = []
     explored = set()
     came_from = {}
@@ -124,41 +134,20 @@ def global_greedy(start, goal):
 
     return None
 
-def dfs(start, goal):
-    open_set = [start]
-    came_from = {}
-    while open_set:
-        current = open_set.pop()
-        if current == goal:
-            return reconstruct_path(came_from, current)
-        for neighbor in reversed(neighbors(current)):
-            if neighbor not in came_from:
-                came_from[neighbor] = current
-                open_set.append(neighbor)
-    return None
-
-def dls(start, goal, depth):
-    open_set = [(start, 0)]
-    came_from = {}
-    while open_set:
-        current, current_depth = open_set.pop()
-        if current == goal:
-            return reconstruct_path(came_from, current)
-        if current_depth < depth:
-            for neighbor in reversed(neighbors(current)):
-                if neighbor not in came_from:
-                    came_from[neighbor] = current
-                    open_set.append((neighbor, current_depth + 1))
-    return None
-
-def iddfs(start, goal):
-    depth = 0
-    while True:
-        result = dls(start, goal, depth)
-        if result is not None:
-            return result
-        depth += 1
-
+def order_min_corner(state):
+    """ finds the corner with the lowest value and rotates the board so that it is in the upper left corner """
+    # 0 1 2     2 5 8       8 7 6       6 3 0
+    # 3 4 5 ->  1 4 7 ->    5 4 3 ->    7 4 1
+    # 6 7 8     0 3 6       2 1 0       8 5 2
+    min_corner = min(state[0], state[2], state[6], state[8])
+    if min_corner == state[0]:
+        return state
+    elif min_corner == state[2]:
+        return (state[2], state[5], state[8], state[1], state[4], state[7], state[0], state[3], state[6])
+    elif min_corner == state[6]:
+        return (state[6], state[3], state[0], state[7], state[4], state[1], state[8], state[5], state[2])
+    else:
+        return (state[8], state[7], state[6], state[5], state[4], state[3], state[2], state[1], state[0])
 
 def main():
     # Example usage:
@@ -169,7 +158,7 @@ def main():
     for k in range(1):
         start_time = time.time()
 
-        solution = global_greedy(start_state, goal_state)
+        solution = a_star(start_state, goal_state)
 
         end_time = time.time()
         time_array.append(end_time - start_time)

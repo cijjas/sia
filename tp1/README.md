@@ -1,7 +1,7 @@
 # Ejercicio I - 8-Puzzle
 
 ### ¿Que estructura de datos utilizarian?
-Matriz de 3x3 donde cada valor es un char y el vacio es representado por el '\0'. Es decir, cada número del tablero lo representamos como char (1 es '1', 2 es '2', y así)
+Matriz de 3x3 donde cada valor es un número del 0 al 8 inclusive.
 La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
 Por ejemplo
 3 2 1
