@@ -94,8 +94,7 @@ class Deadlock(Heuristic):
 
 # We can say that given a wall with no goals or holes, it is a deadlock if a box is next to it
 class DeadlockCorner(Heuristic):
-
     def __call__(self, state: State) -> float:
         if state.is_deadlock_corner():
             return float('inf')
-        return ManhattanDistance1()(state)
+        return 0

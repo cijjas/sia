@@ -51,6 +51,7 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
         for m in maps:
             map_data = parse_map(f'{MAPS_PATH}/{m}')
             initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
+            initial_state.init_deadlock_areas()
             initial_node = Node(initial_state, None, None, 0)
 
             for algo_config in algorithm_configs:
@@ -86,10 +87,9 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
                     current_execution += 1
                     print(f"Progress: {current_execution}/{total_executions} executions completed ({(current_execution / total_executions) * 100:.2f}%)")
 
-def create_comparison_data_set(maps, algorithm_configs, iterations_for_average, csv_file_name):
-    """ instead of using the heuristics as a parameter for the algorithm, we will compare them. 
-    Each heuristic will be tested in a different execution with the algorithm provided """
-    total_executions = len(maps) * len(algorithm_configs) * iterations_for_average
+def create_comparison_data_set(map, algorithm_config, heuristics, iterations_for_average, csv_file_name):
+    """ Create a data set for comparing heuristics under the same algorithm and map """
+    total_executions = len(heuristics) * iterations_for_average
     current_execution = 0
 
     with open(f'{OUTPUT_DIR}/{csv_file_name}', mode='w', newline='') as file:
@@ -98,51 +98,43 @@ def create_comparison_data_set(maps, algorithm_configs, iterations_for_average, 
 
         writer.writerow(csv_header)
 
-        for m in maps:
-            map_data = parse_map(f'{MAPS_PATH}/{m}')
-            initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
-            initial_node = Node(initial_state, None, None, 0)
+        map_data = parse_map(f'{MAPS_PATH}/{map}')
+        initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
+        initial_state.init_deadlock_areas()
+        initial_node = Node(initial_state, None, None, 0)
 
-            for algo_config in algorithm_configs:
-                algorithm_name = algo_config['name']
-                algorithm_function = algorithm_map.get(algorithm_name)
+        algorithm_name = algorithm_config['name']
+        algorithm_function = algorithm_map.get(algorithm_name)
 
-                if algorithm_function is None:
-                    print(f"Invalid Algorithm: {algorithm_name}")
-                    sys.exit(1)
+        if algorithm_function is None:
+            print(f"Invalid Algorithm: {algorithm_name}")
+            sys.exit(1)
 
-                heuristics_to_use = algo_config.get('heuristics', [])
-                for heuristic_name in heuristics_to_use:
-                    heuristic = heuristics_map.get(heuristic_name)
-                    if heuristic is None:
-                        print(f"Invalid Heuristic: {heuristic_name}")
-                        continue
+        for h in heuristics:
+            for i in range(iterations_for_average):
+                start_time = time.time()
 
-                    for i in range(iterations_for_average):
-                        start_time = time.time()
+                if algorithm_name in ["A_STAR", "GREEDY_LOCAL", "GREEDY_GLOBAL"]:
+                    solution_path, expanded_nodes, frontier_nodes = algorithm_function(initial_node, [h])
+                else:
+                    solution_path, expanded_nodes, frontier_nodes = algorithm_function(initial_node)
 
-                        if algorithm_name in ["A_STAR", "GREEDY_LOCAL", "GREEDY_GLOBAL"]:
-                            solution_path, expanded_nodes, frontier_nodes = algorithm_function(initial_node, [heuristic])
-                        else:
-                            solution_path, expanded_nodes, frontier_nodes = algorithm_function(initial_node)
+                execution_time = time.time() - start_time
+                row = [
+                    map.split('.')[0],
+                    algorithm_name,
+                    str(h),
+                    i + 1, execution_time,
+                    expanded_nodes,
+                    frontier_nodes,
+                    "SUCCESS" if solution_path is not None else "FAILURE",
+                    len(solution_path) if solution_path else 0
+                ]
+                writer.writerow(row)
 
-                        execution_time = time.time() - start_time
-                        row = [
-                            m.split('.')[0],
-                            algorithm_name,
-                            heuristic_name,
-                            i + 1,
-                            execution_time,
-                            expanded_nodes,
-                            frontier_nodes,
-                            "SUCCESS" if solution_path is not None else "FAILURE",
-                            len(solution_path) if solution_path else 0
-                        ]
-                        writer.writerow(row)
-
-                        current_execution += 1
-                        print(f"Progress: {current_execution}/{total_executions} executions completed ({(current_execution / total_executions) * 100:.2f}%)")
-        
+                current_execution += 1
+                print(f"Progress: {current_execution}/{total_executions} executions completed ({(current_execution / total_executions) * 100:.2f}%)")
+    
 
 def main():
     if len(sys.argv) != 2:
@@ -163,7 +155,9 @@ def main():
             if 'compare' in exec_config['data_generation']:
                 compare = exec_config['data_generation']['compare']
                 if compare:
-                    create_comparison_data_set(maps, algorithm_configs, iterations_for_average, name)
+                    heuristics_name = algorithm_configs[0].get('heuristics', [])
+                    heuristics = [heuristics_map[h] for h in heuristics_name]
+                    create_comparison_data_set(maps[0], algorithm_configs[0], heuristics, iterations_for_average, name)
             else:
                 create_data_set(maps, algorithm_configs, iterations_for_average, name)
         

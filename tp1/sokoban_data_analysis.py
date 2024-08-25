@@ -61,18 +61,18 @@ def show_heuristics_comparison_graphs(df, algorithm, heuristics_to_compare, outp
 
     plt.figure(figsize=(10, 6))
     plt.bar(grouped_df['heuristics_used'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
-    plt.title(f'Expanded Nodes for {", ".join(heuristics_to_compare)} in {algorithm}')
-    plt.xlabel('Heuristic')
-    plt.ylabel('Expanded Nodes')
+    plt.title(f'Nodos expandidos para las heurísticas {", ".join(heuristics_to_compare)} con el algoritmo {algorithm}')
+    plt.xlabel('Heuristica')
+    plt.ylabel('Nodos expandidos')
     plt.savefig(f'output/graphs/en_{output_file}.png')
     plt.close()
 
     plt.figure(figsize=(10, 6))
     plt.bar(grouped_df['heuristics_used'], grouped_df['execution_time_mean'],
             yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
-    plt.title(f'Execution Time for {", ".join(heuristics_to_compare)} in {algorithm}')
-    plt.xlabel('Heuristic')
-    plt.ylabel('Execution Time (s)')
+    plt.title(f'Tiempo de ejecución del algoritmo {algorithm} con las heurísticas {", ".join(heuristics_to_compare)}')
+    plt.xlabel('Heuristica')
+    plt.ylabel('Tiempo de ejecución [s]')
     plt.savefig(f'output/graphs/t_{output_file}.png')
     plt.close()
 
