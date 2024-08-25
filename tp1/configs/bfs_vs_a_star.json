@@ -1,10 +1,10 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_bad.csv",
+            "output_file": "bfs_vs_a_star.csv",
             "data_generation": {
                 "maps": [
-                    "lvl4.txt"
+                    "lvl6.txt"
                 ],
                 "algorithms": [
                     {
@@ -18,7 +18,7 @@
                         ]
                     }
                 ],
-                "iterations_for_average": 2
+                "iterations_for_average": 10
             }
         }
     ]

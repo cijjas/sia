@@ -53,6 +53,43 @@ class ManhattanDistance2(Heuristic):
 
         return total_distance + min_for_a_box
 
+def wall_and_path_penalty( state, box):
+    penalty = 0
+    for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]: 
+        adjacent = (box[0] + direction[0], box[1] + direction[1])
+        if adjacent in state.walls:
+            penalty += 2  
+    return penalty
+
+# igual que m2 pero con un poco de inteligencia
+class Smarthattan(Heuristic):
+    def __call__(self, state: State) -> float:
+        total_distance = 0
+        min_player_to_box = float('inf')
+
+        for box in state.boxes:
+            player_to_box_distance = manhattan(box, state.player)
+            if player_to_box_distance < min_player_to_box:
+                min_player_to_box = player_to_box_distance
+
+        for box in state.boxes:
+            min_box_to_goal = float('inf')
+            for goal in state.goals:
+                box_to_goal_distance = manhattan(box, goal)
+
+                # Agregarle un changüi si están en la misma fila o columna
+                if (goal[0] == box[0] and state.player[0] == box[0]) or (goal[1] == box[1] and state.player[1] == box[1]):
+                    box_to_goal_distance -= 1  
+
+                if box_to_goal_distance < min_box_to_goal:
+                    min_box_to_goal = box_to_goal_distance
+
+            total_distance += min_box_to_goal
+
+        # penalizar si se quiere mover la caja contra una pared
+        total_distance += wall_and_path_penalty(state, box)
+        return total_distance + min_player_to_box
+
 # Calculates the sum of the manhattan distance to the closest box, and from the box the closest distance to a target
 class ManhattanDistance3(Heuristic):
     def __call__(self, state: State) -> float:
@@ -98,3 +135,9 @@ class Deadlock(Heuristic):
 #        if state.is_deadlock_corner():
 #            return float('inf')
 #        return 0
+
+
+class BasicHeuristic(Heuristic):
+    def __call__(self, state: State) -> float:
+        #  returns the amount of boxes that are not in the correct position
+        return len([box for box in state.boxes if box not in state.goals])
