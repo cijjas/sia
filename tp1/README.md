@@ -54,7 +54,7 @@ Interfaz gráfica simple, hecha con pygame para probar distintos algorítmos y v
 
 ![bfs 1 gif](resources/gifs/bfs_1.gif)
 
-para ejecutarlo 
+para ejecutarlo
 
 ```sh
 python3 sokoban_cool.py path/to/map.txt
@@ -85,7 +85,7 @@ Por ejemplo:
                         "heuristics": ["Heuristic_1"]
                     }
                 ],
-                "iterations_for_average": NUMBER_OF_ITERATIONS
+                "iterations_for_average": 10
             }
         }
     ]
@@ -97,15 +97,16 @@ donde todas las configuraciones deben ser de esta forma.
 |campo | opciones|
 |--|--|
 | output_file| cualquier nombre seguido de .csv|
-| maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)| 
+| maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)|
 | algorithms | array de algoritmos |
 | name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
-| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean|
+| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean, Inadmissible|
 | iterations_for_average | cantidad de ejecuciones de los algorítmos \*|
 
 \* notar que esto sólo debería cambiar el tiempo de ejecución dado que es el único parámetro no determinístico para una ejecución
 
 
+Correr de la siguiente manera:
 
 ```sh
 python3 sokoban_data_generation.py configs/my_configuration.json
@@ -115,7 +116,7 @@ El output csv de esta ejecución se guarda en la carpeta [output](output/) que e
 
 ### Sokoban data analysis
 
-Esta ejecución nos permite hacer el análisis del paso previo (data generation) para generar gráficos comparativos de las distintas ejecuciones. Su propósito es ser configurado y perfeccionado a medida del que hace el análisis. 
+Esta ejecución nos permite hacer el análisis del paso previo (data generation) para generar gráficos comparativos de las distintas ejecuciones. Su propósito es ser configurado y perfeccionado a medida del que hace el análisis.
 
 ## Q&A sobre la implementación
 

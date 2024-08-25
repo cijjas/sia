@@ -4,7 +4,7 @@
             "output_file": "dfs_vs_local.csv",
             "data_generation": {
                 "maps": [
-                    "lvl1.txt"
+                    "lvl6.txt"
                 ],
                 "algorithms": [
                     {

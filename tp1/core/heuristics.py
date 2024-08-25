@@ -141,3 +141,18 @@ class BasicHeuristic(Heuristic):
     def __call__(self, state: State) -> float:
         #  returns the amount of boxes that are not in the correct position
         return len([box for box in state.boxes if box not in state.goals])
+    
+
+class Inadmissible(Heuristic):
+    def __call__(self, state: State) -> float:
+        total_distance = 0
+
+        for box in state.boxes:
+            total_distance += manhattan(box, state.player)
+           
+
+        for box in state.boxes:
+            for goal in state.goals:
+                total_distance += manhattan(box, goal)
+
+        return total_distance
