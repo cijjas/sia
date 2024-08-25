@@ -37,6 +37,7 @@ heuristics_map = {
     "Deadlock": Deadlock(),
     "Smarthattan": Smarthattan(),
     "Inadmissible": Inadmissible(),
+    "Basic": BasicHeuristic()
 }
 
 def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_name):

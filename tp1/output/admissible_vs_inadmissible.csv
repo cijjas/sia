@@ -1,0 +1,2 @@
+map,algorithm,heuristics_used,iteration,execution_time,expanded_nodes,frontier_nodes,success_or_failure,cost
+lvl5,BFS,,1,5.836341142654419,300279,4349,SUCCESS,52
