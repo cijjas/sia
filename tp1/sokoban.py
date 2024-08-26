@@ -1,6 +1,7 @@
 import pygame
 from core.heuristics import *
 from core.models.state import State
+from core.models.state import Board
 from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.methods import *
@@ -104,7 +105,9 @@ def main():
 
     # Initial Values
     map_data = parse_map(sys.argv[1])
-    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
+    board = Board(map_data['walls'], map_data['goals'], map_data['spaces'], set())
+    board.init_deadlock_areas(map_data['boxes'], map_data['player'])
+    initial_state = State(map_data['boxes'], map_data['player'], board)
     initial_node = Node(initial_state, None, None, 0)
 
     heuristics = [ Deadlock() ]

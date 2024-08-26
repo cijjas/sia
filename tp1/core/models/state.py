@@ -1,53 +1,40 @@
 from typing import List, Tuple
 
-class State:
-    def __init__(self, walls: set, goals: set, boxes: set, player: tuple, spaces: set, deadlock_areas: set = set()):
+class Board:
+    """ Represents the board of the Sokoban game. 
+     The board consists of walls, goals, spaces and deadlocks.
+      The other elements are not considered in the board. """
+    def __init__(self, walls: set, goals: set, spaces: set, deadlock_areas: set = set()):
         self.walls = walls
         self.goals = goals
-        self.boxes = boxes
-        self.player = player
         self.spaces = spaces
-        self._hash_value = None
-        self.deadlock_areas: set = deadlock_areas
-#        self.corner_deadlock_areas: set = corner_deadlock_areas
+        self.deadlock_areas = deadlock_areas
 
+    def print_board(self):
+        for y in range(0, 6):
+            for x in range(0, 6):
+                if (x, y) in self.walls:
+                    print('#', end='')
+                elif (x, y) in self.goals:
+                    print('.', end='')
+                else:
+                    print(' ', end='')
+            print()
 
-    def __eq__(self, other):
-        return self.boxes == other.boxes and self.player == other.player
-
-    def __hash__(self):
-        if self._hash_value is None:
-            self._hash_value = hash((tuple(self.boxes), self.player))
-        return self._hash_value
-
-    def init_deadlock_areas(self):
-        corner_deadlock_areas: set = self._init_corner_deadlock_areas(self.walls)
-        #self.corner_deadlock_areas = corner_deadlock_areas
-        wall_deadlock_areas: set = self._init_wall_deadlock_areas(corner_deadlock_areas)
-        self.deadlock_areas = corner_deadlock_areas.union(wall_deadlock_areas)
-
-    def _init_corner_deadlock_areas(self, walls: set) -> set:
-        """ Initializes the corner deadlock areas set"""
-        corner_deadlock_areas = set()
-        for wall in walls:
-            x, y = wall
-            if (x, y-1) in self.walls and (x-1, y) in self.walls and (x-1, y-1) in self.spaces:
-                corner_deadlock_areas.add((x-1, y-1))
-            if (x, y-1) in self.walls and (x+1, y) in self.walls and (x+1, y-1) in self.spaces:
-                corner_deadlock_areas.add((x+1, y-1))
-            if (x, y+1) in self.walls and (x-1, y) in self.walls and (x-1, y+1) in self.spaces:
-                corner_deadlock_areas.add((x-1, y+1))
-            if (x, y+1) in self.walls and (x+1, y) in self.walls and (x+1, y+1) in self.spaces:
-                corner_deadlock_areas.add((x+1, y+1))
-        return corner_deadlock_areas
-
-    # Looks for situations like these:
+    def is_deadlock_corner(self, state):
+        """ Returns True if the state is a deadlock by checking the corner deadlock areas """
+        for box in state.boxes:
+            if box in self.corner_deadlock_areas and box not in self.goals:
+                return True
+        return False
+    
+        # Looks for situations like these:
     #               ##
     #   ########    #
     #   #      #    #
     #               #
     #               ##
-    def _init_wall_deadlock_areas(self, corner_deadlock_areas: set) -> set:
+    def _init_wall_deadlock_areas(self, corner_deadlock_areas: set, boxes: set, player: tuple) -> set:
         """ Initializes the wall deadlock areas set """
         deadlocks = set()
 
@@ -61,8 +48,8 @@ class State:
                     if x1 == x2:
                         diff = abs(y1 - y2)
                         for y in range(min(y1, y2) + 1, max(y1, y2)):
-                            possible_spaces: set = self.spaces.union(self.boxes)
-                            possible_spaces.add(self.player)
+                            possible_spaces: set = self.spaces.union(boxes)
+                            possible_spaces.add(player)
                             possible_spaces = possible_spaces.difference(self.goals)
                             if (x1, y) in possible_spaces and ( (x1-1, y) in self.walls or (x1+1, y) in self.walls):
                                 new_deadlock_line.add((x1, y))
@@ -70,8 +57,8 @@ class State:
                     elif y1 == y2:
                         diff = abs(x1 - x2)
                         for x in range(min(x1, x2) + 1, max(x1, x2)):
-                            possible_spaces: set = self.spaces.union(self.boxes)
-                            possible_spaces.add(self.player)
+                            possible_spaces: set = self.spaces.union(boxes)
+                            possible_spaces.add(player)
                             possible_spaces = possible_spaces.difference(self.goals)
                             if (x, y1) in possible_spaces and ( (x, y1-1) in self.walls or (x, y1+1) in self.walls):
                                 new_deadlock_line.add((x, y1))
@@ -81,12 +68,49 @@ class State:
                     
         return deadlocks
 
+    def _init_corner_deadlock_areas(self, player: tuple) -> set:
+        """ Initializes the corner deadlock areas set"""
+        corner_deadlock_areas = set()
+        possible_corners = self.spaces.union({player})
+        for wall in self.walls:
+            x, y = wall
+            if (x, y-1) in self.walls and (x-1, y) in self.walls and (x-1, y-1) in possible_corners:
+                corner_deadlock_areas.add((x-1, y-1))
+            if (x, y-1) in self.walls and (x+1, y) in self.walls and (x+1, y-1) in possible_corners:
+                corner_deadlock_areas.add((x+1, y-1))
+            if (x, y+1) in self.walls and (x-1, y) in self.walls and (x-1, y+1) in possible_corners:
+                corner_deadlock_areas.add((x-1, y+1))
+            if (x, y+1) in self.walls and (x+1, y) in self.walls and (x+1, y+1) in possible_corners:
+                corner_deadlock_areas.add((x+1, y+1))
+        return corner_deadlock_areas
+
+    def init_deadlock_areas(self, boxes: set, player: tuple):
+        corner_deadlock_areas: set = self._init_corner_deadlock_areas(player)
+        #self.corner_deadlock_areas = corner_deadlock_areas
+        wall_deadlock_areas: set = self._init_wall_deadlock_areas(corner_deadlock_areas, boxes, player)
+        self.deadlock_areas = corner_deadlock_areas.union(wall_deadlock_areas)
+
+class State:
+    def __init__(self, boxes: set, player: tuple, clean_board: Board):
+        self.boxes: set = boxes
+        self.player: tuple = player
+        self._hash_value: int = None
+        self.board: Board = clean_board
+
+    def __eq__(self, other):
+        return self.boxes == other.boxes and self.player == other.player
+
+    def __hash__(self):
+        if self._hash_value is None:
+            self._hash_value = hash((tuple(self.boxes), self.player))
+        return self._hash_value
+
     def print_state(self):
         for y in range(0, 6):
             for x in range(0, 6):
-                if (x, y) in self.walls:
+                if (x, y) in self.board.walls:
                     print('#', end='')
-                elif (x, y) in self.goals:
+                elif (x, y) in self.board.goals:
                     print('.', end='')
                 elif (x, y) in self.boxes:
                     print('$', end='')
@@ -100,11 +124,11 @@ class State:
     def can_move(self, dx, dy):
         x, y = self.player
         new_x, new_y = x + dx, y + dy
-        if (new_x, new_y) in self.walls:
+        if (new_x, new_y) in self.board.walls:
             return False
         if (new_x, new_y) in self.boxes:
             new_box_x, new_box_y = new_x + dx, new_y + dy
-            if (new_box_x, new_box_y) in self.walls or (new_box_x, new_box_y) in self.boxes:
+            if (new_box_x, new_box_y) in self.board.walls or (new_box_x, new_box_y) in self.boxes:
                 return False
         return True
 
@@ -117,10 +141,10 @@ class State:
             new_boxes.remove(new_player)
             new_box = (new_player[0] + dx, new_player[1] + dy)
             new_boxes.add(new_box)
-        return State(self.walls, self.goals, new_boxes, new_player, self.spaces, self.deadlock_areas)
+        return State(new_boxes, new_player, self.board)
 
     def is_goal(self):
-        return all(box in self.goals for box in self.boxes)
+        return all(box in self.board.goals for box in self.boxes)
 
     def get_actions(self):
         actions = []
@@ -140,13 +164,13 @@ class State:
     def box_next_to_wall(self, box) -> tuple[int, int]:
         """ Returns the wall location. None if there is no wall next to the box """
         x, y = box
-        if (x - 1, y) in self.walls:
+        if (x - 1, y) in self.board.walls:
             return (x - 1, y)
-        if (x + 1, y) in self.walls:
+        if (x + 1, y) in self.board.walls:
             return (x + 1, y)
-        if (x, y - 1) in self.walls:
+        if (x, y - 1) in self.board.walls:
             return (x, y - 1)
-        if (x, y + 1) in self.walls:
+        if (x, y + 1) in self.board.walls:
             return (x, y + 1)
         return None
 
@@ -163,7 +187,7 @@ class State:
     def check_goals_along_wall(self, x, y, dir_parallel_to_wall):
         """Helper function to check for goals along the wall in a given direction."""
         while self.can_move(x, y):
-            if (x, y) in self.goals:
+            if (x, y) in self.board.goals:
                 return True
             x += dir_parallel_to_wall[0]
             y += dir_parallel_to_wall[1]
@@ -185,7 +209,7 @@ class State:
     def is_deadlock(self):
         """ Returns True if the state is a deadlock by checking the deadlock areas """
         for box in self.boxes:
-            if box in self.deadlock_areas and box not in self.goals:
+            if box in self.board.deadlock_areas and box not in self.board.goals:
                 return True
         return False
 

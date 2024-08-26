@@ -1,5 +1,6 @@
 import pygame
 from core.models.state import State
+from core.models.state import Board
 from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.heuristics import *
@@ -155,15 +156,15 @@ def draw_board(screen, game_state, images, tile_size, x_offset, y_offset, map_da
     for y in range(map_data['height']):
         for x in range(map_data['width']):
             screen.blit(images[' '], (x * tile_size + x_offset, y * tile_size + y_offset))
-    for x, y in game_state.walls:
+    for x, y in game_state.board.walls:
         screen.blit(images['#'], (x * tile_size + x_offset, y * tile_size + y_offset))
-    for x, y in game_state.goals:
+    for x, y in game_state.board.goals:
         screen.blit(images['.'], (x * tile_size + x_offset, y * tile_size + y_offset))
     for x, y in game_state.boxes:
         screen.blit(images['$'], (x * tile_size + x_offset, y * tile_size + y_offset))
-    for x, y in game_state.goals & game_state.boxes:
+    for x, y in game_state.board.goals & game_state.boxes:
         screen.blit(images['*'], (x * tile_size + x_offset, y * tile_size + y_offset))
-    for x, y in game_state.goals & {game_state.player}:
+    for x, y in game_state.board.goals & {game_state.player}:
         screen.blit(images['+'], (x * tile_size + x_offset, y * tile_size + y_offset))
     screen.blit(images['@'], (game_state.player[0] * tile_size + x_offset, game_state.player[1] * tile_size + y_offset))
 
@@ -292,8 +293,9 @@ def main():
     default_tile_size = think_tile_size(map_data['width'], map_data['height'])
 
     images = load_images(default_tile_size, "minecraft")
-    initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
-    initial_state.init_deadlock_areas()
+    board = Board(map_data['walls'], map_data['goals'], map_data['spaces'], set())
+    board.init_deadlock_areas(map_data['boxes'], map_data['player'])
+    initial_state = State(map_data['boxes'], map_data['player'], board)
 
     current_state = initial_state
     algorithm_finished = False
