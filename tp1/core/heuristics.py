@@ -25,7 +25,7 @@ class ManhattanDistance1(Heuristic):
         total_distance = 0
         for box in state.boxes:
             min_for_box = float('inf')
-            for goal in state.goals:
+            for goal in state.board.goals:
                 box_to_goal_distance = manhattan(box, goal)
                 if box_to_goal_distance < min_for_box:
                     min_for_box = box_to_goal_distance
@@ -49,7 +49,7 @@ class ManhattanDistance2(Heuristic):
             if box in state.goals:
                 continue
             min_for_box = float('inf')
-            for goal in state.goals:
+            for goal in state.board.goals:
                 box_to_goal_distance = manhattan(box, goal)
                 if box_to_goal_distance < min_for_box:
                     min_for_box = box_to_goal_distance
@@ -63,7 +63,7 @@ def wall_and_path_penalty( state, box):
     penalty = 0
     for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]: 
         adjacent = (box[0] + direction[0], box[1] + direction[1])
-        if adjacent in state.walls:
+        if adjacent in state.board.walls:
             penalty += 2  
     return penalty
 
@@ -83,7 +83,7 @@ class Smarthattan(Heuristic):
             if box in state.goals:
                 continue
             min_box_to_goal = float('inf')
-            for goal in state.goals:
+            for goal in state.board.goals:
                 box_to_goal_distance = manhattan(box, goal)
 
                 # Agregarle un changüi si están en la misma fila o columna
@@ -114,7 +114,7 @@ class ManhattanDistance3(Heuristic):
 
         min_for_target = float('inf')
         if min_box is not None:  
-            for goal in state.goals:
+            for goal in state.board.goals:
                 box_to_goal_distance = manhattan(min_box, goal)
                 if box_to_goal_distance < min_for_target:
                     min_for_target = box_to_goal_distance
@@ -130,7 +130,7 @@ class EuclideanDistance(Heuristic):
         total_distance = 0
         for box in state.boxes:
             min_distance = float('inf')
-            for goal in state.goals:
+            for goal in state.board.goals:
                 distance = euclidean(box, goal)
                 if distance < min_distance:
                     min_distance = distance
@@ -156,7 +156,7 @@ class Deadlock(Heuristic):
 class BasicHeuristic(Heuristic):
     def __call__(self, state: State) -> float:
         #  returns the amount of boxes that are not in the correct position
-        return len([box for box in state.boxes if box not in state.goals])
+        return len([box for box in state.boxes if box not in state.board.goals])
     
 
 class Inadmissible(Heuristic):
@@ -168,7 +168,7 @@ class Inadmissible(Heuristic):
            
 
         for box in state.boxes:
-            for goal in state.goals:
+            for goal in state.board.goals:
                 total_distance += manhattan(box, goal)
 
         return total_distance
