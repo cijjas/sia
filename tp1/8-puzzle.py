@@ -1,5 +1,7 @@
 import heapq
 import time
+import csv
+import os
 
 class State:
     def __init__(self, state):
@@ -72,7 +74,7 @@ def reconstruct_path(came_from, current):
         path.append(current)
     return path[::-1]
 
-def a_star(start, goal):
+def a_star(start, goal, heuristic):
     start = State(order_min_corner(start))
     goal = State(order_min_corner(goal))
     open_set = PriorityQueue()
@@ -82,14 +84,13 @@ def a_star(start, goal):
 
     came_from = {}
     g_score = {start: 0}
-    f_score = {start: misplaced_tiles(start, goal)}
+    f_score = {start: heuristic(start, goal)}
 
     while not open_set.is_empty():
         current = open_set.get()
 
         if current == goal:
-            print(f"Expanded nodes: {expanded_nodes}")
-            return reconstruct_path(came_from, current)
+            return reconstruct_path(came_from, current), expanded_nodes
 
         explored.add(current)
         expanded_nodes += 1
@@ -100,12 +101,12 @@ def a_star(start, goal):
             if neighbor not in explored and (neighbor not in g_score or tentative_g_score < g_score[neighbor]):
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = tentative_g_score + misplaced_tiles(neighbor, goal)
+                f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
                 open_set.put(neighbor, f_score[neighbor])
 
-    return None  # No solution found
+    return None, expanded_nodes  # No solution found
 
-def global_greedy(start, goal):
+def global_greedy(start, goal, heuristic):
     start = State(order_min_corner(start))
     goal = State(order_min_corner(goal))
     frontier = []
@@ -121,24 +122,20 @@ def global_greedy(start, goal):
         _, current = heapq.heappop(frontier)
 
         if current == goal:
-            print(f"Expanded nodes: {expanded_nodes}")
-            return reconstruct_path(came_from, current)
+            return reconstruct_path(came_from, current), expanded_nodes
 
         for neighbor in neighbors(current):
             if neighbor not in explored:
-                heapq.heappush(frontier, (misplaced_tiles(neighbor, goal), neighbor))
+                heapq.heappush(frontier, (heuristic(neighbor, goal), neighbor))
                 explored.add(neighbor)
                 came_from[neighbor] = current
 
         expanded_nodes += 1
 
-    return None
+    return None, expanded_nodes
 
 def order_min_corner(state):
     """ finds the corner with the lowest value and rotates the board so that it is in the upper left corner """
-    # 0 1 2     2 5 8       8 7 6       6 3 0
-    # 3 4 5 ->  1 4 7 ->    5 4 3 ->    7 4 1
-    # 6 7 8     0 3 6       2 1 0       8 5 2
     min_corner = min(state[0], state[2], state[6], state[8])
     if min_corner == state[0]:
         return state
@@ -150,31 +147,30 @@ def order_min_corner(state):
         return (state[8], state[7], state[6], state[5], state[4], state[3], state[2], state[1], state[0])
 
 def main():
-    # Example usage:
     start_state = (8, 0, 6, 5, 4, 7, 2, 3, 1)  # Empty space is represented by 0
     goal_state = (0, 1, 2, 3, 4, 5, 6, 7, 8)  # Goal configuration
 
-    time_array = []
-    for k in range(1):
-        start_time = time.time()
+    algorithms = [a_star, global_greedy]
+    heuristics = [misplaced_tiles, manhattan_distance]
+    heuristic_names = ["misplaced_tiles", "manhattan_distance"]
 
-        solution = a_star(start_state, goal_state)
+    os.makedirs('output', exist_ok=True)
 
-        end_time = time.time()
-        time_array.append(end_time - start_time)
+    for algorithm in algorithms:
+        algorithm_name = algorithm.__name__
+        with open(f'output/{algorithm_name}_8puzzle_results.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['heuristic', 'iteration', 'execution_time', 'expanded_nodes', 'total_movements'])
 
-    if solution:
-        for i, state in enumerate(solution):
-            print(f"Move {i + 1}")
-            if state:
-                print_board(state)
-            
-    else:
-        print("No solution found")
-    
-    print(f"Time taken: {sum(time_array) / len(time_array):.6f} seconds")
-    print(f"Number of moves: {len(solution) - 1}")
+            for heuristic, heuristic_name in zip(heuristics, heuristic_names):
+                for iteration in range(100):
+                    start_time = time.time()
+                    solution, expanded_nodes = algorithm(start_state, goal_state, heuristic)
+                    end_time = time.time()
+                    execution_time = end_time - start_time
+                    total_movements = len(solution) - 1 if solution else 0
 
+                    writer.writerow([heuristic_name, iteration + 1, execution_time, expanded_nodes, total_movements])
 
 if __name__ == "__main__":
     main()
