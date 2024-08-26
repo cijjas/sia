@@ -15,14 +15,14 @@
                         "name": "GREEDY_GLOBAL",
                         "heuristics": [
                             "Manhattan1",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
                             "Manhattan1",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     },
                     {
@@ -33,7 +33,7 @@
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
                             "Manhattan1",
-                            "DeadlockCorner"
+                            "Deadlock"
                         ]
                     }
                 ],
