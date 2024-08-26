@@ -1,36 +1,37 @@
 {
     "executions": [
         {
-            "output_file": "smarthattan.csv",
+            "output_file": "smarthattan2.csv",
             "data_generation": {
                 "maps": [
-                    "lvl1.txt"
+                    "lvl3.txt"
                 ],
                 "algorithms": [
                     {
-                        "name": "A_STAR",
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Smarthattan"
+                        ]
+                    },
+                    {
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
                             "Manhattan1"
                         ]
                     },
-                    {
-                        "name": "A_STAR",
+                   {
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
                             "Manhattan2"
                         ]
                     },
                     {
-                        "name": "A_STAR",
+                        "name": "GREEDY_LOCAL",
                         "heuristics": [
                             "Manhattan3"
                         ]
-                    },
-                    {
-                        "name": "A_STAR",
-                        "heuristics": [
-                            "Smarthattan"
-                        ]
                     }
+                    
                 ],
                 "iterations_for_average": 100
             }

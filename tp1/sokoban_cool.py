@@ -291,7 +291,7 @@ def main():
     map_data = parse_map(map_txt)
     default_tile_size = think_tile_size(map_data['width'], map_data['height'])
 
-    images = load_images(default_tile_size, "minecraft")
+    images = load_images(default_tile_size)
     initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
     initial_state.init_deadlock_areas()
 

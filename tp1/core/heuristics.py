@@ -39,11 +39,15 @@ class ManhattanDistance2(Heuristic):
         min_for_a_box = float('inf')
 
         for box in state.boxes:
-            player_to_box_distance = manhattan(box, state.player)
+            if box in state.goals:
+                continue
+            player_to_box_distance = manhattan(box, state.player) - 1 # el -1 viene de la distancia a tocar la caja
             if player_to_box_distance < min_for_a_box:
                 min_for_a_box = player_to_box_distance
 
         for box in state.boxes:
+            if box in state.goals:
+                continue
             min_for_box = float('inf')
             for goal in state.goals:
                 box_to_goal_distance = manhattan(box, goal)
@@ -51,8 +55,10 @@ class ManhattanDistance2(Heuristic):
                     min_for_box = box_to_goal_distance
             total_distance += min_for_box
 
-        return total_distance + min_for_a_box
+        return total_distance + (min_for_a_box if min_for_a_box < float('inf') else 0)
 
+
+# Esta funcion penaliza fuertemente si se quiere mover la caja contra una pared
 def wall_and_path_penalty( state, box):
     penalty = 0
     for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]: 
@@ -61,18 +67,21 @@ def wall_and_path_penalty( state, box):
             penalty += 2  
     return penalty
 
-# igual que m2 pero con un poco de inteligencia
 class Smarthattan(Heuristic):
     def __call__(self, state: State) -> float:
         total_distance = 0
         min_player_to_box = float('inf')
 
         for box in state.boxes:
+            if box in state.goals:
+                continue
             player_to_box_distance = manhattan(box, state.player)
             if player_to_box_distance < min_player_to_box:
                 min_player_to_box = player_to_box_distance
 
         for box in state.boxes:
+            if box in state.goals:
+                continue
             min_box_to_goal = float('inf')
             for goal in state.goals:
                 box_to_goal_distance = manhattan(box, goal)
@@ -81,32 +90,39 @@ class Smarthattan(Heuristic):
                 if (goal[0] == box[0] and state.player[0] == box[0]) or (goal[1] == box[1] and state.player[1] == box[1]):
                     box_to_goal_distance -= 1  
 
+                total_distance += wall_and_path_penalty(state, box)
                 if box_to_goal_distance < min_box_to_goal:
                     min_box_to_goal = box_to_goal_distance
 
             total_distance += min_box_to_goal
-
-        # penalizar si se quiere mover la caja contra una pared
-        total_distance += wall_and_path_penalty(state, box)
-        return total_distance + min_player_to_box
-
+        
+        return total_distance + (min_player_to_box if min_player_to_box < float('inf') else 0)
+    
 # Calculates the sum of the manhattan distance to the closest box, and from the box the closest distance to a target
 class ManhattanDistance3(Heuristic):
     def __call__(self, state: State) -> float:
         min_box, min_for_a_box = (None, float('inf'))
 
         for box in state.boxes:
-            player_to_box_distance = manhattan(box, state.player)
+            if box in state.goals:
+                continue 
+            player_to_box_distance = manhattan(box, state.player) - 1  
             if player_to_box_distance < min_for_a_box:
                 min_box, min_for_a_box = box, player_to_box_distance
 
-        min_for_target = float('inf')
-        for goal in state.goals:
-            box_to_goal_distance = manhattan(min_box, goal)
-            if box_to_goal_distance < min_for_target:
-                min_for_target = box_to_goal_distance
+        min_for_a_box = min_for_a_box if min_for_a_box < float('inf') else 0
 
-        return min_for_target + min_for_a_box
+        min_for_target = float('inf')
+        if min_box is not None:  
+            for goal in state.goals:
+                box_to_goal_distance = manhattan(min_box, goal)
+                if box_to_goal_distance < min_for_target:
+                    min_for_target = box_to_goal_distance
+
+        min_for_target = min_for_target if min_for_target < float('inf') else 0
+
+        return min_for_a_box + min_for_target
+
 
 # Calculates the sum of the euclidean distances between the boxes and their closest target
 class EuclideanDistance(Heuristic):

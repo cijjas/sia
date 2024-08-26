@@ -152,7 +152,7 @@ def main():
     # preprocesamiento FTW
 
 
-    file_path = f'{OUTPUT_DIR}/smarthattan.csv'
+    file_path = f'{OUTPUT_DIR}/smarthattan2.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
         # Group data by heuristics and calculate mean and standard deviation
@@ -168,10 +168,10 @@ def main():
 
 
         new_names = {
+            "Smarthattan": "Smarthattan",
             "ManhattanDistance1": "M1",
             "ManhattanDistance2": "M2",
             "ManhattanDistance3": "M3",
-            "Smarthattan": "Smarthattan",
         }
         # Bar plot for Expanded Nodes
         bars1 = ax1.bar(grouped['heuristics_used'],expanded_nodes['expanded_nodes'],
@@ -181,7 +181,6 @@ def main():
         ax1.set_ylabel('Nodos Expandidos')
         ax1.set_xticks(range(len(grouped['heuristics_used'])))
         ax1.set_xticklabels([new_names[name] for name in grouped['heuristics_used']])
-        ax1.set_ylim(32000, max(expanded_nodes['expanded_nodes']) + 1000)  # Set y-axis to start at 30000
 
         # Adding text labels on bars
         for bar in bars1:
