@@ -39,14 +39,14 @@ class ManhattanDistance2(Heuristic):
         min_for_a_box = float('inf')
 
         for box in state.boxes:
-            if box in state.goals:
+            if box in state.board.goals:
                 continue
             player_to_box_distance = manhattan(box, state.player) - 1 # el -1 viene de la distancia a tocar la caja
             if player_to_box_distance < min_for_a_box:
                 min_for_a_box = player_to_box_distance
 
         for box in state.boxes:
-            if box in state.goals:
+            if box in state.board.goals:
                 continue
             min_for_box = float('inf')
             for goal in state.board.goals:
@@ -73,14 +73,14 @@ class Smarthattan(Heuristic):
         min_player_to_box = float('inf')
 
         for box in state.boxes:
-            if box in state.goals:
+            if box in state.board.goals:
                 continue
             player_to_box_distance = manhattan(box, state.player)
             if player_to_box_distance < min_player_to_box:
                 min_player_to_box = player_to_box_distance
 
         for box in state.boxes:
-            if box in state.goals:
+            if box in state.board.goals:
                 continue
             min_box_to_goal = float('inf')
             for goal in state.board.goals:
@@ -104,7 +104,7 @@ class ManhattanDistance3(Heuristic):
         min_box, min_for_a_box = (None, float('inf'))
 
         for box in state.boxes:
-            if box in state.goals:
+            if box in state.board.goals:
                 continue 
             player_to_box_distance = manhattan(box, state.player) - 1  
             if player_to_box_distance < min_for_a_box:

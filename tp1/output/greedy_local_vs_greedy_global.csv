@@ -1,0 +1,3 @@
+map,algorithm,heuristics_used,iteration,execution_time,expanded_nodes,frontier_nodes,success_or_failure,cost
+lvl4,GREEDY_LOCAL,ManhattanDistance2,1,2.7294652462005615,148569,470,SUCCESS,616
+lvl4,GREEDY_GLOBAL,ManhattanDistance2,1,0.9273617267608643,57434,5052,SUCCESS,139
