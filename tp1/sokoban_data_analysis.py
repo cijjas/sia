@@ -77,15 +77,13 @@ def show_heuristics_comparison_graphs(df, algorithm, heuristics_to_compare, outp
 
 def main():
     # all_algorithms.json
-    # Differences in time and spatial complexity for all algorithms
     # Conclusion : BFS takes longer and expands more nodes than BFS but get to optimal, heuristics seem to be good...
     file_path = f'{OUTPUT_DIR}/all_algorithms.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR", "DFS", "GREEDY_LOCAL"])
+        show_comparison_graphs(df, ["BFS", "GREEDY_GLOBAL", "A_STAR", "DFS", "GREEDY_LOCAL"], "all_algorithms")
 
     # bfs_vs_dfs.json
-    # Differences in time and spatial complexity for BFS and DFS in maps that ruin DFS preference
     # Conclusion : Usual case where BFS expands more nodes and takes more time than DFS
     file_path = f'{OUTPUT_DIR}/bfs_vs_dfs.csv'
     if os.path.exists(file_path):
@@ -93,46 +91,64 @@ def main():
         show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
 
     # bfs_vs_dfs_rigged.json
-    # Differences in time and spatial complexity for BFS and DFS in maps that ruin DFS preference
     # Conclusion : En ciertos casos expanden los mismos nodos e incluso DFS puede ser mas lento debido a la preference
     file_path = f'{OUTPUT_DIR}/bfs_vs_dfs_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs")
+        show_comparison_graphs(df, ["BFS", "DFS"], "bfs_vs_dfs_rigged")
 
     # bfs_vs_a_star.json
-    # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristics seems to be the way to go
     file_path = f'{OUTPUT_DIR}/bfs_vs_a_star.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "A_STAR"])
+        show_comparison_graphs(df, ["BFS", "A_STAR"], "bfs_vs_a_star")
 
     # bfs_vs_a_star_rigged.json
-    # Differences in time and spatial complexity for BFS, A_STAR and GLOBAL
     # Conclusion : heuristic's added time complexity is not worth the spatial savings
     file_path = f'{OUTPUT_DIR}/bfs_vs_a_star_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["BFS", "A_STAR"])
+        show_comparison_graphs(df, ["BFS", "A_STAR"], "bfs_vs_a_star_rigged")
 
     # dfs_vs_local.json
-    # Differences in time and spatial complexity for DFS and LOCAL
-    # Good trade off using Deadlock Corner Heuristic DFS
     # Conclusion : heuristics seems to be the way to go
     file_path = f'{OUTPUT_DIR}/dfs_vs_local.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
+        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"], "dfs_vs_local")
 
     # dfs_vs_local_rigged.json
-    # Differences in time and spatial complexity for DFS and LOCAL
     # Conclusion : heuristic's added time complexity is not worth the spatial savings
     file_path = f'{OUTPUT_DIR}/dfs_vs_local_rigged.csv'
     if os.path.exists(file_path):
         df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"])
+        show_comparison_graphs(df, ["DFS", "GREEDY_LOCAL"], "dfs_vs_local_rigged")
 
+    #### These do not expose the right information, they are grouping by algorithm but should be grouping by heuristic!
+
+    # admissible_vs_inadmissible.json
+    # Conclusion : inadmissible can be really good in specific situations
+    file_path = f'{OUTPUT_DIR}/admissible_vs_inadmissible.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["A_STAR"], "admissible_vs_inadmissible")
+
+    # heuristic_permutation.json
+    # Conclusion : heuristics performance in a scenario
+    file_path = f'{OUTPUT_DIR}/heuristic_permutation.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["A_STAR"], "heuristic_permutation")
+
+    # heuristic_permutation_2.json
+    # Conclusion : heuristics performance varies according to the scenario
+    file_path = f'{OUTPUT_DIR}/heuristic_permutation_2.csv'
+    if os.path.exists(file_path):
+        df = pd.read_csv(file_path)
+        show_comparison_graphs(df, ["A_STAR"], "heuristic_permutation_2")
+
+    # heuristic permutation 2
     # deadlock_cmp_a_star.json
     # Differences in time and spatial complexity for A_STAR with corner deadlocks vs corner deadlocks + wall deadlocks
     # Conclusion : The maps which have wall deadlock areas perform better with the added heuristic
@@ -143,13 +159,6 @@ def main():
     #    show_heuristics_comparison_graphs(df, "A_STAR", ["Deadlock", "DeadlockCorner"])
 
     # ------------------------------------------------------------
-
-    # compare heuristics in different maps => some are better in some cases
-    # inadmissible heuristic being really good => can be really good
-    # compare all types of manhattans => which is better in which maps
-    # combine heuristics, which combination is better
-    # preprocesamiento FTW
-
 
     file_path = f'{OUTPUT_DIR}/smarthattan2.csv'
     if os.path.exists(file_path):

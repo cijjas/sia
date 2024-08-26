@@ -1,7 +1,7 @@
 {
     "executions": [
         {
-            "output_file": "heuristic_permutation.csv",
+            "output_file": "heuristic_permutation_2.csv",
             "data_generation": {
                 "maps": [
                     "lvl5.txt"

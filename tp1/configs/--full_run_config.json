@@ -1,6 +1,148 @@
 {
     "executions": [
         {
+            "output_file": "all_algorithms.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_GLOBAL",
+                        "heuristics": [
+                            "Manhattan1",
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1",
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Manhattan1",
+                            "Deadlock"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "admissible_vs_inadmissible.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl5.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan2"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan3"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Smarthattan"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Inadmissible"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 3
+            }
+        },
+        {
+            "output_file": "bfs_vs_a_star_bad_rigged.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl4.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "bfs_vs_a_star.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl6.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "bfs_vs_dfs_rigged.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl3.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "BFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
             "output_file": "bfs_vs_dfs.csv",
             "data_generation": {
                 "maps": [
@@ -14,6 +156,164 @@
                     {
                         "name": "DFS",
                         "heuristics": []
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "dfs_vs_local_rigged.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl0.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "dfs_vs_local.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl6.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "DFS",
+                        "heuristics": []
+                    },
+                    {
+                        "name": "GREEDY_LOCAL",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "heuristic_permutation.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl1.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1",
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        },
+        {
+            "output_file": "heuristic_permutation_2.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl5.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1",
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1"
+                        ]
                     }
                 ],
                 "iterations_for_average": 10
