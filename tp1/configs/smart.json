@@ -1,10 +1,10 @@
 {
     "executions": [
         {
-            "output_file": "smarthattan2.csv",
+            "output_file": "smarthattan1.csv",
             "data_generation": {
                 "maps": [
-                    "lvl3.txt"
+                    "lvl1.txt"
                 ],
                 "algorithms": [
                     {
