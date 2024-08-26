@@ -14,14 +14,14 @@
                     {
                         "name": "GREEDY_GLOBAL",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     },
@@ -32,7 +32,7 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     }
@@ -50,19 +50,19 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan2"
+                            "M2"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan3"
+                            "M3"
                         ]
                     },
                     {
@@ -82,7 +82,7 @@
             }
         },
         {
-            "output_file": "bfs_vs_a_star_bad_rigged.csv",
+            "output_file": "bfs_vs_a_star_rigged.csv",
             "data_generation": {
                 "maps": [
                     "lvl4.txt"
@@ -95,7 +95,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -116,7 +116,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -175,7 +175,7 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -196,7 +196,7 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -214,7 +214,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1",
+                            "M1",
                             "Basic"
                         ]
                     },
@@ -227,7 +227,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -240,7 +240,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Basic",
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -254,7 +254,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -272,7 +272,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1",
+                            "M1",
                             "Basic"
                         ]
                     },
@@ -285,7 +285,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -298,7 +298,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Basic",
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -312,7 +312,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],

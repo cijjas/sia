@@ -174,7 +174,7 @@ def max_heuristic_from_list(heuristics) -> Heuristic:
     return max_heuristic
 
 def run_algorithm(algorithm, initial_node):
-    heuristics = [ ManhattanDistance1(), Deadlock() ]
+    heuristics = [ M1(), Deadlock() ]
 
     if algorithm == 'BFS':
         return bfs(initial_node)

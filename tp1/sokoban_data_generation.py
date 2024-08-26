@@ -31,9 +31,9 @@ algorithm_map = {
 
 # Map user input to the corresponding heuristic class
 heuristics_map = {
-    "Manhattan1": ManhattanDistance1(),
-    "Manhattan2": ManhattanDistance2(),
-    "Manhattan3": ManhattanDistance3(),
+    "M1": M1(),
+    "M2": M2(),
+    "M3": M3(),
     "Euclidean": EuclideanDistance(),
     "Deadlock": Deadlock(),
     "Smarthattan": Smarthattan(),
