@@ -11,7 +11,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1",
+                            "M1",
                             "Basic"
                         ]
                     },
@@ -24,7 +24,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -37,7 +37,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Basic",
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
@@ -51,7 +51,7 @@
                         "name": "A_STAR",
                         "heuristics": [
                             "Deadlock",
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],

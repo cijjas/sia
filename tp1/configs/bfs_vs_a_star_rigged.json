@@ -1,7 +1,7 @@
 {
     "executions": [
         {
-            "output_file": "bfs_vs_a_star_bad_rigged.csv",
+            "output_file": "bfs_vs_a_star_rigged.csv",
             "data_generation": {
                 "maps": [
                     "lvl4.txt"
@@ -14,7 +14,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],

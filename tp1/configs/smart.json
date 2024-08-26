@@ -16,19 +16,19 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                    {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan2"
+                            "M2"
                         ]
                     },
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan3"
+                            "M3"
                         ]
                     }
                     

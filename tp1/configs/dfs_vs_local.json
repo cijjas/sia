@@ -14,7 +14,7 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],

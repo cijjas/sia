@@ -10,19 +10,19 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan2"
+                            "M2"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan3"
+                            "M3"
                         ]
                     },
                     {
@@ -55,14 +55,14 @@
                     {
                         "name": "GREEDY_GLOBAL",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     },
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     },
@@ -73,7 +73,7 @@
                     {
                         "name": "GREEDY_LOCAL",
                         "heuristics": [
-                            "Manhattan1",
+                            "M1",
                             "Deadlock"
                         ]
                     }
@@ -95,7 +95,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
@@ -116,7 +116,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],

@@ -131,8 +131,45 @@ def main():
     # Conclusion : inadmissible can be really good in specific situations
     file_path = f'{OUTPUT_DIR}/admissible_vs_inadmissible.csv'
     if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["A_STAR"], "admissible_vs_inadmissible")
+        data = pd.read_csv(file_path)
+
+        # Group data by heuristics and calculate mean and standard deviation for execution time
+        grouped_stats = data.groupby('heuristics_used').agg(
+            mean_execution_time=pd.NamedAgg(column='execution_time', aggfunc='mean'),
+            std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std'),
+            mean_expanded_nodes=pd.NamedAgg(column='expanded_nodes', aggfunc='mean')
+        ).reset_index()
+
+        # Get the mean cost for each heuristic
+        mean_cost = data.groupby('heuristics_used').agg(
+            mean_cost=pd.NamedAgg(column='cost', aggfunc='mean')
+        ).reset_index()
+
+        # Plotting all three graphs
+        fig, axs = plt.subplots(1, 3, figsize=(21, 5))
+
+        # Graph 1: Cost by Heuristic
+        axs[0].bar(mean_cost['heuristics_used'], mean_cost['mean_cost'], color='teal')
+        axs[0].set_title('Costo Promedio por Heurística')
+        axs[0].set_xlabel('Heurísticas')
+        axs[0].set_ylabel('Costo Promedio')
+        axs[0].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
+        # Graph 2: Mean Execution Time with Standard Deviation
+        axs[1].bar(grouped_stats['heuristics_used'], grouped_stats['mean_execution_time'], 
+                yerr=grouped_stats['std_execution_time'], color='coral', alpha=0.7)
+        axs[1].set_title('Tiempo Promedio de Ejecución con STD')
+        axs[1].set_xlabel('Heurísticas')
+        axs[1].set_ylabel('Tiempo de Ejecución (s)')
+        axs[1].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
+        # Graph 3: Expanded Nodes by Heuristic
+        axs[2].bar(grouped_stats['heuristics_used'], grouped_stats['mean_expanded_nodes'], color='skyblue')
+        axs[2].set_title('Nodos Expandidos por Heurística')
+        axs[2].set_xlabel('Heurísticas')
+        axs[2].set_ylabel('Nodos Expandidos')
+        axs[2].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
+        plt.tight_layout()
+        plt.show()
+        
 
     # heuristic_permutation.json
     # Conclusion : heuristics performance in a scenario
@@ -177,9 +214,9 @@ def main():
 
         new_names = {
             "Smarthattan": "Smarthattan",
-            "ManhattanDistance1": "M1",
-            "ManhattanDistance2": "M2",
-            "ManhattanDistance3": "M3",
+            "M1": "M1",
+            "M2": "M2",
+            "M3": "M3",
         }
         # Bar plot for Expanded Nodes
         bars1 = ax1.bar(grouped['heuristics_used'],expanded_nodes['expanded_nodes'],

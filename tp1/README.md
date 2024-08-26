@@ -60,7 +60,7 @@ para ejecutarlo
 python3 sokoban_cool.py path/to/map.txt
 ```
 
-Dado que el objetivo de este tp no era tener una interfaz super perfecta (sino que obtener soluciones de mapas de sokoban) dejamos algunas configuraciones a hacer manualmente como por ejemplo elegir las heurísticas a usar para los algoritmos informados. Por default estan Manhattan1 y Deadlocks. Para cambiar esto se puede configurar en la función de `run_algorithm` de [sokoban_cool.py](sokoban_cool.py) donde se pueden quitar o introducir nuevas heurísticas definidas en el archivo de heurísticas. También es posible cambiar el texture pack agregando el parámetro en la función `load_images` mencionando el nombre de la carpeta que se quiera que está en [texture_packs](resources/texture_packs/).
+Dado que el objetivo de este tp no era tener una interfaz super perfecta (sino que obtener soluciones de mapas de sokoban) dejamos algunas configuraciones a hacer manualmente como por ejemplo elegir las heurísticas a usar para los algoritmos informados. Por default estan M1 y Deadlocks. Para cambiar esto se puede configurar en la función de `run_algorithm` de [sokoban_cool.py](sokoban_cool.py) donde se pueden quitar o introducir nuevas heurísticas definidas en el archivo de heurísticas. También es posible cambiar el texture pack agregando el parámetro en la función `load_images` mencionando el nombre de la carpeta que se quiera que está en [texture_packs](resources/texture_packs/).
 
 ### Sokoban data generation
 
@@ -100,7 +100,7 @@ donde todas las configuraciones deben ser de esta forma.
 | maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)|
 | algorithms | array de algoritmos |
 | name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
-| heuristics | Manhattan1, Manhattan2, Manhattan3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean, Inadmissible|
+| heuristics | M1, M2, M3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean, Inadmissible|
 | iterations_for_average | cantidad de ejecuciones de los algorítmos \*|
 
 \* notar que esto sólo debería cambiar el tiempo de ejecución dado que es el único parámetro no determinístico para una ejecución

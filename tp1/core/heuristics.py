@@ -20,7 +20,7 @@ class Heuristic(ABC):
         return self.__class__.__name__
 
 # Calculates the sum of the manhattan distances between the boxes and their closest target
-class ManhattanDistance1(Heuristic):
+class M1(Heuristic):
     def __call__(self, state: State) -> float:
         total_distance = 0
         for box in state.boxes:
@@ -33,7 +33,7 @@ class ManhattanDistance1(Heuristic):
         return total_distance
 
 # Calculates the sum of the manhattan distances to the closest box and the distances from each box to their closest target
-class ManhattanDistance2(Heuristic):
+class M2(Heuristic):
     def __call__(self, state: State) -> float:
         total_distance = 0
         min_for_a_box = float('inf')
@@ -99,7 +99,7 @@ class Smarthattan(Heuristic):
         return total_distance + (min_player_to_box if min_player_to_box < float('inf') else 0)
 
 # Calculates the sum of the manhattan distance to the closest box, and from the box the closest distance to a target
-class ManhattanDistance3(Heuristic):
+class M3(Heuristic):
     def __call__(self, state: State) -> float:
         min_box, min_for_a_box = (None, float('inf'))
 

@@ -14,7 +14,7 @@
                     {
                         "name": "A_STAR",
                         "heuristics": [
-                            "Manhattan1"
+                            "M1"
                         ]
                     }
                 ],
