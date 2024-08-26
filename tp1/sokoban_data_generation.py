@@ -11,6 +11,7 @@ from core.algorithms.dfs import dfs
 from core.algorithms.greedy_local import greedy_local
 from core.algorithms.greedy_global import greedy_global
 from core.models.state import State
+from core.models.state import Board
 from core.models.node import Node
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -52,8 +53,9 @@ def create_data_set(maps, algorithm_configs, iterations_for_average, csv_file_na
 
         for m in maps:
             map_data = parse_map(f'{MAPS_PATH}/{m}')
-            initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
-            initial_state.init_deadlock_areas()
+            board = Board(map_data['walls'], map_data['goals'], map_data['spaces'], set())
+            board.init_deadlock_areas(map_data['boxes'], map_data['player'])
+            initial_state = State(map_data['boxes'], map_data['player'], board)
             initial_node = Node(initial_state, None, None, 0)
 
             for algo_config in algorithm_configs:
@@ -101,8 +103,9 @@ def create_comparison_data_set(map, algorithm_config, heuristics, iterations_for
         writer.writerow(csv_header)
 
         map_data = parse_map(f'{MAPS_PATH}/{map}')
-        initial_state = State(map_data['walls'], map_data['goals'], map_data['boxes'], map_data['player'], map_data['spaces'])
-        initial_state.init_deadlock_areas()
+        board = Board(map_data['walls'], map_data['goals'], map_data['spaces'], set())
+        board.init_deadlock_areas(map_data['boxes'], map_data['player'])
+        initial_state = State(map_data['boxes'], map_data['player'], board)
         initial_node = Node(initial_state, None, None, 0)
 
         algorithm_name = algorithm_config['name']

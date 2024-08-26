@@ -10,7 +10,6 @@ from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
 from core.algorithms.greedy_local import greedy_local
 from core.algorithms.greedy_global import greedy_global
-from core.models.state import State
 from core.models.node import Node
 import numpy as np
 import pandas as pd
