@@ -28,52 +28,79 @@ def show_comparison_graphs(df, algorithms_to_compare, output_file="pone_nombre")
 
     grouped_df.columns = ['algorithm', 'expanded_nodes_mean', 'execution_time_mean', 'execution_time_std']
 
-    # https://matplotlib.org/stable/users/explain/colors/colormaps.html
-
+    # Plot for Expanded Nodes
     plt.figure(figsize=(10, 6))
-    plt.bar(grouped_df['algorithm'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
+    bars = plt.bar(grouped_df['algorithm'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
     plt.title(f'Expanded Nodes for {", ".join(algorithms_to_compare)}')
     plt.xlabel('Algorithm')
     plt.ylabel('Expanded Nodes')
+    
+    # Adding text labels above bars for Expanded Nodes
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text((bar.get_x() + bar.get_width() / 2) , yval, f'{yval:.0f}', ha='center', va='bottom')
+
     plt.savefig(f'output/graphs/en_{output_file}.png')
     plt.close()
 
+    # Plot for Execution Time
     plt.figure(figsize=(10, 6))
-    plt.bar(grouped_df['algorithm'], grouped_df['execution_time_mean'],
-            yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
+    bars = plt.bar(grouped_df['algorithm'], grouped_df['execution_time_mean'], yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
     plt.title(f'Execution Time for {", ".join(algorithms_to_compare)}')
     plt.xlabel('Algorithm')
     plt.ylabel('Execution Time (s)')
+
+    # Adding text labels above bars for Execution Time
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text((bar.get_x() + bar.get_width() / 2) +1/10, yval, f'{yval:.4f}', ha='center', va='bottom')
+
     plt.savefig(f'output/graphs/t_{output_file}.png')
     plt.close()
 
-def show_heuristics_comparison_graphs(df, algorithm, heuristics_to_compare, output_file="pone_nombre"):
-    os.makedirs('output/graphs', exist_ok=True)
+def compare_heuristics(data):
+            # Group data by heuristics and calculate mean and standard deviation for execution time
+        grouped_stats = data.groupby('heuristics_used').agg(
+            mean_execution_time=pd.NamedAgg(column='execution_time', aggfunc='mean'),
+            std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std'),
+            mean_expanded_nodes=pd.NamedAgg(column='expanded_nodes', aggfunc='mean')
+        ).reset_index()
 
-    filtered_df = df[(df['algorithm'] == algorithm) & (df['heuristics_used'].isin(heuristics_to_compare))]
-    grouped_df = filtered_df.groupby(['heuristics_used']).agg({
-        'expanded_nodes': 'mean',
-        'execution_time': ['mean', 'std']
-    }).reset_index()
+        # Get the mean cost for each heuristic
+        mean_cost = data.groupby('heuristics_used').agg(
+            mean_cost=pd.NamedAgg(column='cost', aggfunc='mean')
+        ).reset_index()
 
-    grouped_df.columns = ['heuristics_used', 'expanded_nodes_mean', 'execution_time_mean', 'execution_time_std']
+        # Plotting all three graphs
+        fig, axs = plt.subplots(1, 3, figsize=(21, 5))
 
-    plt.figure(figsize=(10, 6))
-    plt.bar(grouped_df['heuristics_used'], grouped_df['expanded_nodes_mean'], color=plt.cm.Paired.colors, capsize=5)
-    plt.title(f'Nodos expandidos para las heurísticas {", ".join(heuristics_to_compare)} con el algoritmo {algorithm}')
-    plt.xlabel('Heuristica')
-    plt.ylabel('Nodos expandidos')
-    plt.savefig(f'output/graphs/en_{output_file}.png')
-    plt.close()
+        # Graph 1: Cost by Heuristic
+        axs[0].bar(mean_cost['heuristics_used'], mean_cost['mean_cost'], color='teal')
+        axs[0].set_title('Costo por Heurística')
+        axs[0].set_xlabel('Heurísticas')
+        axs[0].set_ylabel('Costo Promedio')
+        axs[0].set_xticks(range(len(mean_cost['heuristics_used'])))
+        axs[0].set_xticklabels(mean_cost['heuristics_used'], rotation=90)
 
-    plt.figure(figsize=(10, 6))
-    plt.bar(grouped_df['heuristics_used'], grouped_df['execution_time_mean'],
-            yerr=grouped_df['execution_time_std'], color=plt.cm.Accent.colors, capsize=5)
-    plt.title(f'Tiempo de ejecución del algoritmo {algorithm} con las heurísticas {", ".join(heuristics_to_compare)}')
-    plt.xlabel('Heuristica')
-    plt.ylabel('Tiempo de ejecución [s]')
-    plt.savefig(f'output/graphs/t_{output_file}.png')
-    plt.close()
+        # Graph 2: Mean Execution Time with Standard Deviation
+        axs[1].bar(grouped_stats['heuristics_used'], grouped_stats['mean_execution_time'], 
+                yerr=grouped_stats['std_execution_time'], color='coral', alpha=0.7)
+        axs[1].set_title('Tiempo Promedio de Ejecución con STD')
+        axs[1].set_xlabel('Heurísticas')
+        axs[1].set_ylabel('Tiempo de Ejecución (s)')
+        axs[1].set_xticks(range(len(mean_cost['heuristics_used'])))
+        axs[1].set_xticklabels(mean_cost['heuristics_used'], rotation=90)
+
+        # Graph 3: Expanded Nodes by Heuristic
+        axs[2].bar(grouped_stats['heuristics_used'], grouped_stats['mean_expanded_nodes'], color='skyblue')
+        axs[2].set_title('Nodos Expandidos por Heurística')
+        axs[2].set_xlabel('Heurísticas')
+        axs[2].set_ylabel('Nodos Expandidos')
+        axs[2].set_xticks(range(len(mean_cost['heuristics_used'])))
+        axs[2].set_xticklabels(mean_cost['heuristics_used'], rotation=90)
+
+        plt.tight_layout()
+        plt.show()
 
 def main():
     # all_algorithms.json
@@ -132,63 +159,23 @@ def main():
     file_path = f'{OUTPUT_DIR}/admissible_vs_inadmissible.csv'
     if os.path.exists(file_path):
         data = pd.read_csv(file_path)
-
-        # Group data by heuristics and calculate mean and standard deviation for execution time
-        grouped_stats = data.groupby('heuristics_used').agg(
-            mean_execution_time=pd.NamedAgg(column='execution_time', aggfunc='mean'),
-            std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std'),
-            mean_expanded_nodes=pd.NamedAgg(column='expanded_nodes', aggfunc='mean')
-        ).reset_index()
-
-        # Get the mean cost for each heuristic
-        mean_cost = data.groupby('heuristics_used').agg(
-            mean_cost=pd.NamedAgg(column='cost', aggfunc='mean')
-        ).reset_index()
-
-        # Plotting all three graphs
-        fig, axs = plt.subplots(1, 3, figsize=(21, 5))
-
-        # Graph 1: Cost by Heuristic
-        axs[0].bar(mean_cost['heuristics_used'], mean_cost['mean_cost'], color='teal')
-        axs[0].set_title('Costo Promedio por Heurística')
-        axs[0].set_xlabel('Heurísticas')
-        axs[0].set_ylabel('Costo Promedio')
-        axs[0].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
-        # Graph 2: Mean Execution Time with Standard Deviation
-        axs[1].bar(grouped_stats['heuristics_used'], grouped_stats['mean_execution_time'], 
-                yerr=grouped_stats['std_execution_time'], color='coral', alpha=0.7)
-        axs[1].set_title('Tiempo Promedio de Ejecución con STD')
-        axs[1].set_xlabel('Heurísticas')
-        axs[1].set_ylabel('Tiempo de Ejecución (s)')
-        axs[1].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
-        # Graph 3: Expanded Nodes by Heuristic
-        axs[2].bar(grouped_stats['heuristics_used'], grouped_stats['mean_expanded_nodes'], color='skyblue')
-        axs[2].set_title('Nodos Expandidos por Heurística')
-        axs[2].set_xlabel('Heurísticas')
-        axs[2].set_ylabel('Nodos Expandidos')
-        axs[2].set_xticklabels(mean_cost['heuristics_used'], rotation=45)
-        plt.tight_layout()
-        plt.show()
+        compare_heuristics(data)
         
 
     # heuristic_permutation.json
     # Conclusion : heuristics performance in a scenario
     file_path = f'{OUTPUT_DIR}/heuristic_permutation.csv'
     if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["A_STAR"], "heuristic_permutation")
+        data = pd.read_csv(file_path)
+        compare_heuristics(data)
 
     # heuristic_permutation_2.json
     # Conclusion : heuristics performance varies according to the scenario
     file_path = f'{OUTPUT_DIR}/heuristic_permutation_2.csv'
     if os.path.exists(file_path):
-        df = pd.read_csv(file_path)
-        show_comparison_graphs(df, ["A_STAR"], "heuristic_permutation_2")
+        data = pd.read_csv(file_path)
+        compare_heuristics(data)
 
-    # heuristic permutation 2
-    # deadlock_cmp_a_star.json
-    # Differences in time and spatial complexity for A_STAR with corner deadlocks vs corner deadlocks + wall deadlocks
-    # Conclusion : The maps which have wall deadlock areas perform better with the added heuristic
 
     #file_path = f'{OUTPUT_DIR}/deadlock_cmp_a_star.csv'
     #if os.path.exists(file_path):
