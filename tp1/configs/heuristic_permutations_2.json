@@ -1,0 +1,62 @@
+{
+    "executions": [
+        {
+            "output_file": "heuristic_permutation.csv",
+            "data_generation": {
+                "maps": [
+                    "lvl5.txt"
+                ],
+                "algorithms": [
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1",
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Manhattan1"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Basic",
+                            "Deadlock"
+                        ]
+                    },
+                    {
+                        "name": "A_STAR",
+                        "heuristics": [
+                            "Deadlock",
+                            "Manhattan1"
+                        ]
+                    }
+                ],
+                "iterations_for_average": 10
+            }
+        }
+    ]
+}
