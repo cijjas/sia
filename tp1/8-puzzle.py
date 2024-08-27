@@ -39,13 +39,24 @@ class PriorityQueue:
 def misplaced_tiles(state, goal):
     return sum(s != g for s, g in zip(state.state, goal.state))
 
+def min_manhattan_distance(state, goal):
+    """ finds the misplaced corner with the lowest manhattan distance """
+    min_distance = float('inf')
+    for i in range(1, 9):  # 1 through 8
+        x1, y1 = divmod(state.state.index(i), 3)
+        x2, y2 = divmod(goal.state.index(i), 3)
+        distance = abs(x1 - x2) + abs(y1 - y2)
+        if distance < min_distance:
+            min_distance = distance
+    return min_distance
+
 def manhattan_distance(state, goal):
     distance = 0
     for i in range(1, 9):  # 1 through 8
         x1, y1 = divmod(state.state.index(i), 3)
         x2, y2 = divmod(goal.state.index(i), 3)
         distance += abs(x1 - x2) + abs(y1 - y2)
-    return distance
+    return distance/2
 
 def neighbors(state):
     neighbors = []
@@ -151,7 +162,7 @@ def main():
     goal_state = (0, 1, 2, 3, 4, 5, 6, 7, 8)  # Goal configuration
 
     algorithms = [a_star, global_greedy]
-    heuristics = [misplaced_tiles, manhattan_distance]
+    heuristics = [misplaced_tiles, manhattan_distance, min_manhattan_distance]
     heuristic_names = ["misplaced_tiles", "manhattan_distance"]
 
     os.makedirs('output', exist_ok=True)

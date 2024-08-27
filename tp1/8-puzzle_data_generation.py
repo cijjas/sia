@@ -19,13 +19,18 @@ def generate_graphs(algorithm_name):
         std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std')
     ).reset_index()
 
-    plt.figure(figsize=(10, 6))
+    if algorithm_name == "global_greedy":
+        plt.figure(figsize=(15, 6))  # Larger horizontally for global_greedy
+    else:
+        plt.figure(figsize=(10, 6))
+    
     bars = plt.barh(avg_time_df['heuristic'], avg_time_df['mean_execution_time'], xerr=avg_time_df['std_execution_time'], capsize=5)
     plt.title(f'Average Execution Time for {algorithm_name}')
     plt.xlabel('Execution Time (s)')
     plt.ylabel('Heuristic')
-    for bar in bars:
-        plt.text(bar.get_width(), bar.get_y() + bar.get_height()/2, f'{bar.get_width():.4f}', va='center')
+    for bar, err in zip(bars, avg_time_df['std_execution_time']):
+        plt.text(bar.get_width() + err + 0.005, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.4f}', va='center')
+    plt.tight_layout()
     plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_avg_time.png')
     plt.close()
 
@@ -40,7 +45,8 @@ def generate_graphs(algorithm_name):
     plt.xlabel('Expanded Nodes')
     plt.ylabel('Heuristic')
     for bar in bars:
-        plt.text(bar.get_width(), bar.get_y() + bar.get_height()/2, f'{bar.get_width():.0f}', va='center')
+        plt.text(bar.get_width() + 0.005, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.0f}', va='center')
+    plt.tight_layout()
     plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_expanded_nodes.png')
     plt.close()
 
@@ -55,7 +61,8 @@ def generate_graphs(algorithm_name):
     plt.xlabel('Total Movements')
     plt.ylabel('Heuristic')
     for bar in bars:
-        plt.text(bar.get_width(), bar.get_y() + bar.get_height()/2, f'{bar.get_width():.0f}', va='center')
+        plt.text(bar.get_width() + 0.005, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.0f}', va='center')
+    plt.tight_layout()
     plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_total_movements.png')
     plt.close()
 
