@@ -6,6 +6,24 @@ Para instalar las dependencias usar pipenv
 pipenv install
 ```
 
+## 8-Puzzle
+Todo el código de la implementación del 8-Puzzle se encuentra en [8-puzzle](8-puzzle.py). Los archivos csv generados se guardan en [output](output/). El juego considera un estado inicial y estado final fijados en el código.
+
+Para ejecutar el 8-Puzzle correr en el directorio tp1 el siguiente comando:
+
+```sh
+python3 8-puzzle.py
+```
+
+## 8-Puzzle_data_generation
+
+Este ejecutable genera los gráficos en la carpeta [output/graphs](output/graphs) en base a los archivos csv generados por juego.
+
+Para correrlo, ejecutar en el directorio tp1 el siguiente comando:
+```sh
+python3 8-puzzle_data_generation.py
+```
+
 ## Sokoban
 
 Todos los códigos para el funcionamiento escencial de las estructuras y algorítmos se encuentran en la carpeta core.
