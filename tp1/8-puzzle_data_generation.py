@@ -18,21 +18,31 @@ def generate_graphs(algorithm_name):
         mean_execution_time=pd.NamedAgg(column='execution_time', aggfunc='mean'),
         std_execution_time=pd.NamedAgg(column='execution_time', aggfunc='std')
     ).reset_index()
-
+    
+        # Average Time Graph for global_greedy
     if algorithm_name == "global_greedy":
         plt.figure(figsize=(15, 6))  # Larger horizontally for global_greedy
+        colors = ['blue' if i % 2 == 0 else 'violet' for i in range(len(avg_time_df))]
+        bars = plt.barh(avg_time_df['heuristic'], avg_time_df['mean_execution_time'], xerr=avg_time_df['std_execution_time'], capsize=5, color=colors)
+        plt.title(f'Average Execution Time for {algorithm_name}')
+        plt.xlabel('Execution Time (s)')
+        plt.ylabel('Heuristic')
+        for bar, err in zip(bars, avg_time_df['std_execution_time']):
+            plt.text(bar.get_width() + err + 0.00003, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.4f}', va='center')
+        plt.tight_layout()
+        plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_avg_time.png')
+        plt.close()
     else:
-        plt.figure(figsize=(10, 6))
-    
-    bars = plt.barh(avg_time_df['heuristic'], avg_time_df['mean_execution_time'], xerr=avg_time_df['std_execution_time'], capsize=5)
-    plt.title(f'Average Execution Time for {algorithm_name}')
-    plt.xlabel('Execution Time (s)')
-    plt.ylabel('Heuristic')
-    for bar, err in zip(bars, avg_time_df['std_execution_time']):
-        plt.text(bar.get_width() + err + 0.005, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.4f}', va='center')
-    plt.tight_layout()
-    plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_avg_time.png')
-    plt.close()
+        colors = ['blue' if i % 2 == 0 else 'violet' for i in range(len(avg_time_df))]
+        bars = plt.barh(avg_time_df['heuristic'], avg_time_df['mean_execution_time'], xerr=avg_time_df['std_execution_time'], capsize=5, color=colors)
+        plt.title(f'Average Execution Time for {algorithm_name}')
+        plt.xlabel('Execution Time (s)')
+        plt.ylabel('Heuristic')
+        for bar, err in zip(bars, avg_time_df['std_execution_time']):
+            plt.text(bar.get_width() + err + 0.005, bar.get_y() + bar.get_height()/2, f'{bar.get_width():.4f}', va='center')
+        plt.tight_layout()
+        plt.savefig(f'{OUTPUT_DIR}/{GRAPH_DIR}/{algorithm_name}_avg_time.png')
+        plt.close()
 
     # Expanded Nodes Graph
     expanded_nodes_df = df.groupby('heuristic').agg(
@@ -40,7 +50,8 @@ def generate_graphs(algorithm_name):
     ).reset_index()
 
     plt.figure(figsize=(10, 6))
-    bars = plt.barh(expanded_nodes_df['heuristic'], expanded_nodes_df['mean_expanded_nodes'], capsize=5)
+    colors = ['blue' if i % 2 == 0 else 'violet' for i in range(len(expanded_nodes_df))]
+    bars = plt.barh(expanded_nodes_df['heuristic'], expanded_nodes_df['mean_expanded_nodes'], capsize=5, color=colors)
     plt.title(f'Expanded Nodes for {algorithm_name}')
     plt.xlabel('Expanded Nodes')
     plt.ylabel('Heuristic')
@@ -56,7 +67,8 @@ def generate_graphs(algorithm_name):
     ).reset_index()
 
     plt.figure(figsize=(10, 6))
-    bars = plt.barh(total_movements_df['heuristic'], total_movements_df['mean_total_movements'], capsize=5)
+    colors = ['blue' if i % 2 == 0 else 'violet' for i in range(len(total_movements_df))]
+    bars = plt.barh(total_movements_df['heuristic'], total_movements_df['mean_total_movements'], capsize=5, color=colors)
     plt.title(f'Total Movements for {algorithm_name}')
     plt.xlabel('Total Movements')
     plt.ylabel('Heuristic')
