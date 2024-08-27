@@ -1,5 +1,4 @@
-# Ejercicio II - Sokoban
-
+# Ejercicio I - 8-puzzle
 Para instalar las dependencias usar pipenv
 
 ```sh
@@ -24,7 +23,9 @@ Para correrlo, ejecutar en el directorio tp1 el siguiente comando:
 python3 8-puzzle_data_generation.py
 ```
 
-## Sokoban
+# Ejercicio II - Sokoban
+
+## Intro
 
 Todos los códigos para el funcionamiento escencial de las estructuras y algorítmos se encuentran en la carpeta core.
 
