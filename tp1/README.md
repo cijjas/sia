@@ -1,30 +1,3 @@
-# Ejercicio I - 8-Puzzle
-
-### ¿Que estructura de datos utilizarian?
-Matriz de 3x3 donde cada valor es un número del 0 al 8 inclusive.
-La igualdad de estados se realiza con un previo ordenamiento, ubicando en la esquina superior izquierda el valor minimo entre las 4 posibles esquinas.
-Por ejemplo
-3 2 1
-4 0 6
-7 8 5
-Se reordena a la matriz a la forma canonica definida
-1 6 5
-2 0 8
-3 4 7
-De esta manera, podemos comparar rotaciones del tablero que pueden llegar a representar el mismo estado.
-
-### Heuristicas Admisibles
-- Sumatoria de distancias manhattan, aunque seria valido para norma = 0 (euclideana), norma supremo
-- Sumatoria del triangulo superior sea menor
-- Cantidad de posicionamientos correctos de los numeros, hacer una desviacion estandar segun la posicion de donde estas y donde deberia estar
-- Cantidad de posicionamientos incorrectos de los numeros
-- v siendo la lista de elementos
-$$\sum_{i = 1}^{8} \frac{v[i]}{8\cdot i }-1$$
-
-### ¿Que Algoritmo de Busqueda usarian y con que heuristicas?
-Cuando hagamos el Sokoban vamos a tener mas idea
-
-
 # Ejercicio II - Sokoban
 
 Para instalar las dependencias usar pipenv
@@ -128,18 +101,10 @@ Depende del algoritmo a usar pero sepuede ver en las implementaciones en el dire
 
 Nos aseguramos de no visitar nodos repetidos manteniendo un set paralelo a la ejecutción que garantiza evitar la repetición y evita entrar en loops infinitos.
 
-- dfs importante como decidis el siguiente estado (no trivial) hay algunos tableros que dependen de esta decisión.
-- checkeo de deadlocks
-- a* debería dar óptimo para todas las heurisiticas admisibles
 
-
-
-# Referencias
+# Trabajos futuros y referenicas
 
 - [Experto en Heuristicas](https://www.reddit.com/r/algorithms/comments/fedzu1/pathfinding_heuristic_for_indirect_movement_like/)
 - IDA*
-- Poner cantidad de iteraciones en los graficos, y toda la informacion fija
-- Usar otro color scheme para los graficos
-- ponerte a un escalon de la solucion y que de mas la heuristica no admisible
-- estado definido como posicion de las cajas y jugador
-- Creas Mapa entonces tenes Walls, Targets
+- IDDFS
+- Preprocesamiento de heurísticas para lograr O(1)
