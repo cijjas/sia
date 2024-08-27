@@ -4,7 +4,6 @@ from core.models.state import Board
 from core.models.node import Node
 from core.utils.map_parser import parse_map
 from core.heuristics import *
-from core.methods import *
 from core.algorithms.bfs import bfs
 from core.algorithms.dfs import dfs
 from core.algorithms.a_star import a_star
