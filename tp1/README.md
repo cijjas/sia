@@ -1,12 +1,46 @@
-# Ejercicio II - Sokoban
+# Tabla de Contenidos
+1. [Ejercicio I - 8-puzzle](#ejercicio-i---8-puzzle)
+   - [8-Puzzle](#8-puzzle)
+   - [8-Puzzle data generation](#8-puzzle_data_generation)
+2. [Ejercicio II - Sokoban](#ejercicio-ii---sokoban)
+   - [Intro](#intro)
+   - [Sokoban cool](#sokoban-cool)
+   - [Sokoban data generation](#sokoban-data-generation)
+   - [Sokoban data analysis](#sokoban-data-analysis)
+3. [Q&A sobre la implementación](#qa-sobre-la-implementación)
+   - [¿Cómo implementamos backtracking?](#cómo-implementamos-backtracking)
+   - [¿Qué hacemos con repetidos estados?](#qué-hacemos-con-repetidos-estados)
+4. [Trabajos futuros y referencias](#trabajos-futuros-y-referencias)
 
+
+# Ejercicio I - 8-puzzle
 Para instalar las dependencias usar pipenv
 
 ```sh
 pipenv install
 ```
 
-## Sokoban
+## 8-Puzzle
+Todo el código de la implementación del 8-Puzzle se encuentra en [8-puzzle](8-puzzle.py). Los archivos csv generados se guardan en [output](output/). El juego considera un estado inicial y estado final fijados en el código.
+
+Para ejecutar el 8-Puzzle correr en el directorio tp1 el siguiente comando:
+
+```sh
+python3 8-puzzle.py
+```
+
+## 8-Puzzle_data_generation
+
+Este ejecutable genera los gráficos en la carpeta [output/graphs](output/graphs) en base a los archivos csv generados por juego.
+
+Para correrlo, ejecutar en el directorio tp1 el siguiente comando:
+```sh
+python3 8-puzzle_data_generation.py
+```
+
+# Ejercicio II - Sokoban
+
+## Intro
 
 Todos los códigos para el funcionamiento escencial de las estructuras y algorítmos se encuentran en la carpeta core.
 
@@ -73,7 +107,7 @@ donde todas las configuraciones deben ser de esta forma.
 | maps | array de nombres de mapas a analizar (se buscan en maps/ asi que definirlos ahí)|
 | algorithms | array de algoritmos |
 | name | BFS, DFS, A_STAR, GREEDY_LOCAL, GREEDY_GLOBAL |
-| heuristics | M1, M2, M3, Smarthattan, Deadlocks, DeadlockCorner, Basic, Euclidean, Inadmissible|
+| heuristics | M1, M2, M3, Smarthattan, Deadlocks, Basic, Euclidean, Inadmissible|
 | iterations_for_average | cantidad de ejecuciones de los algorítmos \*|
 
 \* notar que esto sólo debería cambiar el tiempo de ejecución dado que es el único parámetro no determinístico para una ejecución
