@@ -1,4 +1,4 @@
-from characters import Character
+from tp2.src.game.characters import Character
 
 class EVE:
     def evaluate(self, character: Character):

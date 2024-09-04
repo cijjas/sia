@@ -1,7 +1,7 @@
 import random
 import time
-from characters import Warrior, Archer, Guardian, Mage, Character
-from utils import AttributeAllocator, TimeManager
+from tp2.src.game.characters import Warrior, Archer, Guardian, Mage, Character
+from tp2.src.utils.utils import AttributeAllocator, TimeManager
 from eve import EVE
 
 def start(config):

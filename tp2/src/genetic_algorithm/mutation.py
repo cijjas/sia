@@ -1,0 +1,5 @@
+# GEN
+# MULTIGEN
+# UNIFORME
+# NO_UNIFORME (OPCIONAL!!!!!!!!!!!!!!!)
+
