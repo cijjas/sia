@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from abc import ABC, abstractmethod
 
 class Character(ABC):
@@ -10,11 +11,26 @@ class Character(ABC):
         self.vigor_points = vigor
         self.constitution_points = constitution
 
-        self.strength_total = 100 * math.tanh(0.01 * self.strength_points)
-        self.dexterity_total = math.tanh(0.01 * self.dexterity_points)
-        self.intelligence_total = 0.6 * math.tanh(0.01 * self.intelligence_points)
-        self.vigor_total = math.tanh(0.01 * self.vigor_points)
-        self.constitution_total = 100 * math.tanh(0.01 * self.constitution_points)
+        # Create temporary lists for each attribute's points
+        points = [self.strength_points, self.dexterity_points, self.intelligence_points, self.vigor_points, self.constitution_points]
+        
+        # Apply numpy.tanh to the list of points
+        tanh_values = np.tanh(0.01 * np.array(points))
+
+        # Store the results in the attributes dictionary
+        self.attributes = {
+            "strength": 100 * tanh_values[0],
+            "dexterity": tanh_values[1],
+            "intelligence": 0.6 * tanh_values[2],
+            "vigor": tanh_values[3],
+            "constitution": 100 * tanh_values[4]
+        }
+
+        self.strength_total = self.attributes["strength"]
+        self.dexterity_total = self.attributes["dexterity"]
+        self.intelligence_total = self.attributes["intelligence"]
+        self.vigor_total = self.attributes["vigor"]
+        self.constitution_total = self.attributes["constitution"]
 
         self.atm = 0.5 - (3 * self.height - 5)**4 + (3 * self.height - 5)**2 + self.height / 2
         self.dem = 2 + (3 * self.height - 5)**4 - (3 * self.height - 5)**2 - self.height / 2
@@ -23,15 +39,9 @@ class Character(ABC):
         self.defense = (self.vigor_total + self.intelligence_total) * self.constitution_total * self.dem
 
     def get_attributes(self):
-        return {
-            "strength_total": self.strength_total,
-            "dexterity_total": self.dexterity_total,
-            "intelligence_total": self.intelligence_total,
-            "vigor_total": self.vigor_total,
-            "constitution_total": self.constitution_total
-        }
+        return self.attributes
     
-    def set_attributes(self, attributes, height=None):
+    def set_attributes(self, attributes: dict, height=None):
         self.strength_points = attributes.get('strength', self.strength_points)
         self.dexterity_points = attributes.get('dexterity', self.dexterity_points)
         self.intelligence_points = attributes.get('intelligence', self.intelligence_points)
@@ -43,6 +53,14 @@ class Character(ABC):
         self.intelligence_total = 0.6 * math.tanh(0.01 * self.intelligence_points)
         self.vigor_total = math.tanh(0.01 * self.vigor_points)
         self.constitution_total = 100 * math.tanh(0.01 * self.constitution_points)
+
+        self.attributes = {
+            "strength": self.strength_total,
+            "dexterity": self.dexterity_total,
+            "intelligence": self.intelligence_total,
+            "vigor": self.vigor_total,
+            "constitution": self.constitution_total
+        }
 
         if height is not None:
             self.height = height
