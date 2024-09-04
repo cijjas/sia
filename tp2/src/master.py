@@ -1,6 +1,6 @@
 import sys
 from game import start
-from config_loader import ConfigLoader
+from tp2.src.utils.config_loader import ConfigLoader
 
 def main():
     if len(sys.argv) != 2:
