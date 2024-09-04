@@ -1,89 +1,29 @@
 import random
 import time
 from tp2.src.game.characters import Warrior, Archer, Guardian, Mage, Character
-from tp2.src.utils.utils import AttributeAllocator, TimeManager
+from tp2.src.utils.attribute_alocator import AttributeAllocator, TimeManager
 from eve import EVE
+from utils.time_manager import TimeManager
 
-def start(config):
-    """
-    Inicializa el juego y coordina todos los componentes. Permite al jugador ajustar
-    los atributos del personaje dentro de un tiempo limitado y muestra el mejor personaje
-    al final del tiempo.
+def start_game(config, game_config):
 
-    :param config: Diccionario de configuración ya validado.
-    """
-    # Definir los tipos de personajes
-    character_classes = [Warrior, Archer, Guardian, Mage]
+    characters = game_config['characters_classes']
+    attributes = game_config['attributes']
+    points_range = game_config['points_range']
+    height_range = game_config['height_range']
+    time_limit_range = game_config['time_limit_range']
 
-    # Extraer variables desde la configuración
-    total_points = config['total_points']
-    time_limit = config['time_limit']
-    character_height = config['height']
+    time_limit = random.randint(time_limit_range[0], time_limit_range[1]) # seconds
+    height = random.uniform(height_range[0], height_range[1])
+    points = random.randint(points_range[0], points_range[1])
 
-    # Seleccionar una clase de personaje aleatoriamente
-    character_class = random.choice(character_classes)
-    character: Character = character_class(character_height)
-
-    # Configurar el asignador de atributos y el administrador de tiempo
-    attribute_allocator = AttributeAllocator(total_points)
     time_manager = TimeManager(time_limit)
-    
-    character.set_attributes(attribute_allocator.random_allocate())
 
-    # Crear instancia del EVE
-    eve = EVE()
-    
-    # Mostrar mensaje inicial
-    print(f"Class selected: {character_class.__name__}")
-    print(f"Adjust your character within {time_limit} seconds.")
-    
-    # Temporizador para que el jugador ajuste los atributos
-    time_manager.start()
-    best_attributes = None
-    best_performance = float('-inf')
+    return time_manager
+    # start timer
 
-    while time_manager.time_remaining() > 0:
-        # Solicitar al jugador que ingrese los atributos
-        print("Enter your attributes:")
-        strength = int(input("Strength: "))
-        dexterity = int(input("Dexterity: "))
-        intelligence = int(input("Intelligence: "))
-        vigor = int(input("Vigor: "))
-        constitution = int(input("Constitution: "))
-        
-        # Asignar los atributos al personaje
-        attributes = {
-            'strength': strength,
-            'dexterity': dexterity,
-            'intelligence': intelligence,
-            'vigor': vigor,
-            'constitution': constitution
-        }
-        
-        if sum(attributes.values()) != total_points:
-            print(f"Error: The total points must be exactly {total_points}.")
-            continue
-        
-        character.set_attributes(attributes)
-        character.set_height(character_height)
-        
-        # Calcular el desempeño usando EVE
-        performance = eve.evaluate(character)
-        
-        if performance > best_performance:
-            best_performance = performance
-            best_attributes = attributes
-        
-        # Mostrar el desempeño actual
-        print(f"Current performance: {performance}")
-    
-    # Terminado el tiempo, mostrar el mejor personaje
-    character.set_attributes(best_attributes)
-    character.set_height(character_height)
-    
-    print("\nTime's up!")
-    print(f"Best character type: {character_class.__name__}")
-    print(f"Final Attributes: {best_attributes}")
-    print(f"Height: {character_height:.2f} meters")
-    print(f"Performance: {best_performance}")
+
+
+
+
 
