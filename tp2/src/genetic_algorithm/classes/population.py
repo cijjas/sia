@@ -28,30 +28,53 @@ class Population:
    
     
     def select(self):
+        selected_parents = combined_selection(
+            self.individuals, 
+            self.selection_method["parents"], 
+            self.selection_method["selection_rate"],
+            self.generation
+        )
+        return selected_parents
+    
+    def replace(self, new_kids):
+        survivors = combined_selection(
+            self.individuals, 
+            self.selection_method['replacement'], 
+            1 - self.selection_method['selection_rate'],
+            self.generation
+        )
+        self.individuals = survivors + new_kids
+        
+    
 
-        selected_parents = combined_selection(self.individuals, self.selection_method["parents"])
-        replacements = combined_selection(self.individuals, self.selection_method['replacement'])
-
-        return selected_parents, replacements
-
-    def crossover(self, parents):
+    def crossover(self, parents, generation):
         # Aplicar operación de cruce según la configuración
-        offspring = crossover_operation(parents, self.crossover_method, self.generation + 1)
-        # TODO agregar o reemplazar? 
+        offspring = crossover_operation(parents, self.crossover_method, generation)
+        return offspring 
 
 
-    # TODO
-    # def mutate(self):
-    #     # Aplicar mutaciones según la configuración
-    #     for individual in self.individuals:
-    #         mutation_operation(individual, self.mutation_config)
+    def mutate(self):
+        # Aplicar mutaciones según la configuración
+        for individual in self.individuals:
+            mutation_operation(individual, self.mutation_method)
 
     def evolve(self):
         self.evaluete_population()
+
         parents = self.select()
-        self.crossover(parents)
-        self.mutate()
+
+        offspring = self.crossover(parents, self.generation)
+        
+        tri_eyed_kids = self.mutate(offspring)
+
+        self.replace(tri_eyed_kids)
+
         self.generation += 1
+
+
+
+
+        
     
     def has_converged(self):
 

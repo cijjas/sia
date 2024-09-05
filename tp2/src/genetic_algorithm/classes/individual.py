@@ -24,6 +24,9 @@ class Individual:
     def get_generation(self):
         return self.generation
     
+    def set_generation(self, generation):
+        self.generation = generation
+
     def get_genes(self):
         return self.genes.as_array()
     
