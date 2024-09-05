@@ -10,7 +10,7 @@ def crossover_operation(parents, config, generation):
     for i in range(0, len(parents), 2):
         parent1 = parents[i].genes
         parent2 = parents[i + 1].genes
-        child1, child2 = crossover((parent1, parent2), config['type'])
+        child1, child2 = select_crossover((parent1, parent2), config['method'])
         offspring.extend([
             Individual(child1, generation, parents[i].character),
             Individual(child2, generation, parents[i + 1].character),
@@ -47,7 +47,7 @@ def annular_crossover(parent1, parent2):
     child2 = parent2[:point] + parent1[point:point + length] + parent2[point + length:]
     return child1, child2
 
-def crossover(parents, method="single_point"):
+def select_crossover(parents, method="single_point"):
     if method == "single_point":
         return single_point_crossover(*parents)
     elif method == "two_point":

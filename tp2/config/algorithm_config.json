@@ -1,13 +1,14 @@
 {
     "operators": {
         "crossover": {
-            "type": "two_point"
+            "method": "two_point"
         },
         "mutation": {
-            "type": "uniform_multigen"
+            "method": "uniform_multigen"
         }
     },
     "selection": {
+        "selection_rate": 0.3,
         "parents": [
             {
                 "method": "tournament", 
@@ -43,7 +44,7 @@
         "desired_fitness": 0.9
 
     },
-    "initial_population": [
+    "fixed_population": [
         {"strength":  20, "dexterity": 30, "intelligence": 30, "vigor": 20, "constitution": 50, "height": 1.7  },
         {"strength":  10, "dexterity": 40, "intelligence": 30, "vigor": 20, "constitution": 50, "height": 1.31 },
         {"strength":  10, "dexterity": 10, "intelligence": 10, "vigor": 110, "constitution": 10, "height": 1.35 },

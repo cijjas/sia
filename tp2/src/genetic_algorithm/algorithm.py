@@ -46,5 +46,5 @@ def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points
     for individual in population.individuals:
         print(individual)
 
-#    while not population.has_converged() and not time_manager.time_is_up():
-        #population.evolve()
+    while not population.has_converged() and not time_manager.time_is_up():
+        population.evolve()
