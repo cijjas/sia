@@ -3,7 +3,7 @@
 # Cruce uniforme
 # Cruce anular
 import random
-from genetic_algorithm.population import Individual
+from genetic_algorithm.classes.individual import Individual
 
 def crossover_operation(parents, config, generation):
     offspring = []
@@ -12,8 +12,8 @@ def crossover_operation(parents, config, generation):
         parent2 = parents[i + 1].genes
         child1, child2 = crossover((parent1, parent2), config['type'])
         offspring.extend([
-            Individual(child1, generation),
-            Individual(child2, generation)
+            Individual(child1, generation, parents[i].character),
+            Individual(child2, generation, parents[i + 1].character),
         ])
     return offspring
 
