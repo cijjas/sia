@@ -4,7 +4,8 @@
             "method": "two_point"
         },
         "mutation": {
-            "method": "uniform_multigen"
+            "method": "multigen_flip",
+            "rate": 0.1
         }
     },
     "selection": {

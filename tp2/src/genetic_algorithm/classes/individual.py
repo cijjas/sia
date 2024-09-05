@@ -2,7 +2,7 @@
 from genetic_algorithm.classes.genotype import Genotype
 class Individual:
     
-    def __init__(self, genes, generation, character):
+    def __init__(self, genes: dict, generation: int, character: str):
         self.genes = Genotype(
             genes['strength'],
             genes['dexterity'],

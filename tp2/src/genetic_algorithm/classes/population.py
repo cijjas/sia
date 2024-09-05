@@ -3,13 +3,11 @@
 import random
 from genetic_algorithm.crossover import crossover_operation
 from genetic_algorithm.selection import combined_selection
-
-
-
+from genetic_algorithm.mutation import mutation_operation
 from genetic_algorithm.classes.individual import Individual
 
 class Population:
-    def __init__(self, initial_population, fitness_func, selection_method, crossover_method, mutation_method, termination_criteria, character): # genes_pool: lista de todos los genes posibles
+    def __init__(self, initial_population, fitness_func, selection_method, crossover_method, mutation_method: dict, termination_criteria: dict, character): # genes_pool: lista de todos los genes posibles
         self.fitness_func = fitness_func
         self.individuals = [
                 Individual(genes, 0, character)
@@ -24,8 +22,6 @@ class Population:
     def evaluete_population(self):
         for individual in self.individuals:
             individual.calculate_fitness(self.fitness_func)
-
-   
     
     def select(self):
         selected_parents = combined_selection(
@@ -44,41 +40,37 @@ class Population:
             self.generation
         )
         self.individuals = survivors + new_kids
-        
-    
 
     def crossover(self, parents, generation):
         # Aplicar operación de cruce según la configuración
         offspring = crossover_operation(parents, self.crossover_method, generation)
         return offspring 
 
-
     def mutate(self):
         # Aplicar mutaciones según la configuración
         for individual in self.individuals:
-            mutation_operation(individual, self.mutation_method)
+            individual.genes = mutation_operation(individual.genes, self.mutation_method)
 
     def evolve(self):
+        # Evaluar la población
         self.evaluete_population()
 
+        # Seleccionar padres para la cruza
         parents = self.select()
 
+        # Cruzar padres para generar hijos
         offspring = self.crossover(parents, self.generation)
         
+        # Mutar hijos
         tri_eyed_kids = self.mutate(offspring)
 
+        # Reemplazar la población actual con los hijos
         self.replace(tri_eyed_kids)
 
+        # Incrementar la generación
         self.generation += 1
-
-
-
-
-        
     
     def has_converged(self):
-
-
 
         max_generations = self.termination_criteria.get('max_generations', None)
         if max_generations is not None and self.generation >= max_generations:
