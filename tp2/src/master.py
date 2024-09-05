@@ -1,9 +1,8 @@
 import sys
 from game.game import start_game
-from tp2.src.utils.config_loader import ConfigLoader
-from game.eve import EVE
-import genetic_algorithm.algorithm as algorithm
-
+from utils.config_loader import ConfigLoader
+from genetic_algorithm import algorithm
+from game.eve import eve
 def main():
     if len(sys.argv) != 2:
         print("Usage: python main.py <config_file>")
@@ -15,16 +14,17 @@ def main():
     try:
         # Use ConfigLoader to load and validate the configuration
         config_loader = ConfigLoader(config_file, game_config_file)
-        config = config_loader.load()
+
         game_config = config_loader.load_game_config() 
+        timer, points, character = start_game( game_config)
 
-        timer = start_game(config, game_config)
-
-        algorithm.run_genetic_algorithm(config, EVE(), timer)
+        config = config_loader.load()
+        algorithm.run_genetic_algorithm(config, eve, timer, points, character)
 
 
     except Exception as e:
-        print(f"Error: {e}")
+        #print error stack trace
+        print(e.with_traceback())
         sys.exit(1)
 
 if __name__ == "__main__":
