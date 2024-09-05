@@ -1,40 +1,41 @@
 # BOLTZMANN
 # TORNEOS (Ambas versiones)
 
-import random 
+import random
 import math
 
+# Define a mapping from selection method strings to selection functions
+selection_map = {
+    "deterministic_tournament": lambda individuals, num_selected, params: deterministic_tournament_selection(individuals, num_selected, params['tournament_size']),
+    "probabilistic_tournament": lambda individuals, num_selected, params: probabilistic_tournament_selection(individuals, num_selected, params['threshold']),
+    "roulette": lambda individuals, num_selected, params: roulette_wheel_selection(individuals, num_selected),
+    "elite": lambda individuals, num_selected, params: elite_selection(individuals, num_selected),
+    "ranking": lambda individuals, num_selected, params: ranking_selection(individuals, num_selected),
+    "universal": lambda individuals, num_selected, params: universal_selection(individuals, num_selected),
+    "boltzmann": lambda individuals, num_selected, params, generation: boltzmann_selection(individuals, num_selected, params['t_0'], params['t_C'], params['k'], generation)
+}
 
 # agarra una lista de individuos y selecciona de acuerdo a la configuración
 def combined_selection(individuals, selection_config, survival_rate, generation):
     selected = []
     individuals_size = len(individuals) * survival_rate
     for config in selection_config:
-        num_selected = int(config['weight'] * individuals_size) #FIXME ver si castea bien
+        num_selected = int(config['weight'] * individuals_size)  # FIXME ver si castea bien
         method = config['method']
-        if method == "deterministic_tournament":
-            selected.extend(deterministic_tournament_selection(individuals, num_selected, config['params']['tournament_size']))
-        elif method == "probabilistic_tournament":
-            selected.extend(probabilistic_tournament_selection(individuals, num_selected, config['params']['threshold']))
-        elif method == "roulette":
-            selected.extend(roulette_wheel_selection(individuals, num_selected))
-        elif method == "elite":
-            selected.extend(elite_selection(individuals, num_selected))
-        elif method == "ranking":
-            selected.extend(ranking_selection(individuals, num_selected))
-        elif method == "universal":
-            selected.extend(universal_selection(individuals, num_selected))
-        elif method == "boltzmann":
-            selected.extend(boltzmann_selection(individuals, num_selected, config['params']['t_0'], config['params']['t_C'], config['params']['k'], generation))
+        params = config.get('params', {})
+        
+        if method in selection_map:
+            if method == "boltzmann":
+                selected.extend(selection_map[method](individuals, num_selected, params, generation))
+            else:
+                selected.extend(selection_map[method](individuals, num_selected, params))
         else:
             raise ValueError(f"Unknown selection method: {method}")
 
     return selected
 
-
 def elite_selection(individuals, num_selected):
     return sorted(individuals, key=lambda x: x.fitness, reverse=True)[:num_selected]
-
 
 def roulette_wheel_selection(individuals, num_selected):
     total_fitness = sum(ind.fitness for ind in individuals)
@@ -57,7 +58,6 @@ def ranking_selection(individuals, num_selected):
     selected = random.choices(sorted_individuals, weights=weights, k=num_selected)
     return selected
 
-
 def universal_selection(individuals, num_selected):
     total_fitness = sum(ind.fitness for ind in individuals)
     p_i = [ind.fitness / total_fitness for ind in individuals]
@@ -73,7 +73,6 @@ def universal_selection(individuals, num_selected):
     
     return selected
 
-
 def deterministic_tournament_selection(individuals, num_selected, tournament_size):
     selected = []
     for _ in range(num_selected):
@@ -81,7 +80,6 @@ def deterministic_tournament_selection(individuals, num_selected, tournament_siz
         winner = max(tournament, key=lambda x: x.fitness)
         selected.append(winner)
     return selected
-
 
 def probabilistic_tournament_selection(individuals, num_selected, threshold):
     selected = []
@@ -95,11 +93,9 @@ def probabilistic_tournament_selection(individuals, num_selected, threshold):
         selected.append(winner)
     return selected
 
-def boltzmann_selection(individuals, num_selected, t_0, t_C, k , generation):
-    temperature = t_0 + (t_C - t_0) * math.exp(-k * generation) 
-    
+def boltzmann_selection(individuals, num_selected, t_0, t_C, k, generation):
+    temperature = t_0 + (t_C - t_0) * math.exp(-k * generation)
     avg_fitness = sum(math.exp(ind.fitness / temperature) for ind in individuals) / len(individuals)
-    exp_values = [math.exp(ind.fitness / temperature) / avg_fitness  for ind in individuals]
-    
+    exp_values = [math.exp(ind.fitness / temperature) / avg_fitness for ind in individuals]
     selected = random.choices(individuals, weights=exp_values, k=num_selected)
     return selected

@@ -1,18 +1,12 @@
-
-
-
-
 class Genotype:
     
-    def __init__ (self, strength, dexterity, intelligence, vigor, consitution, height):
+    def __init__ (self, strength, dexterity, intelligence, vigor, constitution, height):
         self.strength = strength
         self.dexterity = dexterity
         self.intelligence = intelligence
         self.vigor = vigor
-        self.constitution = consitution
+        self.constitution = constitution
         self.height = height
-        #
-
 
     def __eq__(self, other):
         return self.strength == other.strength and self.dexterity == other.dexterity and self.intelligence == other.intelligence and self.vigor == other.vigor and self.constitution == other.constitution and self.height == other.height
@@ -42,10 +36,12 @@ class Genotype:
         self.constitution = constitution
     def set_height(self, height):
         self.height = height
-        
 
     def as_array(self):
         return [self.strength, self.dexterity, self.intelligence, self.vigor, self.constitution, self.height]
+    
+    def __len__(self):
+        return 6  # Number of attributes in the genotype
     
     def __str__(self):
         return f"Genotype: {self.strength}, {self.dexterity}, {self.intelligence}, {self.vigor}, {self.constitution}, {self.height}"

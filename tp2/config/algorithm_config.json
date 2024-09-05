@@ -5,14 +5,14 @@
         },
         "mutation": {
             "method": "multigen_flip",
-            "rate": 0.1
+            "rate": 0.3
         }
     },
     "selection": {
         "selection_rate": 0.3,
         "parents": [
             {
-                "method": "tournament", 
+                "method": "elite", 
                 "weight": 0.7, 
                 "params": {
                     "tournament_size": 3

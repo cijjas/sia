@@ -47,14 +47,16 @@ def annular_crossover(parent1, parent2):
     child2 = parent2[:point] + parent1[point:point + length] + parent2[point + length:]
     return child1, child2
 
+# Define a mapping from crossover method strings to crossover functions
+crossover_map = {
+    "single_point": single_point_crossover,
+    "two_point": two_point_crossover,
+    "uniform": uniform_crossover,
+    "annular": annular_crossover
+}
+
 def select_crossover(parents, method="single_point"):
-    if method == "single_point":
-        return single_point_crossover(*parents)
-    elif method == "two_point":
-        return two_point_crossover(*parents)
-    elif method == "uniform":
-        return uniform_crossover(*parents, crossover_prob=0.5)
-    elif method == "annular":
-        return annular_crossover(*parents)
+    if method in crossover_map:
+        return crossover_map[method](*parents)
     else:
         raise ValueError(f"Unknown crossover method: {method}")
