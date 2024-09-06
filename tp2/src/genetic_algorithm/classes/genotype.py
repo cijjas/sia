@@ -40,6 +40,16 @@ class Genotype:
     def as_array(self):
         return [self.strength, self.dexterity, self.intelligence, self.vigor, self.constitution, self.height]
     
+    def as_dict(self):
+        return {
+            "strength": self.strength,
+            "dexterity": self.dexterity,
+            "intelligence": self.intelligence,
+            "vigor": self.vigor,
+            "constitution": self.constitution,
+            "height": self.height
+        }
+
     def __len__(self):
         return 6  # Number of attributes in the genotype
     

@@ -5,12 +5,13 @@ from genetic_algorithm.crossover import crossover_operation
 from genetic_algorithm.selection import combined_selection
 from genetic_algorithm.mutation import mutation_operation
 from genetic_algorithm.classes.individual import Individual
+from genetic_algorithm.classes.genotype import Genotype
 
 class Population:
-    def __init__(self, initial_population, fitness_func, selection_method, crossover_method, mutation_method: dict, termination_criteria: dict, character): # genes_pool: lista de todos los genes posibles
+    def __init__(self, initial_population, fitness_func, selection_method, crossover_method: dict, mutation_method: dict, termination_criteria: dict, character): # genes_pool: lista de todos los genes posibles
         self.fitness_func = fitness_func
         self.individuals = [
-                Individual(genes, 0, character)
+                Individual(Genotype(**genes), 0, character)
                 for genes in initial_population
             ]
         self.selection_method = selection_method
@@ -41,15 +42,18 @@ class Population:
         )
         self.individuals = survivors + new_kids
 
-    def crossover(self, parents, generation):
+    def crossover(self, parents, generation)->list:
         # Aplicar operación de cruce según la configuración
-        offspring = crossover_operation(parents, self.crossover_method, generation)
+        offspring = crossover_operation(parents, self.crossover_method, generation, self.fitness_func)
         return offspring 
 
-    def mutate(self):
+    def mutate(self, offspring: list[Individual])->list: # TODO: check i am recieving a list of individuals
         # Aplicar mutaciones según la configuración
-        for individual in self.individuals:
-            individual.genes = mutation_operation(individual.genes, self.mutation_method)
+        mutated_offspring = []
+        for child in offspring:
+            mutated_child = mutation_operation(child, self.mutation_method)
+            mutated_offspring.append(mutated_child)
+        return mutated_offspring
 
     def evolve(self):
         # Evaluar la población
@@ -98,3 +102,6 @@ class Population:
             return False
 
         return False
+    
+    def __str__(self) -> str:
+        return f"Population:\n" + "\n".join(map(str, self.individuals))

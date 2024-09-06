@@ -1,7 +1,7 @@
 {
     "operators": {
         "crossover": {
-            "method": "two_point"
+            "method": "single_point"
         },
         "mutation": {
             "method": "multigen_flip",
@@ -35,8 +35,8 @@
         ]
     },
     "termination_criteria": {
-        "maximum_generations": 100,
-        "maximum_time": 90,
+        "max_generations": 3,
+        "max_time": 90,
         "structure": {
             "portion": 0.9,
             "generations": 10
