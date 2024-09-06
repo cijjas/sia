@@ -17,10 +17,10 @@ def main():
         # Use ConfigLoader to load and validate the configuration
         config_loader = ConfigLoader(config_file, game_config_file)
 
-        game_config = config_loader.load_game_config() 
+        game_config = config_loader.load_game_config()
         timer, points, character = start_game(game_config)
-            
-            
+
+
         config = config_loader.load()
         algorithm.run_genetic_algorithm(config, eve, timer, points, character)
 

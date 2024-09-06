@@ -23,20 +23,20 @@ class Population:
     def evaluete_population(self):
         for individual in self.individuals:
             individual.calculate_fitness(self.fitness_func)
-    
+
     def select(self):
         selected_parents = combined_selection(
-            self.individuals, 
-            self.selection_method["parents"], 
+            self.individuals,
+            self.selection_method["parents"],
             1 - self.selection_method["selection_rate"],
             self.generation
         )
         return selected_parents
-    
+
     def replace(self, new_kids):
         survivors = combined_selection(
-            self.individuals, 
-            self.selection_method['replacement'], 
+            self.individuals,
+            self.selection_method['replacement'],
             1 - self.selection_method['selection_rate'],
             self.generation
         )
@@ -45,37 +45,28 @@ class Population:
     def crossover(self, parents, generation)->list:
         # Aplicar operación de cruce según la configuración
         offspring = crossover_operation(parents, self.crossover_method, generation)
-        return offspring 
+        return offspring
 
     def mutate(self, offspring: list[Individual])->list: # TODO: check i am recieving a list of individuals
         # Aplicar mutaciones según la configuración
-        mutated_offspring = []
-        for child in offspring:
-            mutated_child = mutation_operation(child, self.mutation_method)
-            mutated_offspring.append(mutated_child)
+        mutated_offspring = mutation_operation(offspring, self.mutation_method)
         return mutated_offspring
 
     def evolve(self):
-        
+        self.evaluete_population() # La poblacion tiene que ser evaluada ya que hubo reemplazos
 
-        # Seleccionar padres para la cruza
         parents = self.select()
 
-        # Cruzar padres para generar hijos
         offspring = self.crossover(parents, self.generation)
-        
-        # Mutar hijos
-        tri_eyed_kids = self.mutate(offspring)
 
-        # Reemplazar la población actual con los hijos
-        self.replace(tri_eyed_kids)
+        mutated_offspring = self.mutate(offspring)
 
-        # Evaluar la población
-        self.evaluete_population()
+        self.evaluete_population() # La poblacin tiene que ser evaluada ya que hubo mutaciones, y el fitness afecta el algoritmo de replacement
 
-        # Incrementar la generación
+        self.replace(mutated_offspring)
+
         self.generation += 1
-    
+
     def has_converged(self):
 
         max_generations = self.termination_criteria.get('max_generations', None)
@@ -92,7 +83,7 @@ class Population:
             generations = structure.get('generations', None)
             # TODO checkear si tanta cantidad de porcion no cambio en tanta cantidad de generaciones
             return False
-            
+
         content_generation_amount = self.termination_criteria.get('content', None)
         if content_generation_amount is not None:
             # TODO checkear si en tantas generaciones no cambio el mejor individuo
@@ -104,6 +95,6 @@ class Population:
             return False
 
         return False
-    
+
     def __str__(self) -> str:
         return f"Population:\n" + "\n".join(map(str, self.individuals))
