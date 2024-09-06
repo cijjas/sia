@@ -24,7 +24,7 @@ class Mutation(ABC):
     def __str__(self):
         return self.__class__.__name__
 
-class GenMutation(Mutation):
+class GenHeightMutation(Mutation):
     """ GenMutation is a mutation operation that flips the value of a random gene in the genotype.
     Given that attributes must sum up to a given value, only the height attribute is flipped."""
     def __call__(self, genes: dict):
@@ -92,7 +92,7 @@ class MultigenSumMutation(Mutation):
         return genes
 
 mutation_map = {
-    "gen": GenMutation,
+    "gen_height": GenHeightMutation,
     "multigen_flip": MultigenFlipMutation,
     "multigen_sum": MultigenSumMutation
 }

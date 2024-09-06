@@ -28,7 +28,7 @@ class Population:
         selected_parents = combined_selection(
             self.individuals, 
             self.selection_method["parents"], 
-            self.selection_method["selection_rate"],
+            1 - self.selection_method["selection_rate"],
             self.generation
         )
         return selected_parents
@@ -44,7 +44,7 @@ class Population:
 
     def crossover(self, parents, generation)->list:
         # Aplicar operación de cruce según la configuración
-        offspring = crossover_operation(parents, self.crossover_method, generation, self.fitness_func)
+        offspring = crossover_operation(parents, self.crossover_method, generation)
         return offspring 
 
     def mutate(self, offspring: list[Individual])->list: # TODO: check i am recieving a list of individuals
@@ -56,8 +56,7 @@ class Population:
         return mutated_offspring
 
     def evolve(self):
-        # Evaluar la población
-        self.evaluete_population()
+        
 
         # Seleccionar padres para la cruza
         parents = self.select()
@@ -70,6 +69,9 @@ class Population:
 
         # Reemplazar la población actual con los hijos
         self.replace(tri_eyed_kids)
+
+        # Evaluar la población
+        self.evaluete_population()
 
         # Incrementar la generación
         self.generation += 1
