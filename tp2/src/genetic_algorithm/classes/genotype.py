@@ -1,5 +1,5 @@
 class Genotype:
-    
+
     def __init__ (self, strength, dexterity, intelligence, vigor, constitution, height):
         self.strength = strength
         self.dexterity = dexterity
@@ -7,10 +7,22 @@ class Genotype:
         self.vigor = vigor
         self.constitution = constitution
         self.height = height
+        self.attributes = [strength, dexterity, intelligence, vigor, constitution, height]
+
 
     def __eq__(self, other):
-        return self.strength == other.strength and self.dexterity == other.dexterity and self.intelligence == other.intelligence and self.vigor == other.vigor and self.constitution == other.constitution and self.height == other.height
-    
+        return self.attributes == other.attributes
+
+    def from_array(cls, array):
+        return cls(*array)
+
+    def __getitem__(self, index):
+        return self.attributes[index]
+
+    def __setitem__(self, index, value):
+            self.attributes[index] = value
+            self.strength, self.dexterity, self.intelligence, self.vigor, self.constitution, self.height = self.attributes
+
     def get_strength(self):
         return self.strength
     def get_dexterity(self):
@@ -23,7 +35,7 @@ class Genotype:
         return self.constitution
     def get_height(self):
         return self.height
-    
+
     def set_strength(self, strength):
         self.strength = strength
     def set_dexterity(self, dexterity):
@@ -39,7 +51,7 @@ class Genotype:
 
     def as_array(self):
         return [self.strength, self.dexterity, self.intelligence, self.vigor, self.constitution, self.height]
-    
+
     def as_dict(self):
         return {
             "strength": self.strength,
@@ -50,8 +62,11 @@ class Genotype:
             "height": self.height
         }
 
+    def get_total_points(self):
+        return sum(self.attributes[:-1])
+
     def __len__(self):
-        return 6  # Number of attributes in the genotype
-    
+        return len(self.attributes)
+
     def __str__(self):
         return f"Genotype: {self.strength}, {self.dexterity}, {self.intelligence}, {self.vigor}, {self.constitution}, {self.height}"
