@@ -35,13 +35,13 @@
         ]
     },
     "termination_criteria": {
-        "max_generations": 3,
+        "max_generations": 10,
         "max_time": 90,
         "structure": {
             "portion": 0.7,
             "generations": 6
         },
-        "content": 10,
+        "content": 4,
         "desired_fitness": 0.9
 
     },
