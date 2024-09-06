@@ -55,9 +55,13 @@ class Population:
             mutated_offspring.append(mutated_child)
         return mutated_offspring
 
+    def grow_older(self):
+        """ Every Individual in the population grows older by 1 """
+        for individual in self.individuals:
+            individual.age += 1
+
     def evolve(self):
         
-
         # Seleccionar padres para la cruza
         parents = self.select()
 
@@ -75,7 +79,14 @@ class Population:
 
         # Incrementar la generación
         self.generation += 1
+        self.grow_older()
+
     
+    def get_percentage_of_elder_individuals(self, age: int)->float:
+        """ Returns the portion of individuals with age greater or equal to the given age """
+        elder_individuals = [individual for individual in self.individuals if individual.age >= age]
+        return len(elder_individuals) / len(self.individuals)
+
     def has_converged(self):
 
         max_generations = self.termination_criteria.get('max_generations', None)
@@ -90,8 +101,11 @@ class Population:
         if structure is not None:
             portions = structure.get('portions', None)
             generations = structure.get('generations', None)
-            # TODO checkear si tanta cantidad de porcion no cambio en tanta cantidad de generaciones
-            return False
+
+            if portions is not None and generations is not None:
+                for portion in portions:
+                    if self.get_percentage_of_elder_individuals(portion) >= generations:
+                        return True
             
         content_generation_amount = self.termination_criteria.get('content', None)
         if content_generation_amount is not None:
