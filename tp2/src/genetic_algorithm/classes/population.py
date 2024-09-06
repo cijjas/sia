@@ -6,6 +6,7 @@ from genetic_algorithm.selection import combined_selection
 from genetic_algorithm.mutation import mutation_operation
 from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.genotype import Genotype
+from typing import List
 
 class Population:
     def __init__(self, initial_population, fitness_func, selection_method, crossover_method: dict, mutation_method: dict, termination_criteria: dict, character): # genes_pool: lista de todos los genes posibles
@@ -114,7 +115,10 @@ class Population:
 
         desired_fitness = self.termination_criteria.get('desired_fitness', None)
         if desired_fitness is not None:
+            best_individual = max(self.individuals, key=lambda ind: ind.get_fitness())
+            if best_individual.get_fitness() >= desired_fitness:
             # TODO checkear si el mejor individuo tiene la fitness deseada
+                return True
             return False
 
         return False
