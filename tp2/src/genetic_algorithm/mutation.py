@@ -5,6 +5,8 @@
 
 import random
 from abc import ABC, abstractmethod
+from genetic_algorithm.classes.individual import Individual
+from genetic_algorithm.classes.genotype import Genotype
 
 """ The Mutation class is an abstract class that defines the interface for mutation operations.
     The __call__ method is the one that should be implemented by the subclasses.
@@ -95,17 +97,20 @@ mutation_map = {
     "multigen_sum": MultigenSumMutation
 }
 
-def mutation_operation(genes: dict, mutation_dict: dict):
+def mutation_operation(individual: Individual, mutation_dict: dict):
     """ Applies the mutation operation to the genes with the given mutation rate """
     mutation_rate = mutation_dict['rate']
-    mutation_type = mutation_dict['type']
+    mutation_method = mutation_dict['method']
 
     # Get the mutation class from the map
-    mutation_class = mutation_map.get(mutation_type)
+    mutation_class = mutation_map.get(mutation_method)
 
     if mutation_class is None:
-        raise ValueError(f"Unknown mutation method: {mutation_type}")
+        raise ValueError(f"Unknown mutation method: {mutation_method}")
 
     # Instantiate the mutation class and apply it to the genes
     mutation = mutation_class(mutation_rate)
-    return mutation(genes)
+    genes = individual.genes.as_dict()
+    mutated_genes = mutation(genes)
+    individual.genes = Genotype(**mutated_genes)
+    return individual

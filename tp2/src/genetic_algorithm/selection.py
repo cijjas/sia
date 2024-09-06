@@ -16,7 +16,7 @@ selection_map = {
 }
 
 # agarra una lista de individuos y selecciona de acuerdo a la configuración
-def combined_selection(individuals, selection_config, survival_rate, generation):
+def combined_selection(individuals, selection_config, survival_rate, generation)->list:
     selected = []
     individuals_size = len(individuals) * survival_rate
     for config in selection_config:
@@ -52,6 +52,9 @@ def roulette_wheel_selection(individuals, num_selected):
     return selected
 
 def ranking_selection(individuals, num_selected):
+    if not individuals:
+        return []
+    
     sorted_individuals = sorted(individuals, key=lambda x: x.fitness)
     n = len(individuals)
     weights = [(n - rank) / n for rank in range(n)]

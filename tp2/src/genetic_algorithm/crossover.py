@@ -4,17 +4,34 @@
 # Cruce anular
 import random
 from genetic_algorithm.classes.individual import Individual
+from genetic_algorithm.classes.genotype import Genotype
 
-def crossover_operation(parents, config, generation):
+def crossover_operation(parents, config: dict, generation, fitness_function) -> list:
     offspring = []
-    for i in range(0, len(parents), 2):
-        parent1 = parents[i].genes
-        parent2 = parents[i + 1].genes
+    num_parents = len(parents)
+    
+    # Ensure the number of parents is even
+    if num_parents % 2 != 0:
+        num_parents -= 1
+    
+    for i in range(0, num_parents, 2):
+        parent1 = parents[i].genes.as_array()
+        parent2 = parents[i + 1].genes.as_array()
         child1, child2 = select_crossover((parent1, parent2), config['method'])
+        ind1 = Individual(Genotype(*child1), generation+1, parents[i].character)
+        ind2 = Individual(Genotype(*child2), generation+1, parents[i + 1].character)
+        ind1.calculate_fitness(fitness_function)
+        ind2.calculate_fitness(fitness_function)
         offspring.extend([
-            Individual(child1, generation, parents[i].character),
-            Individual(child2, generation, parents[i + 1].character),
+            ind1,
+            ind2
         ])
+    
+    # Optionally handle the last parent if the number of parents is odd
+    if len(parents) % 2 != 0:
+        last_parent = parents[-1]
+        offspring.append(Individual(last_parent.genes, generation, last_parent.character))
+    
     return offspring
 
 def single_point_crossover(parent1, parent2):

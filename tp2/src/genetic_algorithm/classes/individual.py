@@ -2,15 +2,16 @@
 from genetic_algorithm.classes.genotype import Genotype
 class Individual:
     
-    def __init__(self, genes: dict, generation: int, character: str):
-        self.genes = Genotype(
-            genes['strength'],
-            genes['dexterity'],
-            genes['intelligence'],
-            genes['vigor'],
-            genes['constitution'],
-            genes['height'],
-        )
+    def __init__(self, genes: Genotype, generation: int, character: str):
+        self.genes = genes
+        #Genotype(
+        #    genes['strength'],
+        #    genes['dexterity'],
+        #    genes['intelligence'],
+        #    genes['vigor'],
+        #    genes['constitution'],
+        #    genes['height'],
+        #)
         self.character = character
         self.fitness = None
         self.generation = generation
