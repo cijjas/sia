@@ -30,8 +30,6 @@ def create_individuals(size, total_points):
 
 def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points: int, character: str):
 
-
-
     population = Population(
         create_individuals(10, points),
         fitness_func,

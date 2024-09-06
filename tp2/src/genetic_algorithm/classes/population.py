@@ -100,13 +100,12 @@ class Population:
 
         structure = self.termination_criteria['structure']
         if structure is not None:
-            portions = structure.get('portions', None)
+            portion = structure.get('portion', None)
             generations = structure.get('generations', None)
 
-            if portions is not None and generations is not None:
-                for portion in portions:
-                    if self.get_percentage_of_elder_individuals(portion) >= generations:
-                        return True
+            if portion is not None and generations is not None:
+                if self.get_percentage_of_elder_individuals(generations) >= portion:
+                    return True
             
         content_generation_amount = self.termination_criteria.get('content', None)
         if content_generation_amount is not None:
