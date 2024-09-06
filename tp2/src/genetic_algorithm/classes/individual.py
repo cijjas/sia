@@ -1,20 +1,26 @@
 
 from genetic_algorithm.classes.genotype import Genotype
+
 class Individual:
     
     def __init__(self, genes: Genotype, generation: int, character: str):
-        self.genes = genes
-        #Genotype(
-        #    genes['strength'],
-        #    genes['dexterity'],
-        #    genes['intelligence'],
-        #    genes['vigor'],
-        #    genes['constitution'],
-        #    genes['height'],
-        #)
+        self._genes = genes  # Use a private attribute to store the genes
         self.character = character
         self.fitness = None
         self.generation = generation
+        self.age = 0
+
+    @property
+    def genes(self):
+        return self._genes
+
+    @genes.setter
+    def genes(self, new_genes):
+        self.set_genes(new_genes)
+
+    def set_genes(self, genes):
+        self.age = 0
+        self._genes = genes
 
     def calculate_fitness(self, fitness_function):
         self.fitness = fitness_function(self.character, self.genes)

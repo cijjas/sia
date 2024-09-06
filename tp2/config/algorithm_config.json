@@ -38,8 +38,8 @@
         "max_generations": 3,
         "max_time": 90,
         "structure": {
-            "portion": 0.9,
-            "generations": 10
+            "portion": 0.7,
+            "generations": 6
         },
         "content": 10,
         "desired_fitness": 0.9
