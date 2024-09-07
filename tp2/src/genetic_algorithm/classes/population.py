@@ -129,7 +129,7 @@ class Population:
             print('Max generations criteria reached')
             return True
 
-        structure = self.termination_criteria['structure']
+        structure = self.termination_criteria.get('structure', None)
         if structure is not None:
             portion = structure.get('portion', None)
             generations = structure.get('generations', None)
