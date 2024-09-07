@@ -4,6 +4,7 @@
 import random
 from genetic_algorithm.classes.genotype import Genotype
 from genetic_algorithm.classes.individual import Individual
+from utils.normalizer import normalizer
 
 def mutation_operation(individuals, mutation_method):
     method = mutation_method["method"]
@@ -16,8 +17,16 @@ def mutation_operation(individuals, mutation_method):
             gen_uniform_mutation(individual, mutation_rate, total_points)
         elif method == "multigen_uniform":
             multigen_uniform_mutation(individual, mutation_rate, total_points)
+        elif method == "multigen_uniform_limited":
+            amount = mutation_method["amount"]
+            multigen_uniform_limited_mutation(individual, mutation_rate, total_points, amount)
+        elif method == "complete":
+            complete_mutation(individual, mutation_rate, total_points)
 
-        normalize(individual, total_points)
+
+        normalizer(individual, total_points)
+
+    return individuals
 
 # Dado una mutacion a un gen dado los limites
 def mutate_gene(individual, index, total_points):
@@ -25,6 +34,47 @@ def mutate_gene(individual, index, total_points):
         individual.genes[index] = random.uniform(1.3, 2.0)
     else:
         individual.genes[index] = random.uniform(0, total_points)
+
+def mutate_gene2(individual, index, total_points, std_dev=0.1):
+    current_value = individual.genes[index]
+
+    if index == (len(individual.genes) - 1):
+        new_value = random.uniform(1.3, 2.0)
+    else:
+        new_value = random.gauss(current_value, std_dev)
+        new_value = max(0, min(new_value, total_points))
+
+    individual.genes[index] = new_value
+
+def mutate_gene3(individual, index, total_points, distribution='gaussian', dist_params=None):
+    current_value = individual.genes[index]
+
+    if index == (len(individual.genes) - 1):
+        new_value = random.uniform(1.3, 2.0)
+    else:
+        if distribution == 'uniform':
+            low, high = dist_params if dist_params else (0, total_points)
+            new_value = random.uniform(low, high)
+        elif distribution == 'gaussian':
+            mean, std_dev = dist_params if dist_params else (current_value, 0.1)
+            new_value = random.gauss(mean, std_dev)
+            new_value = max(0, min(new_value, total_points))  # Clipping within range
+        elif distribution == 'exponential':
+            lam = dist_params[0] if dist_params else 1
+            new_value = random.expovariate(lam) + current_value - lam
+            new_value = max(0, min(new_value, total_points))  # Clipping within range
+        elif distribution == 'beta':
+            alpha, beta = dist_params if dist_params else (2, 2)
+            new_value = random.betavariate(alpha, beta) * total_points
+        elif distribution == 'gamma':
+            shape, scale = dist_params if dist_params else (2, 1)
+            new_value = random.gammavariate(shape, scale) + current_value - (shape * scale)
+            new_value = max(0, min(new_value, total_points))  # Clipping within range
+        else:
+            raise ValueError(f"Unsupported distribution: {distribution}")
+
+    individual.genes[index] = new_value
+
 
 # Elige un gen random y tal vez lo muta
 def gen_uniform_mutation(individual, mutation_rate, total_points):
@@ -49,30 +99,3 @@ def complete_mutation(individual, mutation_rate, total_points):
     if random.random() <= mutation_rate:
         for i in range(len(individual.genes)):
             mutate_gene(individual, i, total_points)
-
-
-def normalize(individual, total_points):
-    current_sum = individual.genes.get_total_points()
-
-    if current_sum == total_points:
-        return
-
-    scaling_factor = total_points / current_sum
-    individual.genes.attributes = [int(attr * scaling_factor) for attr in individual.genes.attributes[:-1]] + [individual.genes.attributes[-1]]
-
-    final_sum = individual.genes.get_total_points()
-    residual = total_points - final_sum
-
-    while abs(residual) > 0 :
-        random_idx = random.randint(0, len(individual.genes.attributes) - 2)
-        if residual > 0:
-            adjustment = min(residual, 1)
-            individual.genes[random_idx] += adjustment
-        else:
-            adjustment = max(residual, -1)
-            individual.genes[random_idx] -= adjustment
-
-        residual = total_points - individual.genes.get_total_points()
-        if individual.genes[random_idx] < 0:
-            residual += individual.genes[random_idx]  # Correct the residual for setting value to zero
-            individual.genes[random_idx] = 0

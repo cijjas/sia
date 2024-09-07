@@ -23,7 +23,7 @@ def combined_selection(individuals, selection_config, survival_rate, generation)
         num_selected = int(config['weight'] * individuals_size)  # FIXME ver si castea bien
         method = config['method']
         params = config.get('params', {})
-        
+
         if method in selection_map:
             if method == "boltzmann":
                 selected.extend(selection_map[method](individuals, num_selected, params, generation))
@@ -48,13 +48,13 @@ def roulette_wheel_selection(individuals, num_selected):
             if r < q:
                 selected.append(individuals[i])
                 break
-    
+
     return selected
 
 def ranking_selection(individuals, num_selected):
     if not individuals:
         return []
-    
+
     sorted_individuals = sorted(individuals, key=lambda x: x.fitness)
     n = len(individuals)
     weights = [(n - rank) / n for rank in range(n)]
@@ -73,7 +73,7 @@ def universal_selection(individuals, num_selected):
             if r_j < q:
                 selected.append(individuals[i])
                 break
-    
+
     return selected
 
 def deterministic_tournament_selection(individuals, num_selected, tournament_size):

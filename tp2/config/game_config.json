@@ -1,9 +1,19 @@
 {
-    "character_classes": ["warrior", "archer", "guardian", "mage"],
-    "points_range": [100, 200],
-    "time_limit_range": [10, 120],
+    "character_classes": [
+        "warrior",
+        "archer",
+        "guardian",
+        "mage"
+    ],
+    "points_range": [
+        100,
+        200
+    ],
+    "time_limit_range": [
+        10,
+        120
+    ],
     "seed": {
-        "size": 10,
         "points": 145,
         "time": 60,
         "character": "warrior"

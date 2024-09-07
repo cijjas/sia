@@ -22,11 +22,8 @@ def create_individuals(size, total_points):
         }
         individuals.append(individual)
 
-    
+
     return individuals
-
-
-
 
 def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points: int, character: str):
 
@@ -40,10 +37,6 @@ def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points
         character
     )
 
-    population.evaluete_population()
-    print(population)
-
     while not population.has_converged() and not time_manager.time_is_up():
         population.evolve()
         print(population)
-    
