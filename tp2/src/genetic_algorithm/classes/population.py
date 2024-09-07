@@ -126,10 +126,7 @@ class Population:
 
         max_generations = self.termination_criteria.get('max_generations', None)
         if max_generations is not None and self.generation >= max_generations:
-            return True
-
-        max_time = self.termination_criteria.get('max_time', None)
-        if max_time is not None and self.generation >= max_time:
+            print('Max generations criteria reached')
             return True
 
         structure = self.termination_criteria['structure']
@@ -139,18 +136,20 @@ class Population:
 
             if portion is not None and generations is not None:
                 if self.get_percentage_of_elder_individuals(generations) >= portion:
+                    print('Structure criteria reached')
                     return True
 
         content_generation_amount = self.termination_criteria.get('content', None)
         if content_generation_amount is not None:
             if self.best_fitness_age >= content_generation_amount:
+                print('Content criteria reached')
                 return True
             return False
 
         desired_fitness = self.termination_criteria.get('desired_fitness', None)
         if desired_fitness is not None:
             if self.best_individual.get_fitness() >= desired_fitness:
-            # TODO checkear si el mejor individuo tiene la fitness deseada
+                print('Desired fitness criteria reached')
                 return True
             return False
 
