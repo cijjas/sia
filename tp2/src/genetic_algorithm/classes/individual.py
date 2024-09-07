@@ -2,7 +2,7 @@
 from genetic_algorithm.classes.genotype import Genotype
 
 class Individual:
-    
+
     def __init__(self, genes: Genotype, generation: int, character: str):
         self._genes = genes  # Use a private attribute to store the genes
         self.character = character
@@ -27,16 +27,15 @@ class Individual:
 
     def get_fitness(self):
         return self.fitness
-    
+
     def get_generation(self):
         return self.generation
-    
+
     def set_generation(self, generation):
         self.generation = generation
 
     def get_genes(self):
         return self.genes.as_array()
-    
+
     def __str__(self):
         return f"Individual: {self.genes}, {self.character}, {self.fitness}, {self.generation}"
-

@@ -25,12 +25,12 @@ class Population:
         self.crossover_method = crossover_method
         self.mutation_method = mutation_method
         self.termination_criteria = termination_criteria
-        self.evaluete_population()
+        self.evaluate_population()
         self.best_individual = get_best_individual(self.individuals)
         self.best_fitness_age = 0
         self.generation = 0
 
-    def evaluete_population(self):
+    def evaluate_population(self):
         for individual in self.individuals:
             individual.calculate_fitness(self.fitness_func)
 
@@ -38,7 +38,7 @@ class Population:
         selected_parents = combined_selection(
             self.individuals,
             self.selection_method["parents"],
-            1 - self.selection_method["selection_rate"],
+            self.selection_method["selection_rate"],
             self.generation
         )
         return selected_parents
@@ -76,21 +76,46 @@ class Population:
             self.best_fitness_age += 1
 
     def evolve(self):
-        self.evaluete_population() # La poblacion tiene que ser evaluada ya que hubo reemplazos
+        self.evaluate_population()  # Make sure to correct spelling if it was intended as 'evaluate'
+        # print('----------------')
+        # print('Individuals evaluation:')
+        # print('----------------')
+        # print(len(self.individuals))
+        # for individual in self.individuals:
+        #     print(individual)
 
         parents = self.select()
+        # print('----------------')
+        # print('Parents selected for crossover:')
+        # print('----------------')
+        # for parent in parents:
+        #     print(parent)
 
         offspring = self.crossover(parents, self.generation)
+        # print('----------------')
+        # print('Offspring resulted from crossover:')
+        # print('----------------')
+        # for child in offspring:
+        #     print(child)
 
         mutated_offspring = self.mutate(offspring)
-
-        self.evaluete_population() # La poblacin tiene que ser evaluada ya que hubo mutaciones, y el fitness afecta el algoritmo de replacement
+        # print('----------------')
+        # print('Offspring after mutations:')
+        # print('----------------')
+        # for mutant in mutated_offspring:
+        #     print(mutant)
 
         self.replace(mutated_offspring)
+        # print('----------------')
+        # print('Individuals after replacement:')
+        # print('----------------')
 
+
+        self.evaluate_population()
         self.generation += 1
         self.grow_older()
         self.update_best_individual()
+
 
     def get_percentage_of_elder_individuals(self, age: int)->float:
         """ Returns the portion of individuals with age greater or equal to the given age """

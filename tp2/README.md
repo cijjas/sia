@@ -12,8 +12,150 @@ Ejemplo de archivo de configuración:
 
 ```json
 {
-    "total_points": 150,
-    "time_limit": 60,
-    "height": 1.75
+    "population_size": [>0],
+    "operators": {
+        "crossover": {
+            "method": "[single_point | two_point | uniform | annular]"
+        },
+        "mutation": {
+            "method": "[gen_uniform | multigen_uniform | multigen_uniform_limited | complete]",
+            "rate": [0-1]
+            "amount": [population_size > amount >0]
+        }
+    },
+    "selection": {
+        "selection_rate": 0.3,
+        "parents": [
+            {
+                "method": "elite",
+                "weight": 0.7,
+                "params": {
+                    "tournament_size": 3
+                }
+            },
+            {
+                "method": "roulette",
+                "weight": 0.3
+            }
+        ],
+        "replacement": [
+            {
+                "method": "elite",
+                "weight": 0.5
+            },
+            {
+                "method": "ranking",
+                "weight": 0.5
+            }
+        ]
+    },
+    "termination_criteria": {
+        "max_generations": 10,
+        "max_time": 90,
+        "structure": {
+            "portion": 0.7,
+            "generations": 6
+        },
+        "content": 4,
+        "desired_fitness": 0.9
+    },
+    "fixed_population": [
+        {
+            "strength": 20,
+            "dexterity": 30,
+            "intelligence": 30,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.7
+        },
+        {
+            "strength": 10,
+            "dexterity": 40,
+            "intelligence": 30,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.31
+        },
+        {
+            "strength": 10,
+            "dexterity": 10,
+            "intelligence": 10,
+            "vigor": 110,
+            "constitution": 10,
+            "height": 1.35
+        },
+        {
+            "strength": 20,
+            "dexterity": 20,
+            "intelligence": 20,
+            "vigor": 20,
+            "constitution": 20,
+            "height": 1.5
+        },
+        {
+            "strength": 20,
+            "dexterity": 5,
+            "intelligence": 55,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.6
+        },
+        {
+            "strength": 20,
+            "dexterity": 40,
+            "intelligence": 20,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.4
+        },
+        {
+            "strength": 20,
+            "dexterity": 30,
+            "intelligence": 30,
+            "vigor": 15,
+            "constitution": 55,
+            "height": 1.5
+        },
+        {
+            "strength": 10,
+            "dexterity": 20,
+            "intelligence": 30,
+            "vigor": 40,
+            "constitution": 50,
+            "height": 2
+        },
+        {
+            "strength": 30,
+            "dexterity": 30,
+            "intelligence": 30,
+            "vigor": 30,
+            "constitution": 30,
+            "height": 1.6
+        },
+        {
+            "strength": 5,
+            "dexterity": 5,
+            "intelligence": 5,
+            "vigor": 5,
+            "constitution": 5,
+            "height": 1.9
+        },
+        {
+            "strength": 10,
+            "dexterity": 40,
+            "intelligence": 115,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.31
+        },
+        {
+            "strength": 20,
+            "dexterity": 10,
+            "intelligence": 30,
+            "vigor": 20,
+            "constitution": 50,
+            "height": 1.7
+        }
+    ]
 }
 ```

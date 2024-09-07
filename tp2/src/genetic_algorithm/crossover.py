@@ -5,6 +5,7 @@
 import random
 from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.genotype import Genotype
+from utils.normalizer import normalizer
 
 def circular_indexing(arr, index):
     """Handle circular indexing."""
@@ -13,27 +14,30 @@ def circular_indexing(arr, index):
 def crossover_operation(parents, config: dict, generation) -> list:
     offspring = []
     num_parents = len(parents)
-    
+
     # Ensure the number of parents is even
     if num_parents % 2 != 0:
         num_parents -= 1
-    
+
     for i in range(0, num_parents, 2):
         parent1 = parents[i].genes.as_array()
         parent2 = parents[i + 1].genes.as_array()
+        total_sum = parents[i].genes.get_total_points()
         child1, child2 = select_crossover((parent1, parent2), config['method'])
         ind1 = Individual(Genotype(*child1), generation+1, parents[i].character)
         ind2 = Individual(Genotype(*child2), generation+1, parents[i + 1].character)
+        normalizer(ind1, total_sum)
+        normalizer(ind2, total_sum)
         offspring.extend([
             ind1,
             ind2
         ])
-    
+
     # Optionally handle the last parent if the number of parents is odd
     if len(parents) % 2 != 0:
         last_parent = parents[-1]
         offspring.append(Individual(last_parent.genes, generation, last_parent.character))
-    
+
     return offspring
 
 def single_point_crossover(parent1, parent2):
@@ -63,11 +67,11 @@ def annular_crossover(parent1, parent2):
     length = len(parent1)
     child1 = parent1.copy()
     child2 = parent2.copy()
-    
+
     # Randomly select crossover points
     cross_points = random.sample(range(length), 2)
     cross_points.sort()  # Ensure first point is less than second
-    
+
     # Perform annular crossover
     for i in range(cross_points[0], cross_points[1]):
         child1[i], child2[i] = child2[i], child1[i]

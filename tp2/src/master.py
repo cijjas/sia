@@ -13,22 +13,17 @@ def main():
     game_config_file = "../config/game_config.json"
     config_file = sys.argv[1]
 
-    try:
-        # Use ConfigLoader to load and validate the configuration
-        config_loader = ConfigLoader(config_file, game_config_file)
+    # Use ConfigLoader to load and validate the configuration
+    config_loader = ConfigLoader(config_file, game_config_file)
 
-        game_config = config_loader.load_game_config()
-        timer, points, character = start_game(game_config)
+    game_config = config_loader.load_game_config()
+    timer, points, character = start_game(game_config)
 
-
-        config = config_loader.load()
-        algorithm.run_genetic_algorithm(config, eve, timer, points, character)
+    config = config_loader.load()
+    algorithm.run_genetic_algorithm(config, eve, timer, points, character)
 
 
-    except Exception as e:
-        #print error stack trace
-        print(e.with_traceback())
-        sys.exit(1)
+    sys.exit(1)
 
 if __name__ == "__main__":
     main()
