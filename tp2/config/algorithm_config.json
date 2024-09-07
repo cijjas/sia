@@ -14,7 +14,10 @@
         "parents": [
             {
                 "method": "elite",
-                "weight": 1
+                "weight": 1,
+                "params": {
+                    "tournament_size": 2
+                }
             }
         ],
         "replacement": [
@@ -24,15 +27,7 @@
             }
         ]
     },
-    "termination_criteria": {
-        "max_generations": 100,
-        "structure": {
-            "portion": 0.9,
-            "generations": 6
-        },
-        "content": 8,
-        "desired_fitness": 0.9
-    },
+    
     "fixed_population": [
         {
             "strength": 20,

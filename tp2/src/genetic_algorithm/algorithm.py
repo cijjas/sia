@@ -33,7 +33,7 @@ def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points
         config['selection'],
         config['operators']['crossover'],
         config['operators']['mutation'],
-        config['termination_criteria'],
+        config.get('termination_criteria', {}),
         character
     )
 

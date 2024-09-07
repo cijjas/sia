@@ -15,7 +15,7 @@
     ],
     "seed": {
         "points": 145,
-        "time": 60,
+        "time": 5,
         "character": "warrior"
     }
 }
