@@ -51,7 +51,6 @@ Ejemplo de archivo de configuración:
     },
     "termination_criteria": {
         "max_generations": 10,
-        "max_time": 90,
         "structure": {
             "portion": 0.7,
             "generations": 6
