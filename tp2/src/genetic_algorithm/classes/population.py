@@ -170,5 +170,8 @@ class Population:
 
         return False
 
+    def get_average_fitness(self):
+        return sum(individual.get_fitness() for individual in self.individuals) / len(self.individuals)
+
     def __str__(self) -> str:
         return f"Population:\n" + "\n".join(map(str, self.individuals))
