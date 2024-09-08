@@ -6,21 +6,19 @@ from genetic_algorithm.classes.genotype import Genotype
 from genetic_algorithm.classes.individual import Individual
 from utils.normalizer import normalizer
 
-def mutation_operation(individuals, mutation_method):
-    method = mutation_method["method"]
-    mutation_rate = mutation_method["rate"]
+def mutation_operation(individuals, mutation_method, mutation_rate):
 
     total_points = individuals[0].genes.get_total_points()
 
     for individual in individuals:
-        if method == "gen_uniform":
+        if mutation_method == "gen_uniform":
             gen_uniform_mutation(individual, mutation_rate, total_points)
-        elif method == "multigen_uniform":
+        elif mutation_method == "multigen_uniform":
             multigen_uniform_mutation(individual, mutation_rate, total_points)
-        elif method == "multigen_uniform_limited":
+        elif mutation_method == "multigen_uniform_limited":
             amount = mutation_method["amount"]
             multigen_uniform_limited_mutation(individual, mutation_rate, total_points, amount)
-        elif method == "complete":
+        elif mutation_method == "complete":
             complete_mutation(individual, mutation_rate, total_points)
 
 
