@@ -1,5 +1,6 @@
 import json
 import os
+from utils.genetic_config import GAConfig
 
 class ConfigLoader:
     def __init__(self, config_file, game_config_file):
@@ -14,10 +15,11 @@ class ConfigLoader:
         with open(self.config_file, 'r') as file:
             try:
                 self.config = json.load(file)
+                ga_config = GAConfig(self.config)
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error al leer el archivo de configuración: {e}")
 
-        return self.config
+        return ga_config
 
     def load_game_config(self):
         if not os.path.exists(self.game_config_file):

@@ -11,21 +11,23 @@ def circular_indexing(arr, index):
     """Handle circular indexing."""
     return arr[(index % len(arr))]
 
-def crossover_operation(parents, config: dict, generation) -> list:
+def crossover_operation(parents, crossover_method, generation) -> list:
     offspring = []
     num_parents = len(parents)
 
+    
     # Ensure the number of parents is even
+    even_parents = parents
     if num_parents % 2 != 0:
-        num_parents -= 1
+        even_parents += [parents[0]] # agregar el mejor para que sea par
 
-    for i in range(0, num_parents, 2):
-        parent1 = parents[i].genes.as_array()
-        parent2 = parents[i + 1].genes.as_array()
-        total_sum = parents[i].genes.get_total_points()
-        child1, child2 = select_crossover((parent1, parent2), config['method'])
-        ind1 = Individual(Genotype(*child1), generation+1, parents[i].character)
-        ind2 = Individual(Genotype(*child2), generation+1, parents[i + 1].character)
+    for i in range(0, len(even_parents), 2):
+        parent1 = even_parents[i].genes.as_array()
+        parent2 = even_parents[i + 1].genes.as_array()
+        total_sum = even_parents[i].genes.get_total_points()
+        child1, child2 = select_crossover((parent1, parent2), crossover_method)
+        ind1 = Individual(Genotype(*child1), generation+1, even_parents[i].character)
+        ind2 = Individual(Genotype(*child2), generation+1, even_parents[i + 1].character)
         normalizer(ind1, total_sum)
         normalizer(ind2, total_sum)
         offspring.extend([
@@ -33,11 +35,7 @@ def crossover_operation(parents, config: dict, generation) -> list:
             ind2
         ])
 
-    # Optionally handle the last parent if the number of parents is odd
-    if len(parents) % 2 != 0:
-        last_parent = parents[-1]
-        offspring.append(Individual(last_parent.genes, generation, last_parent.character))
-
+   
     return offspring
 
 def single_point_crossover(parent1, parent2):

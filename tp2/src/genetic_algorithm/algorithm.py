@@ -6,6 +6,7 @@ from genetic_algorithm.classes.population import Population
 from utils.time_manager import TimeManager
 from genetic_algorithm.classes.individual import Individual
 import numpy as np
+from utils.genetic_config import GAConfig
 
 def create_individuals(size, total_points):
     individuals = []
@@ -25,18 +26,15 @@ def create_individuals(size, total_points):
 
     return individuals
 
-def run_genetic_algorithm(config, fitness_func, time_manager: TimeManager,points: int, character: str):
+def run_genetic_algorithm(config:GAConfig, fitness_func, time_manager: TimeManager,points: int, character: str):
 
     population = Population(
-        create_individuals(10, points),
-        fitness_func,
-        config['selection'],
-        config['operators']['crossover'],
-        config['operators']['mutation'],
-        config.get('termination_criteria', {}),
-        character
+        initial_population=create_individuals(config.population_size, points),
+        fitness_func=fitness_func,
+        config=config,
+        character=character
     )
 
     while not population.has_converged() and not time_manager.time_is_up():
-        population.evolve()
         print(population)
+        population.evolve()

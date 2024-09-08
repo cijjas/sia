@@ -4,34 +4,31 @@
 import random
 import math
 from genetic_algorithm.classes.individual import Individual
+from utils.genetic_config import SelectionMethod
+from typing import List
 
-# Define a mapping from selection method strings to selection functions
-selection_map = {
-    "deterministic_tournament": lambda individuals, num_selected, params: deterministic_tournament_selection(individuals, num_selected, params['tournament_size']),
-    "probabilistic_tournament": lambda individuals, num_selected, params: probabilistic_tournament_selection(individuals, num_selected, params['threshold']),
-    "roulette": lambda individuals, num_selected, params: roulette_wheel_selection(individuals, num_selected),
-    "elite": lambda individuals, num_selected, params: elite_selection(individuals, num_selected),
-    "ranking": lambda individuals, num_selected, params: ranking_selection(individuals, num_selected),
-    "universal": lambda individuals, num_selected, params: universal_selection(individuals, num_selected),
-    "boltzmann": lambda individuals, num_selected, params, generation: boltzmann_selection(individuals, num_selected, params['t_0'], params['t_C'], params['k'], generation)
-}
 
 # agarra una lista de individuos y selecciona de acuerdo a la configuración
-def combined_selection(individuals, selection_config, survival_rate, generation)->list:
-    selected = []
-    individuals_size = len(individuals) * survival_rate
-    for config in selection_config:
-        num_selected = int(config['weight'] * individuals_size)  # FIXME ver si castea bien
-        method = config['method']
-        params = config.get('params', {})
-
-        if method in selection_map:
-            if method == "boltzmann":
-                selected.extend(selection_map[method](individuals, num_selected, params, generation))
-            else:
-                selected.extend(selection_map[method](individuals, num_selected, params))
-        else:
-            raise ValueError(f"Unknown selection method: {method}")
+def combined_selection(individuals, selection_methods:List[SelectionMethod], survival_rate, generation)->list:
+    
+    selected = [] # TODO puede haber repetidos y tiende a seleccionar menos que el porcentaje dado por los redondeos
+    total_to_select = int(len(individuals) * survival_rate)
+    for method in selection_methods:
+        selection_size = int(method.weight * total_to_select)  # FIXME ver si castea bien
+        if method.method == "elite":
+            selected.extend(elite_selection(individuals, selection_size))
+        elif method.method == "roulette":
+            selected.extend(roulette_wheel_selection(individuals, selection_size))
+        elif method.method == "ranking":
+            selected.extend(ranking_selection(individuals, selection_size))
+        elif method.method == "universal":
+            selected.extend(universal_selection(individuals, selection_size))
+        elif method.method == "deterministic_tournament":
+            selected.extend(deterministic_tournament_selection(individuals, selection_size, method.tournament_size))
+        elif method.method == "probabilistic_tournament":
+            selected.extend(probabilistic_tournament_selection(individuals, selection_size, method.threshold))
+        elif method.method == "boltzmann":
+            selected.extend(boltzmann_selection(individuals, selection_size, method.t_0, method.t_C, method.k, generation))
 
     return selected
 

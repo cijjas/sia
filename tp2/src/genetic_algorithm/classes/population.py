@@ -7,12 +7,16 @@ from genetic_algorithm.mutation import mutation_operation
 from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.genotype import Genotype
 from typing import List
+from utils.genetic_config import GAConfig
 
 def get_best_individual(individuals: List[Individual])->Individual:
     return max(individuals, key=lambda ind: ind.get_fitness())
 
+def get_worst_individual(individuals: List[Individual])->Individual:
+    return min(individuals, key=lambda ind: ind.get_fitness())
+
 class Population:
-    def __init__(self, initial_population, fitness_func, selection_method, crossover_method: dict, mutation_method: dict, termination_criteria: dict, character): # genes_pool: lista de todos los genes posibles
+    def __init__(self, initial_population, fitness_func, config:GAConfig, character): # genes_pool: lista de todos los genes posibles
         if initial_population is None or len(initial_population) == 0:
             raise ValueError("Initial population must not be empty")
 
@@ -21,10 +25,9 @@ class Population:
                 Individual(Genotype(**genes), 0, character)
                 for genes in initial_population
             ]
-        self.selection_method = selection_method
-        self.crossover_method = crossover_method
-        self.mutation_method = mutation_method
-        self.termination_criteria = termination_criteria
+        
+        self.config = config
+        # _----------
         self.evaluate_population()
         self.best_individual = get_best_individual(self.individuals)
         self.best_fitness_age = 0
@@ -37,8 +40,8 @@ class Population:
     def select(self):
         selected_parents = combined_selection(
             self.individuals,
-            self.selection_method["parents"],
-            self.selection_method["selection_rate"],
+            self.config.parents_selection_methods,
+            self.config.selection_rate,
             self.generation
         )
         return selected_parents
@@ -46,20 +49,27 @@ class Population:
     def replace(self, new_kids):
         survivors = combined_selection(
             self.individuals,
-            self.selection_method['replacement'],
-            1 - self.selection_method['selection_rate'],
+            self.config.replacements_selection_methods,
+            1 - self.config.selection_rate,
             self.generation
         )
+        while (len(survivors) + len(new_kids) < len(self.individuals)):
+            best = get_best_individual(self.individuals)
+            survivors.append(best)
+        while (len(survivors) + len(new_kids) > len(self.individuals)):
+            worst = get_worst_individual(survivors)
+            survivors.remove(worst)
+
         self.individuals = survivors + new_kids
 
     def crossover(self, parents, generation)->list:
         # Aplicar operación de cruce según la configuración
-        offspring = crossover_operation(parents, self.crossover_method, generation)
+        offspring = crossover_operation(parents, self.config.crossover_method, generation)
         return offspring
 
-    def mutate(self, offspring: list[Individual])->list: # TODO: check i am recieving a list of individuals
+    def mutate(self, offspring: list[Individual])->list: 
         # Aplicar mutaciones según la configuración
-        mutated_offspring = mutation_operation(offspring, self.mutation_method)
+        mutated_offspring = mutation_operation(offspring, self.config.mutation_method, self.config.mutation_rate)
         return mutated_offspring
 
     def grow_older(self):
@@ -75,6 +85,7 @@ class Population:
         else:
             self.best_fitness_age += 1
 
+
     def evolve(self):
         self.evaluate_population()  # Make sure to correct spelling if it was intended as 'evaluate'
         # print('----------------')
@@ -82,19 +93,21 @@ class Population:
         # print('----------------')
         # print(len(self.individuals))
         # for individual in self.individuals:
-        #     print(individual)
+            # print(individual)
 
         parents = self.select()
         # print('----------------')
         # print('Parents selected for crossover:')
         # print('----------------')
+        # print(len(parents))
         # for parent in parents:
-        #     print(parent)
+            # print(parent)
 
         offspring = self.crossover(parents, self.generation)
         # print('----------------')
         # print('Offspring resulted from crossover:')
         # print('----------------')
+        # print(len(offspring))
         # for child in offspring:
         #     print(child)
 
@@ -109,6 +122,9 @@ class Population:
         # print('----------------')
         # print('Individuals after replacement:')
         # print('----------------')
+        # print(len(self.individuals))
+        # for individual in self.individuals:
+        #     print(individual)
 
 
         self.evaluate_population()
@@ -124,29 +140,28 @@ class Population:
 
     def has_converged(self):
 
-        max_generations = self.termination_criteria.get('max_generations', None)
+        max_generations = self.config.termination_criteria.max_generations
         if max_generations is not None and self.generation >= max_generations:
             print('Max generations criteria reached')
             return True
 
-        structure = self.termination_criteria.get('structure', None)
-        if structure is not None:
-            portion = structure.get('portion', None)
-            generations = structure.get('generations', None)
+        portion = self.config.termination_criteria.structure_portion
+        if portion is not None:
+            generations = self.config.termination_criteria.structure_generations
 
-            if portion is not None and generations is not None:
+            if generations is not None:
                 if self.get_percentage_of_elder_individuals(generations) >= portion:
                     print('Structure criteria reached')
                     return True
 
-        content_generation_amount = self.termination_criteria.get('content', None)
+        content_generation_amount = self.config.termination_criteria.content
         if content_generation_amount is not None:
             if self.best_fitness_age >= content_generation_amount:
                 print('Content criteria reached')
                 return True
             return False
 
-        desired_fitness = self.termination_criteria.get('desired_fitness', None)
+        desired_fitness = self.config.termination_criteria.desired_fitness
         if desired_fitness is not None:
             if self.best_individual.get_fitness() >= desired_fitness:
                 print('Desired fitness criteria reached')
