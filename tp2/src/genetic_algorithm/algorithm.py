@@ -2,6 +2,7 @@
 # basicamente setea todos los hyperparametros del algoritmo genetico
 # recibe las config, crea poblacion, manager del algoritmo
 
+import csv
 from genetic_algorithm.classes.population import Population
 from utils.time_manager import TimeManager
 from genetic_algorithm.classes.individual import Individual
@@ -26,7 +27,8 @@ def create_individuals(size, total_points):
 
     return individuals
 
-def run_genetic_algorithm(config:GAConfig, fitness_func, time_manager: TimeManager,points: int, character: str):
+def run_genetic_algorithm(config:GAConfig, fitness_func, time_manager: TimeManager,
+                          points: int, character: str, show: bool = True)->Population:
 
     population = Population(
         initial_population=create_individuals(config.population_size, points),
@@ -36,5 +38,10 @@ def run_genetic_algorithm(config:GAConfig, fitness_func, time_manager: TimeManag
     )
 
     while not population.has_converged() and not time_manager.time_is_up():
-        print(population)
+        print(population) if show else None
         population.evolve()
+    
+    print(population) if show else None
+
+    return population
+
