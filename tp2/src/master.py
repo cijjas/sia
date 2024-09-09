@@ -36,7 +36,7 @@ def selection_method_comparison():
     # Open the file once and write the header
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(["strength", "dexterity", "intelligence", "vigor", "constitution", "height", "fitness", "average_fitness", "generation", "parent_selection_method", "replacement_selection_method"])
+        writer.writerow(["strength", "dexterity", "intelligence", "vigor", "constitution", "height", "fitness", "generation", "parent_selection_method", "replacement_selection_method"])
 
     for parent_selection_method in selection_methods:
         for replacement_selection_method in selection_methods:
@@ -45,13 +45,12 @@ def selection_method_comparison():
 
             population = algorithm.run_genetic_algorithm(config, eve, timer, points, character, show=False)
             
-            avg_fitness = population.get_average_fitness()
             with open(output_file, "a", newline="") as f:  # Open the file in append mode
                 writer = csv.writer(f)
                 for individual in population.individuals:
                     writer.writerow([individual.genes.strength, individual.genes.dexterity, individual.genes.intelligence,
                                      individual.genes.vigor, individual.genes.constitution, individual.genes.height,
-                                     individual.fitness, avg_fitness, population.generation, 
+                                     individual.fitness, population.generation, 
                                      parent_selection_method["method"], replacement_selection_method["method"]])
 
     return

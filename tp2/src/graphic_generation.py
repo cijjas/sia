@@ -1,29 +1,32 @@
 import os
 import csv
 import sys
-import matplotlib.pyplot as plt
 import pandas as pd
 import openpyxl # type: ignore
 from openpyxl.styles import PatternFill # type: ignore
 from openpyxl.utils.dataframe import dataframe_to_rows # type: ignore
+from pandas.core.frame import DataFrame
 
 OUTPUT_DIR = "../output"
-SELECTION_METHOD_COMPARISON_FILE_NAME = "selection_method_comparison.csv"
+SELECTION_METHOD_COMPARISON_AVG_FILE_NAME = "selection_method_comparison.csv"
+SELECTION_METHOD_COMPARISON_BEST_FILE_NAME = "selection_method_comparison.csv"
 DATA_DIR = "../output/data"
 
-def selection_method_comparison():
+def selection_method_comparison(input_dir, is_avg=True):
 
     print("Generando heatmap para comparación de métodos de selección de padres y reemplazo en base al fitness promedio de la generación 100")
     
     # Cargar el CSV
-    df = pd.read_csv(os.path.join(OUTPUT_DIR, SELECTION_METHOD_COMPARISON_FILE_NAME))
+    df = pd.read_csv(os.path.join(input_dir, SELECTION_METHOD_COMPARISON_AVG_FILE_NAME if is_avg else SELECTION_METHOD_COMPARISON_BEST_FILE_NAME))
 
-    # Crear una tabla pivot para tener métodos de padres en columnas, métodos de reemplazo en filas
-    # strength,dexterity,intelligence,vigor,constitution,height,fitness,average_fitness,generation,parent_selection_method,replacement_selection_method
-    pivot_table = df.pivot_table(index='replacement_selection_method', columns='parent_selection_method', values='average_fitness', aggfunc='mean')
-    
+    # Create a pivot table based on the value of is_avg
+    if is_avg:
+        pivot_table = df.pivot_table(index='replacement_selection_method', columns='parent_selection_method', values='fitness', aggfunc='mean')
+    else:
+        pivot_table = df.pivot_table(index='replacement_selection_method', columns='parent_selection_method', values='fitness', aggfunc='max')
+
     # Exportar a Excel
-    excel_filename = os.path.join(DATA_DIR, 'heatmap.xlsx')
+    excel_filename = os.path.join(DATA_DIR, 'heatmap_avg.xlsx') if is_avg else os.path.join(DATA_DIR, 'heatmap_best.xlsx')
 
     # Crear directorio si no existe
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -55,7 +58,8 @@ def selection_method_comparison():
     print(f"El heatmap se guardó en {excel_filename}")
 
 def main():
-    selection_method_comparison()
+    selection_method_comparison(OUTPUT_DIR, is_avg=True)
+    selection_method_comparison(OUTPUT_DIR, is_avg=False)
 
 if __name__ == "__main__":
     main()

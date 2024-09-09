@@ -30,9 +30,6 @@
                 "weight": 1
             }
         ]
-    },
-     "termination_criteria": {
-        "max_generations": 100
     }
     
 }
