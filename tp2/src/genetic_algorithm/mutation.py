@@ -6,19 +6,20 @@ from genetic_algorithm.classes.genotype import Genotype
 from genetic_algorithm.classes.individual import Individual
 from utils.normalizer import normalizer
 from genetic_algorithm.classes.hyperparameters import Mutator
+import math
 
-def mutation_operation(individuals, mutation:Mutator):
+def mutation_operation(individuals, mutation:Mutator, generation:int):
     mutation_method = mutation.method
     total_points = individuals[0].genes.get_total_points()
     for individual in individuals:
         if mutation_method == "gen":
-            gen_mutation(individual, mutation.rate, total_points, mutation.distribution, mutation.distribution_params)
+            gen_mutation(individual, total_points, mutation, generation)
         elif mutation_method == "multigen":
-            multigen_mutation(individual, mutation.rate, total_points, mutation.distribution, mutation.distribution_params)
+            multigen_mutation(individual, total_points, mutation, generation)
         elif mutation_method == "multigen_limited":
-            multigen_limited_mutation(individual, mutation.rate, total_points, mutation.amount, mutation.distribution, mutation.distribution_params)
+            multigen_limited_mutation(individual, total_points, mutation, generation)
         elif mutation_method == "complete":
-            complete_mutation(individual, mutation.rate, total_points, mutation.distribution, mutation.distribution_params)
+            complete_mutation(individual, total_points, mutation, generation)
 
         normalizer(individual, total_points)
 
@@ -28,11 +29,32 @@ def mutation_operation(individuals, mutation:Mutator):
 
 
 
+
 def mutate_gene(individual, index, total_points, distribution='uniform', dist_params=None):
     current_value = individual.genes[index]
-    
+
     if index == (len(individual.genes) - 1):
-        new_value = random.uniform(1.3, 2.0)
+        if distribution == 'uniform':
+            low, high = (1.3, 2.0)
+            new_value = round(random.uniform(low, high), 2)
+        elif distribution == 'gaussian':
+            mean, std_dev = (current_value, 0.1) if not dist_params else (dist_params.get('mean', current_value), dist_params.get('std', 0.1))
+            new_value = round(random.gauss(mean, std_dev), 2)
+            new_value = max(1.3, min(new_value, 2.0))  
+        elif distribution == 'exponential':
+            lambd = 1 if not dist_params else dist_params.get('lambda', 1)
+            new_value = round(random.expovariate(lambd), 2)
+            new_value = max(1.3, min(new_value, 2.0))
+        elif distribution == 'beta':
+            alpha, beta = (2, 2) if not dist_params else (dist_params.get('alpha', 2), dist_params.get('beta', 2))
+            new_value = round(random.betavariate(alpha, beta) * (2.0 - 1.3) + 1.3, 2)
+        elif distribution == 'gamma':
+            shape, scale = (2, 0.1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 0.1))
+            new_value = round(random.gammavariate(shape, scale) + current_value - (shape * scale), 2)
+            new_value = max(1.3, min(new_value, 2.0))  
+        else:
+            raise ValueError(f"Unsupported distribution: {distribution}")
+
     else:
         if distribution == 'uniform':
             low, high = (0, total_points)
@@ -45,7 +67,6 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             lambd = 1 if not dist_params else dist_params.get('lambda', 1)
             new_value = random.expovariate(lambd)
             new_value = max(0, min(new_value, total_points))
-
         elif distribution == 'beta':
             alpha, beta = (2, 2) if not dist_params else (dist_params.get('alpha', 2), dist_params.get('beta', 2))
             new_value = random.betavariate(alpha, beta) * total_points
@@ -59,27 +80,41 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
     individual.genes[index] = new_value
 
 
-# Elige un gen random y tal vez lo muta
-def gen_mutation(individual, mutation_rate, total_points, distribution='uniform', dist_params=None):
+def gen_mutation(individual, total_points, mutator: Mutator, generation=None):
+    mutation_rate = calculate_mutation_rate(mutator, generation)
     if random.random() <= mutation_rate:
         rand = random.randint(0, len(individual.genes) - 1)
-        mutate_gene(individual, rand, total_points, distribution, dist_params)
-
+        mutate_gene(individual, rand, total_points, mutator.distribution, mutator.distribution_params)
 
 # Tal vez muta todos los genes
-def multigen_mutation(individual, mutation_rate, total_points, distribution='uniform', dist_params=None):
+def multigen_mutation(individual, total_points, mutator: Mutator, generation=None):
+    mutation_rate = calculate_mutation_rate(mutator, generation)
     for i in range(len(individual.genes)):
         if random.random() <= mutation_rate:
-            mutate_gene(individual, i, total_points, distribution, dist_params)
+            mutate_gene(individual, i, total_points, mutator.distribution, mutator.distribution_params)
 
-
-def multigen_limited_mutation(individual, mutation_rate, total_points, n, distribution='uniform', dist_params=None):
-    indices_to_mutate = random.sample(range(len(individual.genes)), min(n, len(individual.genes)))
+def multigen_limited_mutation(individual, total_points, mutator: Mutator, generation=None):
+    mutation_rate = calculate_mutation_rate(mutator, generation)
+    indices_to_mutate = random.sample(range(len(individual.genes)), min(mutator.amount, len(individual.genes)))
     for i in indices_to_mutate:
         if random.random() <= mutation_rate:
-            mutate_gene(individual, i, total_points, distribution, dist_params)
+            mutate_gene(individual, i, total_points, mutator.distribution, mutator.distribution_params)
 
-def complete_mutation(individual, mutation_rate, total_points, distribution='uniform', dist_params=None):
+def complete_mutation(individual, total_points, mutator: Mutator, generation=None):
+    mutation_rate = calculate_mutation_rate(mutator, generation)
     if random.random() <= mutation_rate:
         for i in range(len(individual.genes)):
-            mutate_gene(individual, i, total_points, distribution, dist_params)
+            mutate_gene(individual, i, total_points, mutator.distribution, mutator.distribution_params)
+
+
+
+def calculate_mutation_rate(mutator: Mutator, generation: int):
+    if mutator.rate_method == "constant":
+        return mutator.initial_rate
+    elif mutator.rate_method == "exponential_decay":
+        rate = mutator.initial_rate * (mutator.decay_rate ** generation)
+        return max(rate, mutator.final_rate)
+    elif mutator.rate_method == "sinusoidal":
+        rate = mutator.final_rate + (mutator.initial_rate - mutator.final_rate) * (1 + math.sin(2 * math.pi * generation / mutator.period)) / 2  # Asume period en Mutator
+        return rate
+    return mutator.initial_rate 
