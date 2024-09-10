@@ -10,7 +10,6 @@ from utils.normalizer import normalizer
 
 
 def circular_indexing(arr, index):
-    """Handle circular indexing."""
     return arr[(index % len(arr))]
 
 def crossover_operation(parents, crossover_method, generation, crossover_rate) -> list:
@@ -18,7 +17,6 @@ def crossover_operation(parents, crossover_method, generation, crossover_rate) -
     num_parents = len(parents)
 
     
-    # Ensure the number of parents is even
     even_parents = parents
     if num_parents % 2 != 0:
         even_parents += [parents[0]] # agregar el mejor para que sea par
