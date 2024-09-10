@@ -38,4 +38,8 @@ class Individual:
         return self.genes.as_array()
 
     def __str__(self):
-        return f"Individual: {self.genes}, {self.character}, {self.fitness}, {self.generation}"
+        return f"{self.genes}, {self.character}, {self.fitness}, {self.age}"
+
+    def get_line(self):
+        # Return a list of attributes for the individual, formatted as needed for CSV output
+        return self.genes.as_array() + [self.character, self.fitness, self.age]

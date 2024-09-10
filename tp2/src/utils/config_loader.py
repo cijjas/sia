@@ -1,6 +1,6 @@
 import json
 import os
-from utils.genetic_config import GAConfig
+from genetic_algorithm.classes.hyperparameters import Hyperparameters
 
 class ConfigLoader:
     def __init__(self, config_file, game_config_file):
@@ -8,14 +8,14 @@ class ConfigLoader:
         self.game_config_file = game_config_file
         self.config = None
 
-    def load(self)->GAConfig:
+    def load(self)->Hyperparameters:
         if not os.path.exists(self.config_file):
             raise FileNotFoundError(f"El archivo de configuración {self.config_file} no existe.")
 
         with open(self.config_file, 'r') as file:
             try:
                 self.config = json.load(file)
-                ga_config = GAConfig(self.config)
+                ga_config = Hyperparameters(self.config)
             except json.JSONDecodeError as e:
                 raise ValueError(f"Error al leer el archivo de configuración: {e}")
 

@@ -7,7 +7,7 @@ from genetic_algorithm.mutation import mutation_operation
 from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.genotype import Genotype
 from typing import List
-from utils.genetic_config import GAConfig
+from genetic_algorithm.classes.hyperparameters import Hyperparameters
 
 def get_best_individual(individuals: List[Individual])->Individual:
     return max(individuals, key=lambda ind: ind.get_fitness())
@@ -16,10 +16,7 @@ def get_worst_individual(individuals: List[Individual])->Individual:
     return min(individuals, key=lambda ind: ind.get_fitness())
 
 class Population:
-    def __init__(self, initial_population, fitness_func, config:GAConfig, character): # genes_pool: lista de todos los genes posibles
-        if initial_population is None or len(initial_population) == 0:
-            raise ValueError("Initial population must not be empty")
-
+    def __init__(self, initial_population, fitness_func, config:Hyperparameters, character): # genes_pool: lista de todos los genes posibles
         self.fitness_func = fitness_func
         self.individuals = [
                 Individual(Genotype(**genes), 0, character)
@@ -64,12 +61,12 @@ class Population:
 
     def crossover(self, parents, generation)->list:
         # Aplicar operación de cruce según la configuración
-        offspring = crossover_operation(parents, self.config.crossover_method, generation)
+        offspring = crossover_operation(parents, self.config.crossover_method, generation, self.config.crossover_rate)
         return offspring
 
     def mutate(self, offspring: list[Individual])->list: 
         # Aplicar mutaciones según la configuración
-        mutated_offspring = mutation_operation(offspring, self.config.mutation_method, self.config.mutation_rate)
+        mutated_offspring = mutation_operation(offspring, self.config.mutation)
         return mutated_offspring
 
     def grow_older(self):
@@ -175,3 +172,6 @@ class Population:
 
     def __str__(self) -> str:
         return f"Population:\n" + "\n".join(map(str, self.individuals))
+    
+    def get_lines(self):
+        return [ind.get_line() for ind in self.individuals]

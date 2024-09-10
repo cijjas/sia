@@ -1,27 +1,25 @@
 {
-    "population_size": 10,
+    "population_size": 20,
     "operators": {
         "crossover": {
-            "method": "two_point"
+            "method": "single_point"
         },
         "mutation": {
-            "method": "multigen_uniform",
-            "rate": 0.75
+            "method": "gen",
+            "distribution": "gaussian",
+            "distribution_params": {
+                "mean": 0.5,
+                "std": 0.1
+            },
+            "rate": 0.9
         }
     },
     "selection": {
-        "selection_rate": 0.7,
+        "selection_rate": 0.2,
         "parents": [
             {
-                "method": "deterministic_tournament",
-                "weight": 0.5,
-                "params": {
-                    "tournament_size": 2
-                }
-            },
-            {
-                "method": "roulette",
-                "weight": 0.5
+                "method": "elite",
+                "weight": 1
             }
         ],
         "replacement": [
@@ -30,6 +28,9 @@
                 "weight": 1
             }
         ]
+    },
+     "termination_criteria": {
+        "max_generations": 300
     }
     
 }

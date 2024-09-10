@@ -1,9 +1,17 @@
+
 from genetic_algorithm.classes.population import Population
+
 from utils.time_manager import TimeManager
+
 from genetic_algorithm.classes.individual import Individual
+
 import numpy as np
+
 from genetic_algorithm.classes.hyperparameters import Hyperparameters
+
 import csv
+
+import time
 
 def create_individuals(size, total_points):
 
@@ -29,16 +37,46 @@ def create_individuals(size, total_points):
 
 def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: TimeManager,points: int, character: str):
 
+    
+
     population = Population(
-        initial_population=create_individuals(config.population_size, points),
-        fitness_func=fitness_func,
-        config=config,
-        character=character
+
+    initial_population=create_individuals(config.population_size, points),
+
+    fitness_func=fitness_func,
+
+    config=config,
+
+    character=character
+
     )
 
-    while not population.has_converged() and not time_manager.time_is_up():
-        population.evolve()
-        best_individual = population.best_individual
+    csv_file_path = '../output/population_evolution.csv'
 
     
-    return best_individual
+
+    with open(csv_file_path, mode='w', newline='') as file:
+
+        csv_writer = csv.writer(file)
+
+        
+
+        headers = ['strength', 'dexterity', 'intelligence', 'vigor', 'constitution', 'height', 'character', 'fitness', 'age']
+
+        csv_writer.writerow(headers)
+
+        while not population.has_converged() and not time_manager.time_is_up():
+
+            current_population = population.get_lines()
+
+            for individual in current_population:
+
+                csv_writer.writerow(individual)
+
+            population.evolve()
+
+            best_individual = population.best_individual
+
+        
+
+        return best_individual
