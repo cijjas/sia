@@ -38,25 +38,21 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             low, high = (0, total_points)
             new_value = random.uniform(low, high)
         elif distribution == 'gaussian':
-            # Default params for gaussian distribution, using current_value if mean is not provided
             mean, std_dev = (current_value, 5) if not dist_params else (dist_params.get('mean', current_value), dist_params.get('std', 5))
             new_value = random.gauss(mean, std_dev)
-            new_value = max(0, min(new_value, total_points))  # Clipping within range
+            new_value = max(0, min(new_value, total_points))  
         elif distribution == 'exponential':
-            # Default parameter for exponential distribution
             lambd = 1 if not dist_params else dist_params.get('lambda', 1)
             new_value = random.expovariate(lambd)
             new_value = max(0, min(new_value, total_points))
 
         elif distribution == 'beta':
-            # Default parameters for beta distribution
             alpha, beta = (2, 2) if not dist_params else (dist_params.get('alpha', 2), dist_params.get('beta', 2))
             new_value = random.betavariate(alpha, beta) * total_points
         elif distribution == 'gamma':
-            # Default parameters for gamma distribution
             shape, scale = (2, 1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 1))
             new_value = random.gammavariate(shape, scale) + current_value - (shape * scale)
-            new_value = max(0, min(new_value, total_points))  # Clipping within range
+            new_value = max(0, min(new_value, total_points))  
         else:
             raise ValueError(f"Unsupported distribution: {distribution}")
 
