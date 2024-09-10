@@ -66,7 +66,7 @@ class Population:
 
     def mutate(self, offspring: list[Individual])->list: 
         # Aplicar mutaciones según la configuración
-        mutated_offspring = mutation_operation(offspring, self.config.mutation)
+        mutated_offspring = mutation_operation(offspring, self.config.mutation, self.generation)
         return mutated_offspring
 
     def grow_older(self):
