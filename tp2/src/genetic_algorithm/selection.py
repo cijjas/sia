@@ -94,9 +94,11 @@ def probabilistic_tournament_selection(individuals, num_selected, threshold):
         selected.append(winner)
     return selected
 
-def boltzmann_selection(individuals:list[Individual], num_selected, t_0, t_C, k, generation):
+def boltzmann_selection(individuals: List[Individual], num_selected, t_0, t_C, k, generation):
     temperature = t_C + (t_0 - t_C) * math.exp(-k * generation)
     avg_fitness = sum(math.exp(ind.fitness / temperature) for ind in individuals) / len(individuals)
     exp_values = [math.exp(ind.fitness / temperature) / avg_fitness for ind in individuals]
     selected = random.choices(individuals, weights=exp_values, k=num_selected)
     return selected
+
+
