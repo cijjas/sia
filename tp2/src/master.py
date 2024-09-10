@@ -43,7 +43,7 @@ def selection_method_comparison():
             config.parents_selection_methods = [Selector(parent_selection_method)]
             config.replacements_selection_methods = [Selector(replacement_selection_method)]
 
-            population = algorithm.run_genetic_algorithm(config, eve, timer, points, character, show=False)
+            population = algorithm.run_genetic_algorithm(config, eve, timer, points, character)
             
             with open(output_file, "a", newline="") as f:  # Open the file in append mode
                 writer = csv.writer(f)
@@ -72,12 +72,12 @@ def main():
 
     config = config_loader.load()
     
-    best_option = algorithm.run_genetic_algorithm(config, eve, timer, points, character)
+    population = algorithm.run_genetic_algorithm(config, eve, timer, points, character, debug=True)
 
-    print("Your best option is: ", best_option)
+    print("Your best option is: ", population.best_individual)
 
     sys.exit(1)
 
 if __name__ == "__main__":
-    # selection_method_comparison()
+    selection_method_comparison()
     main()

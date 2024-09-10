@@ -11,9 +11,10 @@ class TimeManager:
         elapsed_time = time.time() - self.start_time
         return max(self.time_limit - elapsed_time, 0)
 
-    def time_is_up(self):
+    def time_is_up(self, show_message=False):
         time_remaining = self.time_remaining()
         if time_remaining <= 0:
-            print("Time is up!")
+            if show_message:
+                print("Time is up!")
             return True
         return False

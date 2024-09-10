@@ -27,7 +27,8 @@ def create_individuals(size, total_points):
 
   
 
-def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: TimeManager,points: int, character: str):
+def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: 
+                          TimeManager,points: int, character: str, debug=False) -> Population:
 
     population = Population(
         initial_population=create_individuals(config.population_size, points),
@@ -36,9 +37,8 @@ def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: Ti
         character=character
     )
 
-    while not population.has_converged() and not time_manager.time_is_up():
+    while not population.has_converged(show_message=debug) and not time_manager.time_is_up(show_message=debug):
         population.evolve()
-        best_individual = population.best_individual
 
     
-    return best_individual
+    return population
