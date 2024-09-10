@@ -55,6 +55,55 @@ def selection_method_comparison():
 
     return
 
+def selection_method_comparison_2():
+    """ Compare the selection methods using all available methods. Returns a csv with the best fitness, the average fitness and the execution time for each method."""
+    config_file = "../config/selection_method_comparison.json"
+    game_config_file = "../config/game_config.json"
+
+    config_loader = ConfigLoader(config_file, game_config_file)
+    game_config = config_loader.load_game_config()
+    timer, points, character = start_game(game_config)
+
+    config: Hyperparameters = config_loader.load()
+    selection_methods_list = get_selection_methods()
+
+    selection_methods = []
+    for method1 in selection_methods_list:
+        for method2 in selection_methods_list:
+            selection_methods.append([
+                {"method": method1, "weight": 0.5},
+                {"method": method2, "weight": 0.5}
+            ])
+
+    # create the output directory if it does not exist
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+    output_file = f"{OUTPUT_DIR}/selection_method_comparison_2.csv"
+
+    # Open the file once and write the header
+    with open(output_file, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["strength", "dexterity", "intelligence", "vigor", "constitution", "height", "fitness", "generation",
+                         "parent_selection_method_1", "parent_selection_method_2", "replacement_selection_method_1", "replacement_selection_method_2"])
+
+    for parent_selection_methods in selection_methods:
+        for replacement_selection_methods in selection_methods:
+            config.parents_selection_methods = [Selector(parent_selection_methods[0]), Selector(parent_selection_methods[1])]
+            config.replacements_selection_methods = [Selector(replacement_selection_methods[0]), Selector(replacement_selection_methods[1])]
+
+            population = algorithm.run_genetic_algorithm(config, eve, timer, points, character)
+            
+            with open(output_file, "a", newline="") as f:  # Open the file in append mode
+                writer = csv.writer(f)
+                for individual in population.individuals:
+                    writer.writerow([individual.genes.strength, individual.genes.dexterity, individual.genes.intelligence,
+                                    individual.genes.vigor, individual.genes.constitution, individual.genes.height,
+                                    individual.fitness, population.generation, 
+                                    parent_selection_methods[0]["method"], parent_selection_methods[1]["method"],
+                                    replacement_selection_methods[0]["method"], replacement_selection_methods[1]["method"]])
+
+    return
 
 def main():
     if len(sys.argv) != 2:
@@ -80,4 +129,5 @@ def main():
 
 if __name__ == "__main__":
     selection_method_comparison()
+    selection_method_comparison_2()
     main()
