@@ -1,26 +1,36 @@
 from typing import Dict, Any
 
-class SelectionMethod:
+class Selector:
     def __init__(self, data: Dict[str, Any]):
         self.method = data.get('method', 'elite')
         self.weight = data.get('weight', 1.0)
         if self.method == 'boltzmann':
-            self.k = 1.0
-            self.t_0 = 1.0
-            self.t_C = 0.9
+            self.k = data.get('k', 1.0)
+            self.t_0 = data.get('t_0', 1.0)
+            self.t_C = data.get('t_C', 10.0)
         elif self.method == 'deterministic_tournament':
-            self.tournament_size = 2
+            self.tournament_size = data.get('tournament_size', 2)
         elif self.method == 'probabilistic_tournament':
-            self.threshold = 0.5
+            self.threshold = data.get('threshold', 0.5)
 
     def __str__(self) -> str:
         return f"Method: {self.method}, Weight: {self.weight}, Params: {self.params}"
 
            
 
+class Mutator:
 
+    def __init__(self, data: Dict[str, Any]):
+        self.method = data.get('method', 'multigen_uniform')
+        self.amount = data.get('amount', 1)
+        self.rate = data.get('rate', 0.1)
+        self.distribution = data.get('distribution', 'uniform')
+        self.distribution_params = data.get('distribution_params', {})
 
-class TerminatorConfig:
+    def __str__(self) -> str:
+        return f"Method: {self.method}, Amount: {self.amount}, Rate: {self.rate}, Distribution: {self.distribution}, Distribution Params: {self.distribution_params}"
+
+class Terminator:
     def __init__(self, data: Dict[str, Any]):
         self.max_generations = data.get('max_generations', 1000)
         self.structure_portion = data.get('structure', {}).get('portion', None)
@@ -31,18 +41,19 @@ class TerminatorConfig:
     def __str__(self) -> str:
         return f"Max Generations: {self.max_generations}, Structure Portion: {self.structure_portion}, Structure Generations: {self.structure_generations}, Content: {self.content}, Desired Fitness: {self.desired_fitness}"
 
-class GAConfig:
+class Hyperparameters:
     def __init__(self, data: Dict[str, Any]):
         self.population_size = data.get('population_size', 100)
         self.crossover_method = data.get('operators', {}).get('crossover', {}).get('method', 'uniform')
-        self.mutation_method = data.get('operators', {}).get('mutation', {}).get('method', 'multigen_uniform')
-        self.mutation_rate = data.get('operators', {}).get('mutation', {}).get('rate', 0.1)
+        self.crossover_rate = data.get('operators', {}).get('crossover', {}).get('rate', 0.5)
+        
+        self.mutation = Mutator(data.get('operators', {}).get('mutation', {}))
         self.selection_rate = data.get('selection', {}).get('selection_rate', 0.5)
         parents = data.get('selection', {}).get('parents', [])
         replacements = data.get('selection', {}).get('replacement', [])
-        self.parents_selection_methods = [SelectionMethod(parent) for parent in parents]
-        self.replacements_selection_methods = [SelectionMethod(replacement) for replacement in replacements]
-        self.termination_criteria = TerminatorConfig(data.get('termination_criteria', {}))
+        self.parents_selection_methods = [Selector(parent) for parent in parents]
+        self.replacements_selection_methods = [Selector(replacement) for replacement in replacements]
+        self.termination_criteria = Terminator(data.get('termination_criteria', {}))
         
 
 

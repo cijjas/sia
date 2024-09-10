@@ -23,5 +23,5 @@ def normalizer(individual, total_points):
 
         residual = total_points - individual.genes.get_total_points()
         if individual.genes[random_idx] < 0:
-            residual += individual.genes[random_idx]  # Correct the residual for setting value to zero
+            residual += individual.genes[random_idx]  
             individual.genes[random_idx] = 0

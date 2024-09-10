@@ -7,16 +7,16 @@ from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.genotype import Genotype
 from utils.normalizer import normalizer
 
+
+
 def circular_indexing(arr, index):
-    """Handle circular indexing."""
     return arr[(index % len(arr))]
 
-def crossover_operation(parents, crossover_method, generation) -> list:
+def crossover_operation(parents, crossover_method, generation, crossover_rate) -> list:
     offspring = []
     num_parents = len(parents)
 
     
-    # Ensure the number of parents is even
     even_parents = parents
     if num_parents % 2 != 0:
         even_parents += [parents[0]] # agregar el mejor para que sea par
@@ -25,7 +25,7 @@ def crossover_operation(parents, crossover_method, generation) -> list:
         parent1 = even_parents[i].genes.as_array()
         parent2 = even_parents[i + 1].genes.as_array()
         total_sum = even_parents[i].genes.get_total_points()
-        child1, child2 = select_crossover((parent1, parent2), crossover_method)
+        child1, child2 = select_crossover((parent1, parent2), crossover_method, crossover_rate)
         ind1 = Individual(Genotype(*child1), generation+1, even_parents[i].character)
         ind2 = Individual(Genotype(*child2), generation+1, even_parents[i + 1].character)
         normalizer(ind1, total_sum)
@@ -76,16 +76,14 @@ def annular_crossover(parent1, parent2):
 
     return child1, child2
 
-# Define a mapping from crossover method strings to crossover functions
-crossover_map = {
-    "single_point": single_point_crossover,
-    "two_point": two_point_crossover,
-    "uniform": uniform_crossover,
-    "annular": annular_crossover
-}
 
-def select_crossover(parents, method="single_point"):
-    if method in crossover_map:
-        return crossover_map[method](*parents)
-    else:
-        raise ValueError(f"Unknown crossover method: {method}")
+
+def select_crossover(parents, method="single_point", crossover_rate=0.5):
+    if method == "single_point":
+        return single_point_crossover(*parents)
+    elif method == "two_point":
+        return two_point_crossover(*parents)
+    elif method == "uniform":
+        return uniform_crossover(*parents, crossover_rate)
+    elif method == "annular":
+        return annular_crossover(*parents)
