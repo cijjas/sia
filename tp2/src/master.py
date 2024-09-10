@@ -2,7 +2,7 @@ import sys
 from game.game import start_game
 from utils.config_loader import ConfigLoader
 from genetic_algorithm import algorithm
-from game.eve import eve
+from utils.eve import eve
 from utils.time_manager import TimeManager
 
 def main():
@@ -10,7 +10,7 @@ def main():
         print("Usage: python main.py <config_file>")
         sys.exit(1)
 
-    game_config_file = "../config/game_config.json"
+    game_config_file = "../config/game_config.json" # hardcodeado porque no tiene sentido no
     config_file = sys.argv[1]
 
     # Use ConfigLoader to load and validate the configuration
@@ -20,8 +20,10 @@ def main():
     timer, points, character = start_game(game_config)
 
     config = config_loader.load()
-    algorithm.run_genetic_algorithm(config, eve, timer, points, character)
+    
+    best_option = algorithm.run_genetic_algorithm(config, eve, timer, points, character)
 
+    print("Your best option is: ", best_option)
 
     sys.exit(1)
 

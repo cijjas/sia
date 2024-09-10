@@ -18,6 +18,7 @@ def eve(character, genotype:Genotype):
     attack = (total_dexterity + total_intelligence) * total_strength * atm
     defense = (total_vigor + total_intelligence) * total_constitution * dem
 
+
     performances = {
         'warrior': 0.6 * attack + 0.4 * defense,
         'archer': 0.9 * attack + 0.1 * defense,
