@@ -4,12 +4,12 @@
 import random
 import math
 from genetic_algorithm.classes.individual import Individual
-from utils.genetic_config import SelectionMethod
+from genetic_algorithm.classes.hyperparameters import Selector
 from typing import List
 
 
 # agarra una lista de individuos y selecciona de acuerdo a la configuración
-def combined_selection(individuals, selection_methods:List[SelectionMethod], survival_rate, generation)->list:
+def combined_selection(individuals, selection_methods:List[Selector], survival_rate, generation)->list:
     
     selected = [] # TODO puede haber repetidos y tiende a seleccionar menos que el porcentaje dado por los redondeos
     total_to_select = int(len(individuals) * survival_rate)

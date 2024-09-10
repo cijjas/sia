@@ -69,4 +69,4 @@ class Genotype:
         return len(self.attributes)
 
     def __str__(self):
-        return f"Genotype: {self.strength}, {self.dexterity}, {self.intelligence}, {self.vigor}, {self.constitution}, {self.height}"
+        return f"{self.strength}, {self.dexterity}, {self.intelligence}, {self.vigor}, {self.constitution}, {self.height}"
