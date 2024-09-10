@@ -8,7 +8,7 @@ class ConfigLoader:
         self.game_config_file = game_config_file
         self.config = None
 
-    def load(self):
+    def load(self)->GAConfig:
         if not os.path.exists(self.config_file):
             raise FileNotFoundError(f"El archivo de configuración {self.config_file} no existe.")
 

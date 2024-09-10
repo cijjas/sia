@@ -1,4 +1,5 @@
 
+import csv
 from genetic_algorithm.classes.population import Population
 
 from utils.time_manager import TimeManager
