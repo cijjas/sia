@@ -135,11 +135,12 @@ class Population:
         elder_individuals = [individual for individual in self.individuals if individual.age >= age]
         return len(elder_individuals) / len(self.individuals)
 
-    def has_converged(self):
+    def has_converged(self, show_message=False):
 
         max_generations = self.config.termination_criteria.max_generations
         if max_generations is not None and self.generation >= max_generations:
-            print('Max generations criteria reached')
+            if show_message:
+                print('Max generations criteria reached')
             return True
 
         portion = self.config.termination_criteria.structure_portion
@@ -148,20 +149,23 @@ class Population:
 
             if generations is not None:
                 if self.get_percentage_of_elder_individuals(generations) >= portion:
-                    print('Structure criteria reached')
+                    if show_message:
+                        print('Structure criteria reached')
                     return True
 
         content_generation_amount = self.config.termination_criteria.content
         if content_generation_amount is not None:
             if self.best_fitness_age >= content_generation_amount:
-                print('Content criteria reached')
+                if show_message:
+                    print('Content criteria reached')
                 return True
             return False
 
         desired_fitness = self.config.termination_criteria.desired_fitness
         if desired_fitness is not None:
             if self.best_individual.get_fitness() >= desired_fitness:
-                print('Desired fitness criteria reached')
+                if show_message:
+                    print('Desired fitness criteria reached')
                 return True
             return False
 
