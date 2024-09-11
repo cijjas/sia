@@ -9,6 +9,8 @@ from genetic_algorithm.classes.hyperparameters import Mutator
 
 def mutation_operation(individuals, mutation:Mutator):
     mutation_method = mutation.method
+    if individuals is None or len(individuals) == 0:
+        return individuals
     total_points = individuals[0].genes.get_total_points()
     for individual in individuals:
         if mutation_method == "gen":
