@@ -23,9 +23,13 @@ class Mutator:
     def __init__(self, data: Dict[str, Any]):
         self.method = data.get('method', 'multigen_uniform')
         self.amount = data.get('amount', 1)
-        self.rate = data.get('rate', 0.1)
         self.distribution = data.get('distribution', 'uniform')
         self.distribution_params = data.get('distribution_params', {})
+        self.rate_method = data.get('rate_method', 'constant')
+        self.initial_rate = data.get('initial_rate', 0.5)
+        self.final_rate = data.get('final_rate', 0.1)
+        self.decay_rate = data.get('decay_rate', 0.99)
+
 
     def __str__(self) -> str:
         return f"Method: {self.method}, Amount: {self.amount}, Rate: {self.rate}, Distribution: {self.distribution}, Distribution Params: {self.distribution_params}"
