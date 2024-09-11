@@ -15,14 +15,17 @@ def selection_method_comparison():
     """ Compare the selection methods using all available methods. Returns a csv with the best fitness, the average fitness and the execution time for each method."""
     config_file = "../config/selection_method_comparison.json"
     game_config_file = "../config/game_config.json"
+    initial_population = "../config/initial_poop.json"
 
-    config_loader = ConfigLoader(config_file, game_config_file)
+    config_loader = ConfigLoader(config_file, game_config_file, initial_population_file=initial_population)
     game_config = config_loader.load_game_config()
+
     timer, points, character = start_game(game_config)
 
     config: Hyperparameters = config_loader.load()
     selection_methods_list = get_selection_methods()
 
+    initial_population = config_loader.load_initial_population()
     selection_methods = []
     for method in selection_methods_list:
         selection_methods.append({"method": method})
@@ -43,7 +46,7 @@ def selection_method_comparison():
             config.parents_selection_methods = [Selector(parent_selection_method)]
             config.replacements_selection_methods = [Selector(replacement_selection_method)]
 
-            population = algorithm.run_genetic_algorithm(config, eve, timer, points, character)
+            population = algorithm.run_genetic_algorithm(config, eve, timer, points, character, initial_population=initial_population)
             
             with open(output_file, "a", newline="") as f:  # Open the file in append mode
                 writer = csv.writer(f)
@@ -146,8 +149,8 @@ def main():
         args = ["", SELECTION_RATE_FILE_CONF]
     else:
         args = sys.argv
-    selection_rate_analysis(args[1])
-    #selection_method_comparison()
+    #selection_rate_analysis(args[1])
+    selection_method_comparison()
     #selection_method_comparison_2()
     print("Done")
 
