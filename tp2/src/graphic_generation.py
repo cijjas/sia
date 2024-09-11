@@ -105,14 +105,17 @@ def selection_method_comparison_2(input_dir, is_avg=True):
     wb.save(excel_filename)
     print(f"El heatmap se guardó en {excel_filename}")
 
+#example
+#strength,dexterity,intelligence,vigor,constitution,height,fitness,generation,selection_rate
+#43,44,44,32,35,1.94,33.28143277855617,10000,1
 def selection_rate_comparison(input_dir, is_avg=True):
-    print("Generando heatmap para comparación de tasas de selección en base al fitness promedio de la generación 100")
+    print("Generando heatmap para comparación de tasas de selección en base al fitness promedio de la generación 10000")
     
     # Cargar el CSV
     df = pd.read_csv(os.path.join(input_dir, SELECTION_RATE_FILE_NAME))
 
     # Crear un pivot table
-    pivot_table = df.pivot_table(index='selection_rate', columns='selection_method', values='fitness', aggfunc='mean')
+    pivot_table = df.pivot_table(index='selection_rate', values='fitness', aggfunc='mean')
 
     # Exportar a Excel
     excel_filename = os.path.join(DATA_DIR, 'heatmap_selection_rate_avg.xlsx')
@@ -147,10 +150,11 @@ def selection_rate_comparison(input_dir, is_avg=True):
     print(f"El heatmap se guardó en {excel_filename}")
 
 def main():
-    selection_method_comparison(OUTPUT_DIR, is_avg=True)
-    selection_method_comparison(OUTPUT_DIR, is_avg=False)
-    selection_method_comparison_2(OUTPUT_DIR, is_avg=True)
-    selection_method_comparison_2(OUTPUT_DIR, is_avg=False)
+    selection_rate_comparison(OUTPUT_DIR, is_avg=True)
+    #selection_method_comparison(OUTPUT_DIR, is_avg=True)
+    #selection_method_comparison(OUTPUT_DIR, is_avg=False)
+    #selection_method_comparison_2(OUTPUT_DIR, is_avg=True)
+    #selection_method_comparison_2(OUTPUT_DIR, is_avg=False)
 
 
 if __name__ == "__main__":
