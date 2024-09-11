@@ -5,32 +5,15 @@ import random
 import math
 from genetic_algorithm.classes.individual import Individual
 from genetic_algorithm.classes.hyperparameters import Selector
-from typing import List
+from typing import List, Callable
 
-
-# agarra una lista de individuos y selecciona de acuerdo a la configuración
-def combined_selection(individuals, selection_methods:List[Selector], survival_rate, generation)->list:
-    
-    selected = [] # TODO puede haber repetidos y tiende a seleccionar menos que el porcentaje dado por los redondeos
-    total_to_select = int(len(individuals) * survival_rate)
-    for method in selection_methods:
-        selection_size = int(method.weight * total_to_select)  # FIXME ver si castea bien
-        if method.method == "elite":
-            selected.extend(elite_selection(individuals, selection_size))
-        elif method.method == "roulette":
-            selected.extend(roulette_wheel_selection(individuals, selection_size))
-        elif method.method == "ranking":
-            selected.extend(ranking_selection(individuals, selection_size))
-        elif method.method == "universal":
-            selected.extend(universal_selection(individuals, selection_size))
-        elif method.method == "deterministic_tournament":
-            selected.extend(deterministic_tournament_selection(individuals, selection_size, method.tournament_size))
-        elif method.method == "probabilistic_tournament":
-            selected.extend(probabilistic_tournament_selection(individuals, selection_size, method.threshold))
-        elif method.method == "boltzmann":
-            selected.extend(boltzmann_selection(individuals, selection_size, method.t_0, method.t_C, method.k, generation))
-
-    return selected
+ELITE = "elite"
+ROULETTE = "roulette"
+RANKING = "ranking"
+UNIVERSAL = "universal"
+DETERMINISTIC_TOURNAMENT = "deterministic_tournament"
+PROBABILISTIC_TOURNAMENT = "probabilistic_tournament"
+BOLTZMANN = "boltzmann"
 
 def elite_selection(individuals, num_selected):
     return sorted(individuals, key=lambda x: x.fitness, reverse=True)[:num_selected]
@@ -101,4 +84,35 @@ def boltzmann_selection(individuals: List[Individual], num_selected, t_0, t_C, k
     selected = random.choices(individuals, weights=exp_values, k=num_selected)
     return selected
 
+# Define a dictionary mapping method names to functions
+selection_functions: dict[str, Callable] = {
+    ELITE: elite_selection,
+    ROULETTE: roulette_wheel_selection,
+    RANKING: ranking_selection,
+    UNIVERSAL: universal_selection,
+    DETERMINISTIC_TOURNAMENT: deterministic_tournament_selection,
+    PROBABILISTIC_TOURNAMENT: probabilistic_tournament_selection,
+    BOLTZMANN: boltzmann_selection
+}
 
+# agarra una lista de individuos y selecciona de acuerdo a la configuración
+def combined_selection(individuals, selection_methods: List[Selector], survival_rate, generation) -> list:
+    selected = []  # TODO puede haber repetidos y tiende a seleccionar menos que el porcentaje dado por los redondeos
+    total_to_select = int(len(individuals) * survival_rate)
+    
+    for method in selection_methods:
+        selection_size = int(method.weight * total_to_select)  # FIXME ver si castea bien
+        if method.method in selection_functions:
+            if method.method == DETERMINISTIC_TOURNAMENT:
+                selected.extend(selection_functions[method.method](individuals, selection_size, method.tournament_size))
+            elif method.method == PROBABILISTIC_TOURNAMENT:
+                selected.extend(selection_functions[method.method](individuals, selection_size, method.threshold))
+            elif method.method == BOLTZMANN:
+                selected.extend(selection_functions[method.method](individuals, selection_size, method.t_0, method.t_C, method.k, generation))
+            else:
+                selected.extend(selection_functions[method.method](individuals, selection_size))
+    
+    return selected
+
+def get_selection_methods():
+    return list(selection_functions.keys())
