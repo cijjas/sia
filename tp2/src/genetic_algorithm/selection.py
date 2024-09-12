@@ -20,6 +20,9 @@ def elite_selection(individuals, num_selected):
 
 def roulette_wheel_selection(individuals, num_selected):
     total_fitness = sum(ind.fitness for ind in individuals)
+    ## MARCA
+    if total_fitness == 0: # Si todos los fitness son 0, no se puede hacer ruleta
+        return random.choices(individuals, k=num_selected)
     p_i = [ind.fitness / total_fitness for ind in individuals]
     q_i = [sum(p_i[:i+1]) for i in range(len(p_i))]
     selected = []
@@ -44,6 +47,9 @@ def ranking_selection(individuals, num_selected):
 
 def universal_selection(individuals, num_selected):
     total_fitness = sum(ind.fitness for ind in individuals)
+    ## MARCA
+    if total_fitness == 0:
+        return random.choices(individuals, k=num_selected)
     p_i = [ind.fitness / total_fitness for ind in individuals]
     q_i = [sum(p_i[:i+1]) for i in range(len(p_i))]
     r = random.uniform(0, 1)
@@ -80,6 +86,9 @@ def probabilistic_tournament_selection(individuals, num_selected, threshold):
 def boltzmann_selection(individuals: List[Individual], num_selected, t_0, t_C, k, generation):
     temperature = t_C + (t_0 - t_C) * math.exp(-k * generation)
     avg_fitness = sum(math.exp(ind.fitness / temperature) for ind in individuals) / len(individuals)
+    ## MARCA
+    if avg_fitness == 0: # Si todos los fitness son 0, no se puede hacer boltzmann
+        return random.choices(individuals, k=num_selected)
     exp_values = [math.exp(ind.fitness / temperature) / avg_fitness for ind in individuals]
     selected = random.choices(individuals, weights=exp_values, k=num_selected)
     return selected
