@@ -26,7 +26,7 @@ def create_individuals(size, total_points):
             "intelligence": int(points[2]),
             "vigor": int(points[3]),
             "constitution": int(points[4]),
-            "height": round(np.random.uniform(1.3, 2.0), 2)
+            "height": 1.35
         }
 
         individuals.append(individual)
@@ -41,30 +41,29 @@ def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: Ti
 
     population = Population(
 
-    initial_population=create_individuals(config.population_size, points),
+        initial_population=create_individuals(config.population_size, points),
 
-    fitness_func=fitness_func,
+        fitness_func=fitness_func,
 
-    config=config,
+        config=config,
 
-    character=character
+        character=character
 
     )
 
-    csv_file_path = '../output/population_evolution.csv'
+    csv_file_path = '../output/sinusoidal.csv'
 
-    
 
     with open(csv_file_path, mode='w', newline='') as file:
 
         csv_writer = csv.writer(file)
 
         
+            
 
         headers = ['strength', 'dexterity', 'intelligence', 'vigor', 'constitution', 'height', 'character', 'fitness', 'age']
 
         csv_writer.writerow(headers)
-
         while not population.has_converged() and not time_manager.time_is_up():
 
             current_population = population.get_lines()
@@ -75,8 +74,8 @@ def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager: Ti
 
             population.evolve()
 
-            best_individual = population.best_individual
-
+            last = population
+        
         
 
-        return best_individual
+        return last

@@ -38,19 +38,17 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             low, high = (1.3, 2.0)
             new_value = round(random.uniform(low, high), 2)
         elif distribution == 'gaussian':
-            mean, std_dev = (current_value, 0.1) if not dist_params else (dist_params.get('mean', current_value), dist_params.get('std', 0.1))
+            mean, std_dev = (current_value, 0.1) if not dist_params else (dist_params.get('mean', current_value), dist_params.get('std_h', 0.1))
             new_value = round(random.gauss(mean, std_dev), 2)
             new_value = max(1.3, min(new_value, 2.0))  
-        elif distribution == 'exponential':
-            lambd = 1 if not dist_params else dist_params.get('lambda', 1)
-            new_value = round(random.expovariate(lambd), 2)
+        elif distribution == 'beta': # crecer
+            alpha, beta = (3, 1) if not dist_params else (dist_params.get('alpha', 1), dist_params.get('beta', 1))
+            new_value = round(random.betavariate(alpha, beta) * (2.0 - current_value) + current_value, 2)
             new_value = max(1.3, min(new_value, 2.0))
-        elif distribution == 'beta':
-            alpha, beta = (2, 2) if not dist_params else (dist_params.get('alpha', 2), dist_params.get('beta', 2))
-            new_value = round(random.betavariate(alpha, beta) * (2.0 - 1.3) + 1.3, 2)
-        elif distribution == 'gamma':
+        elif distribution == 'gamma':# decrecer
             shape, scale = (2, 0.1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 0.1))
-            new_value = round(random.gammavariate(shape, scale) + current_value - (shape * scale), 2)
+            scale = current_value / shape if current_value > 0 else scale
+            new_value = round(random.gammavariate(shape, scale) , 2)
             new_value = max(1.3, min(new_value, 2.0))  
         else:
             raise ValueError(f"Unsupported distribution: {distribution}")
@@ -60,19 +58,17 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             low, high = (0, total_points)
             new_value = random.uniform(low, high)
         elif distribution == 'gaussian':
-            mean, std_dev = (current_value, 5) if not dist_params else (dist_params.get('mean', current_value), dist_params.get('std', 5))
+            mean, std_dev = (current_value, 5) if not dist_params else (current_value, dist_params.get('std_p', 5))
             new_value = random.gauss(mean, std_dev)
             new_value = max(0, min(new_value, total_points))  
-        elif distribution == 'exponential':
-            lambd = 1 if not dist_params else dist_params.get('lambda', 1)
-            new_value = random.expovariate(lambd)
+        elif distribution == 'beta': #crecer
+            alpha, beta = (3, 1) if not dist_params else (dist_params.get('alpha', 1), dist_params.get('beta', 1))
+            new_value = int(random.betavariate(alpha, beta) * (total_points - current_value) + current_value)
             new_value = max(0, min(new_value, total_points))
-        elif distribution == 'beta':
-            alpha, beta = (2, 2) if not dist_params else (dist_params.get('alpha', 2), dist_params.get('beta', 2))
-            new_value = random.betavariate(alpha, beta) * total_points
-        elif distribution == 'gamma':
+        elif distribution == 'gamma':# decrecer
             shape, scale = (2, 1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 1))
-            new_value = random.gammavariate(shape, scale) + current_value - (shape * scale)
+            scale = current_value / shape if current_value > 0 else scale
+            new_value = int(random.gammavariate(shape, scale) )
             new_value = max(0, min(new_value, total_points))  
         else:
             raise ValueError(f"Unsupported distribution: {distribution}")
@@ -115,6 +111,6 @@ def calculate_mutation_rate(mutator: Mutator, generation: int):
         rate = mutator.initial_rate * (mutator.decay_rate ** generation)
         return max(rate, mutator.final_rate)
     elif mutator.rate_method == "sinusoidal":
-        rate = mutator.final_rate + (mutator.initial_rate - mutator.final_rate) * (1 + math.sin(2 * math.pi * generation / mutator.period)) / 2  # Asume period en Mutator
+        rate = mutator.final_rate + (mutator.initial_rate - mutator.final_rate) * (1 + math.sin(2 * math.pi * generation / mutator.period)) / 2 
         return rate
     return mutator.initial_rate 

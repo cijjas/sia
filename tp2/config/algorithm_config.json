@@ -1,21 +1,21 @@
 {
-    "population_size": 20,
+    "population_size": 1000,
     "operators": {
         "crossover": {
             "method": "single_point"
         },
         "mutation": {
             "method": "gen",
-            "distribution": "gaussian",
+            "distribution": "gamma",
             "distribution_params": {
-                "mean": 0.5,
-                "std": 0.1
+                "shape": 5,
+                "scale": 0.1
             },
             "rate": {
-                "method": "constant",
+                "method": "sinusoidal",
                 "initial_rate": 0.5,
-                "final_rate": 0.1,
-                "decay_rate": 0.9
+                "period": 20,
+                "final_rate": 0.01
             }
         }
 
@@ -36,7 +36,7 @@
         ]
     },
      "termination_criteria": {
-        "max_generations": 10000
+        "max_generations": 100
     }
     
 }
