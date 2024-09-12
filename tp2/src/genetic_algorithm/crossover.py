@@ -28,7 +28,7 @@ def crossover_operation(parents, crossover_method, generation, crossover_rate) -
         child1, child2 = select_crossover((parent1, parent2), crossover_method, crossover_rate)
         ind1 = Individual(Genotype(*child1), generation+1, even_parents[i].character)
         ind2 = Individual(Genotype(*child2), generation+1, even_parents[i + 1].character)
-        normalizer(ind1, total_sum)
+        normalizer(ind1, total_sum) # ¿QUÉ HACE NORMALIZER?
         normalizer(ind2, total_sum)
         offspring.extend([
             ind1,
