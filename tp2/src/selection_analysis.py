@@ -15,7 +15,7 @@ def selection_method_comparison():
     """ Compare the selection methods using all available methods. Returns a csv with the best fitness, the average fitness and the execution time for each method."""
     config_file = "../config/selection_method_comparison.json"
     game_config_file = "../config/game_config.json"
-    initial_population = "../config/initial_poop.json"
+    initial_population = "../config/placeholder.json"
 
     config_loader = ConfigLoader(config_file, game_config_file, initial_population_file=initial_population)
     game_config = config_loader.load_game_config()
