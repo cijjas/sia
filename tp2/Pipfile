@@ -9,6 +9,7 @@ pandas = "*"
 plotly = "*"
 matplotlib = "*"
 openpyxl = "*"
+scipy = "*"
 
 [dev-packages]
 

@@ -39,7 +39,7 @@ def generate_heatmap_animation(csv_file_path, population_size=10):
 
     num_generations = df['generation'].max() + 1
     ani = FuncAnimation(fig, animate, frames=num_generations, repeat=False)
-    ani.save('../output/population_heatmaps.mp4', writer='ffmpeg', fps=100)
+    ani.save('../output/population_heatmaps.mp4', writer='ffmpeg', fps=30)
     plt.close(fig)
 
 
@@ -117,13 +117,23 @@ def generate_barplot_animation(csv_file_path, population_size=10):
     ani = FuncAnimation(fig, animate, frames=num_generations, repeat=False)
 
 
-    ani.save('../output/genotype_changes_with_fitness.mp4', writer='ffmpeg', fps=100)
+    ani.save('../output/genotype_changes_with_fitness.mp4', writer='ffmpeg', fps=30)
     plt.close(fig) 
 
+
+# This updated function will calculate error bars based on actual min and max values rather than std deviations.
 
 
 # cuando los haces tenes que poner el population size a mano sino vas a hacer cagadas,
 # despues podemos configurarlo para que reciba el config y lo deduzca del population size directamente
-csv_file_path = '../output/population_evolution.csv'  
-#generate_barplot_animation(csv_file_path, 20)
-generate_heatmap_animation(csv_file_path, 20)
+csv_file_path = '../output/what/local_height.csv'  
+json_config = '../config/algorithm_config.json'
+# json object
+import json
+with open(json_config, 'r') as file:
+    config = json.load(file)
+    
+size = config["population_size"]
+
+#generate_barplot_animation(csv_file_path, size)
+# generate_heatmap_animation(csv_file_path,size)

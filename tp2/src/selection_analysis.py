@@ -149,8 +149,8 @@ def main():
         args = ["", SELECTION_RATE_FILE_CONF]
     else:
         args = sys.argv
-    #selection_rate_analysis(args[1])
-    selection_method_comparison()
+    selection_rate_analysis(args[1])
+    #selection_method_comparison()
     #selection_method_comparison_2()
     print("Done")
 

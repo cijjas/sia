@@ -20,15 +20,17 @@ class Selector:
 
 class Mutator:
 
-    def __init__(self, data: Dict[str, Any]):
+    def __init__(self, data: Dict[str, Any], population_size: int):
         self.method = data.get('method', 'multigen_uniform')
         self.amount = data.get('amount', 1)
         self.distribution = data.get('distribution', 'uniform')
         self.distribution_params = data.get('distribution_params', {})
-        self.rate_method = data.get('rate_method', 'constant')
-        self.initial_rate = data.get('initial_rate', 0.5)
-        self.final_rate = data.get('final_rate', 0.1)
-        self.decay_rate = data.get('decay_rate', 0.99)
+        self.rate = data.get('rate', {})
+        self.rate_method = self.rate.get('method', 'constant')
+        self.initial_rate = self.rate.get('initial_rate', 0.5)
+        self.final_rate = self.rate.get('final_rate', 0.5)
+        self.decay_rate = self.rate.get('decay_rate', 0.5)
+        self.period = self.rate.get('period', population_size)
 
 
     def __str__(self) -> str:
@@ -51,7 +53,7 @@ class Hyperparameters:
         self.crossover_method = data.get('operators', {}).get('crossover', {}).get('method', 'uniform')
         self.crossover_rate = data.get('operators', {}).get('crossover', {}).get('rate', 0.5)
         
-        self.mutation = Mutator(data.get('operators', {}).get('mutation', {}))
+        self.mutation = Mutator(data.get('operators', {}).get('mutation', {}), self.population_size)
         self.selection_rate = data.get('selection', {}).get('selection_rate', 0.5)
         parents = data.get('selection', {}).get('parents', [])
         replacements = data.get('selection', {}).get('replacement', [])
