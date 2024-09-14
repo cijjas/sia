@@ -3,6 +3,7 @@ from utils.time_manager import TimeManager
 from genetic_algorithm.classes.individual import Individual
 import numpy as np
 from genetic_algorithm.classes.hyperparameters import Hyperparameters
+import utils.normalizer as normalizer
 import csv
 
 def _generate_polynomial_coeffs_(min_values, max_values):
@@ -13,7 +14,7 @@ def _generate_polynomial_coeffs_(min_values, max_values):
 
     return normalized_coeffs
 
-def create_individuals(size, total_points, seed=None):
+def create_individuals(size, total_points, seed=None, debug=False):
     individuals = []
     for _ in range(size):
         if seed is not None and not seed["ignore"]:
@@ -22,9 +23,10 @@ def create_individuals(size, total_points, seed=None):
             max_values = [seed[attr]["max"] for attr in attributes]
             coeffs = _generate_polynomial_coeffs_(min_values, max_values)
             distributed_points = total_points * coeffs
-            print(distributed_points) if seed["debug"] else None
+            print(distributed_points) if debug else None
             attr_str, attr_dex, attr_int, attr_vig, attr_con = distributed_points
-            individual = {
+            
+            individual:Individual = {
                 "strength": int(round(attr_str)),
                 "dexterity": int(round(attr_dex)),
                 "intelligence": int(round(attr_int)),
@@ -33,7 +35,9 @@ def create_individuals(size, total_points, seed=None):
                 "height": round(np.random.uniform(seed["height"]["min"], seed["height"]["max"]), 2)
             }
 
-            
+            breakpoint()
+            if (sum(individual.values()) - individual["height"]) != total_points:
+                individual = normalizer(individual, total_points)
 
             individuals.append(individual)
         else:
@@ -58,7 +62,7 @@ def run_genetic_algorithm(config:Hyperparameters, fitness_func, time_manager:
                           TimeManager,points: int, character: str, initial_population = None, debug=False) -> Population:
 
     population = Population(
-        initial_population=create_individuals(config.population_size, points, seed=initial_population),
+        initial_population=create_individuals(config.population_size, points, seed=initial_population, debug=debug),
         fitness_func=fitness_func,
         config=config,
         character=character
