@@ -18,14 +18,22 @@ BOLTZMANN = "boltzmann"
 def elite_selection(individuals, num_selected):
     return sorted(individuals, key=lambda x: x.fitness, reverse=True)[:num_selected]
 
+import random
+
 def roulette_wheel_selection(individuals, num_selected):
+    if len(individuals) == 0:  # Verificar si la lista de individuos está vacía
+        return []
+
     total_fitness = sum(ind.fitness for ind in individuals)
-    ## MARCA
-    if total_fitness == 0: # Si todos los fitness son 0, no se puede hacer ruleta
-        return random.choices(individuals, k=num_selected)
-    p_i = [ind.fitness / total_fitness for ind in individuals]
+    
+    if total_fitness == 0:  # Si todos los fitness son 0, asignar probabilidad uniforme
+        p_i = [1 / len(individuals) for _ in individuals]
+    else:
+        p_i = [ind.fitness / total_fitness for ind in individuals]
+    
     q_i = [sum(p_i[:i+1]) for i in range(len(p_i))]
     selected = []
+    
     for _ in range(num_selected):
         r = random.uniform(0, 1)
         for i, q in enumerate(q_i):
@@ -45,15 +53,23 @@ def ranking_selection(individuals, num_selected):
     selected = random.choices(sorted_individuals, weights=weights, k=num_selected)
     return selected
 
+import random
+
 def universal_selection(individuals, num_selected):
+    if len(individuals) == 0:  # Verificar si la lista de individuos está vacía
+        return []
+
     total_fitness = sum(ind.fitness for ind in individuals)
-    ## MARCA
-    if total_fitness == 0:
-        return random.choices(individuals, k=num_selected)
-    p_i = [ind.fitness / total_fitness for ind in individuals]
+    
+    if total_fitness == 0:  # Si todos los fitness son 0, asignar probabilidad uniforme
+        p_i = [1 / len(individuals) for _ in individuals]
+    else:
+        p_i = [ind.fitness / total_fitness for ind in individuals]
+    
     q_i = [sum(p_i[:i+1]) for i in range(len(p_i))]
     r = random.uniform(0, 1)
     selected = []
+    
     for j in range(num_selected):
         r_j = (r + j) / num_selected
         for i, q in enumerate(q_i):
@@ -84,11 +100,15 @@ def probabilistic_tournament_selection(individuals, num_selected, threshold):
     return selected
 
 def boltzmann_selection(individuals: List[Individual], num_selected, t_0, t_C, k, generation):
+    if len(individuals) == 0:  # Verificar si la lista de individuos está vacía
+        return []
+
     temperature = t_C + (t_0 - t_C) * math.exp(-k * generation)
     avg_fitness = sum(math.exp(ind.fitness / temperature) for ind in individuals) / len(individuals)
-    ## MARCA
-    if avg_fitness == 0: # Si todos los fitness son 0, no se puede hacer boltzmann
+    
+    if avg_fitness == 0:  # Si todos los fitness son 0, asignar probabilidad uniforme
         return random.choices(individuals, k=num_selected)
+    
     exp_values = [math.exp(ind.fitness / temperature) / avg_fitness for ind in individuals]
     selected = random.choices(individuals, weights=exp_values, k=num_selected)
     return selected
