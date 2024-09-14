@@ -64,7 +64,8 @@ pipenv run python3 master.py ../config/algorithm_config.json
 
 - **`placeholder.json`** es un archivo opcional que indica los atributos que deberia tener la poblacion inicial
    - `ignore` Valor booleano que identifica si los contenidos del archivo deberian ser ignorados en la generacion de poblacion inicial
-   - `strength`, `dexterity`, `intelligence`, `vigor`, `constitution` Valores entre 0 y 1 cuya sumatoria debe ser igual a 1. Indican la proporcion de puntos que se asignaran a la estadistica que comparte su nombre.
+   - `strength`, `dexterity`, `intelligence`, `vigor`, `constitution` Objetos que contienen rangos de proporcion de puntos que se asignaran a la estadistica que comparte su nombre. Debido al proceso de normalizacion puede ocurrir que las proporciones finales sean proximas, en vez de pertenecer, al rango especificado.
+     - `min`, `max` las proporciones minimas y maximas de puntos que se asignaran al atributo. `min` debe ser menor o igual a `max` 
    - `height` Objeto que contiene en rango de alturas otorgadas a los individuos de la poblacion inicial
       - `min`, `max` el piso y el techo, respectivamente, de altura. `min` debe ser menor o igual a `max`, con un minimo de 1.3. `max` debe ser como maximo 2.
 

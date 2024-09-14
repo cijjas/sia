@@ -5,18 +5,35 @@ import numpy as np
 from genetic_algorithm.classes.hyperparameters import Hyperparameters
 import csv
 
+def _generate_polynomial_coeffs_(min_values, max_values):
+    if len(min_values) != len(max_values):
+        raise ValueError("min_values and max_values must have the same length")
+    random_coeffs = np.array([np.random.uniform(min_val, max_val) for min_val, max_val in zip(min_values, max_values)])
+    normalized_coeffs = random_coeffs / np.sum(random_coeffs)
+
+    return normalized_coeffs
+
 def create_individuals(size, total_points, seed=None):
     individuals = []
     for _ in range(size):
         if seed is not None and not seed["ignore"]:
+            attributes = ["strength", "dexterity", "intelligence", "vigor", "constitution"]
+            min_values = [seed[attr]["min"] for attr in attributes]
+            max_values = [seed[attr]["max"] for attr in attributes]
+            coeffs = _generate_polynomial_coeffs(min_values, max_values)
+            distributed_points = total_points * coeffs
+            print(distributed_points) if seed["debug"] else None
+            attr_str, attr_dex, attr_int, attr_vig, attr_con = distributed_points
             individual = {
-                "strength": int(round(total_points * seed["strength"])),
-                "dexterity": int(round(total_points * seed["dexterity"])),
-                "intelligence": int(round(total_points * seed["intelligence"])),
-                "vigor": int(round(total_points * seed["vigor"])),
-                "constitution": int(round(total_points * seed["constitution"])),
+                "strength": int(round(attr_str)),
+                "dexterity": int(round(attr_dex)),
+                "intelligence": int(round(attr_int)),
+                "vigor": int(round(attr_vig)),
+                "constitution": int(round(attr_con)),
                 "height": round(np.random.uniform(seed["height"]["min"], seed["height"]["max"]), 2)
             }
+
+            
 
             individuals.append(individual)
         else:
