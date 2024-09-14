@@ -6,16 +6,17 @@ El chiste está en que mientras transcurre $t$ nosotros ejecutamos un programa q
 
 # Cómo ejecutarlo
 
-```sh {"id":"01J7RJA8DCF5NNRHHKTEJFK826"}
+Moverse a la carpeta `src` e instalar las dependencias
+
+```sh {"id":"01J7RJCRBWSH7HRM3Y12KW5X34"}
 cd src
+pipenv install
 ```
 
-# Instrucciones de ejecución
+Ejecutar el juego (que usa el motor)
 
-Ejecutar
-
-```sh {"id":"01J7RF46N731E8GD63KHPXS6G6"}
-python main.py config_file_path.json
+```sh {"id":"01J7RJDT3K8CNAGYTA24KCQ3T3"}
+pipenv run python3 master.py ../config/algorithm_config.json
 ```
 
 - __`game_config.json`__ contiene la configuracion del juego, con los objetos de
