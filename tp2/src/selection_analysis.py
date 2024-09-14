@@ -150,8 +150,8 @@ def main():
     else:
         args = sys.argv
     selection_rate_analysis(args[1])
-    #selection_method_comparison()
-    #selection_method_comparison_2()
+    selection_method_comparison()
+    selection_method_comparison_2()
     print("Done")
 
 if __name__ == "__main__":
