@@ -11,7 +11,12 @@
                 "mean": 0.5,
                 "std": 0.1
             },
-            "rate": 0.9
+            "rate": {
+                "method": "sinusoidal",
+                "initial_rate": 0.5,
+                "period": 20,
+                "final_rate": 0.01
+            }
         }
     },
     "selection": {
@@ -30,7 +35,7 @@
         ]
     },
      "termination_criteria": {
-        "max_generations": 300
+        "max_generations": 100
     }
     
 }
