@@ -8,7 +8,7 @@ import csv
 def create_individuals(size, total_points, seed=None):
     individuals = []
     for _ in range(size):
-        if seed is not None:
+        if seed is not None and not seed["ignore"]:
             individual = {
                 "strength": int(round(total_points * seed["strength"])),
                 "dexterity": int(round(total_points * seed["dexterity"])),

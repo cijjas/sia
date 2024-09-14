@@ -4,6 +4,16 @@ import numpy as np
 
 def eve(character, genotype:Genotype):
 
+    performances = {
+        'warrior': 0.6 * attack + 0.4 * defense,
+        'archer': 0.9 * attack + 0.1 * defense,
+        'guardian': 0.1 * attack + 0.9 * defense,
+        'mage': 0.8 * attack + 0.3 * defense
+    }
+
+    if character not in performances:
+        raise ValueError(f"Character {character} not found")
+
     strength, dexterity, intelligence, vigor, constitution, height = genotype.as_array()
 
     total_strength = 100 * np.tanh(0.01 * strength)
@@ -17,13 +27,5 @@ def eve(character, genotype:Genotype):
 
     attack = (total_dexterity + total_intelligence) * total_strength * atm
     defense = (total_vigor + total_intelligence) * total_constitution * dem
-
-
-    performances = {
-        'warrior': 0.6 * attack + 0.4 * defense,
-        'archer': 0.9 * attack + 0.1 * defense,
-        'guardian': 0.1 * attack + 0.9 * defense,
-        'mage': 0.8 * attack + 0.2 * defense
-    }
     
     return performances[character]
