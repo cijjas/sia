@@ -45,7 +45,7 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             new_value = max(1.3, min(new_value, 2.0))  
         elif distribution == 'beta': # crecer
             alpha, beta = (3, 1) if not dist_params else (dist_params.get('alpha', 1), dist_params.get('beta', 1))
-            new_value = round(random.betavariate(alpha, beta) * (2.0 - current_value) + current_value, 2)
+            new_value = round(random.betavariate(alpha, beta) * (2.0 - current_value) + current_value*0.5, 2)
             new_value = max(1.3, min(new_value, 2.0))
         elif distribution == 'gamma':# decrecer
             shape, scale = (2, 0.1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 0.1))
@@ -65,7 +65,7 @@ def mutate_gene(individual, index, total_points, distribution='uniform', dist_pa
             new_value = max(0, min(new_value, total_points))  
         elif distribution == 'beta': #crecer
             alpha, beta = (3, 1) if not dist_params else (dist_params.get('alpha', 1), dist_params.get('beta', 1))
-            new_value = int(random.betavariate(alpha, beta) * (total_points - current_value) + current_value)
+            new_value = int(random.betavariate(alpha, beta) * (total_points - current_value) + current_value*0.5)
             new_value = max(0, min(new_value, total_points))
         elif distribution == 'gamma':# decrecer
             shape, scale = (2, 1) if not dist_params else (dist_params.get('shape', 2), dist_params.get('scale', 1))
