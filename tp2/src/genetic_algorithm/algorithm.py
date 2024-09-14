@@ -20,7 +20,7 @@ def create_individuals(size, total_points, seed=None):
             attributes = ["strength", "dexterity", "intelligence", "vigor", "constitution"]
             min_values = [seed[attr]["min"] for attr in attributes]
             max_values = [seed[attr]["max"] for attr in attributes]
-            coeffs = _generate_polynomial_coeffs(min_values, max_values)
+            coeffs = _generate_polynomial_coeffs_(min_values, max_values)
             distributed_points = total_points * coeffs
             print(distributed_points) if seed["debug"] else None
             attr_str, attr_dex, attr_int, attr_vig, attr_con = distributed_points
