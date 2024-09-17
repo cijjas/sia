@@ -28,7 +28,6 @@ def main():
 
     print("Your best option is: ", population.best_individual)
 
-    sys.exit(1)
 
 if __name__ == "__main__":
     main()
