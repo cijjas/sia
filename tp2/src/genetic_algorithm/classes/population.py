@@ -76,7 +76,7 @@ class Population:
 
     def update_best_individual(self):
         new_best_individual = get_best_individual(self.individuals)
-        if self.best_individual is None or new_best_individual.get_fitness() > self.best_individual.get_fitness():
+        if self.best_individual is None or self.best_individual not in self.individuals or new_best_individual.get_fitness() > self.best_individual.get_fitness():
             self.best_individual = new_best_individual
             self.best_fitness_age = 0
         else:
