@@ -19,55 +19,24 @@ Ejecutar el juego (que usa el motor)
 pipenv run python3 master.py ../config/algorithm_config.json
 ```
 
-- __`game_config.json`__ contiene la configuracion del juego, con los objetos de
-   - `character_classes`: Un array que contiene las clases del juego (strings) que se pueden seleccionar
-   - `points_range`: Un array de dos elementos integer que indican el rango de valores de puntos que se pueden obtener
-   - `time_limit_range`: Un array de dos elementos integer que indican el rango de tiempo que se pueden otorgar para asignar los puntos (en segundos)
 
-- __`algorithm_config.json`__ contiene la configuracion de los algoritmos geneticos, contiene los objetos
-   - `population_size` un integer que indica el tamaño de la poblacion
-   - `operators` un objeto que contiene los metodos de cruza y mutacion
-      - `crossover` un objeto con informacion del metodo de cruza
-         - `method` el metodo de cruza a utilizar. Las opciones son `single_point`, `two_point`, `uniform`, `annular`.
+# Hiperparámetros y configs
 
-      - `mutation` un objeto con informacion del metodo de mutacion
-         - `method` el metodo de mutacion a utilizar. Las opciones son `gen`, `multigen`, `multigen_limited`, `complete`.
-         - `distribution` la distribucion que se usara para modificar las stats. Las opciones son `uniform`, `gaussian`, `beta`, `gamma`.
-         - `distribution_params` los parametros que recibe la distribucion indicada, varian segun la `distribution` elegida. Los campos del objeto varian segun la funcion elegida en distribution
-            - `gaussian(std_p, std_h)`: donde la desviación estandar corresponde a puntos o altura respectivamente. (los puntos operan en otro dominio que la altura)
-            - `beta(alpha, beta)`: favorece el crecimiento
-            - `gamma(shape)`: favorece el decrecimiento y la escala se define automáticamente por el valor que se está modificando
+## `game_config.json`
 
-         - `rate` objeto que contiene la informacion de tasa de mutacion (siempre ligada a la generación)
-            - `method` El metodo para calcular la tasa de mutacion dinamica entre generaciones. Las opciones son `constant`, `sinusoidal`, `exponential_decay`
-            - `initial_rate` La tasa de mutacion en la generacion cero
-            - `final_rate` El minimo que puede alcanzar la tasa de mutacion, campo ignorado para method `constant`
-            - `decay_rate` Una constante que se utiliza en el calculo de la tasa de mutacion. Campo únicamente considerado para `exponential_decay`
-            - `period` **Campo ignorado salvo para method `sinusoidal`**. Indica el periodo de la funcion sinusoidal.
+Este archivo define el comportamiento del juego, por default solo se establecen parámentros fijos que responden al comportamiento originial del juego. Luego también hay una "seed" que se puede poner para que el juego siempre nos asigne el mismo valor de $t, P~ \text{y}~C$. 
 
-   - `selection` un objeto que contiene informacion de seleccion de individuos en una generacion
-      - `selection_rate` la tasa de individuos a seleccionar
-      - `parents` un array de objetos que contienen la informacion de todos los metodos de seleccion que se utilizaran para la generacion
-         - `method` el metodo de seleccion de padres. Las opciones son `elite`, `roulette`, `ranking`, `universal`, `deterministic_tournament`, `probabilistic_tournament`, `boltzmann`
-         - `weight` El peso normalizado de cada metodo de seleccion. La suma de todos los weights en elementos del array parents debe resultar 1
-         - `params` objeto opcional que indica parametros adicionales del metodo, de ser necesarios
-            - Torneo deterministico: `tournament_size`  Indica la cantidad de “batallas”
-            - Torneo probabilístico: `threshold`: 
-            - Boltzmann: `t_0`, `t_C`, `k`
+| Clave              | Tipo        | Descripción                                                                                                   | Valores posibles                            |
+|--------------------|-------------|---------------------------------------------------------------------------------------------------------------|---------------------------------------------|
+| `character_classes`| Array (String) | Un array que contiene las clases del juego que se pueden seleccionar                                          | Por default son warrior, archer, guardian, mage|
+| `points_range`     | Array (Integer) | Un array de dos elementos que indican el rango de valores de puntos que se pueden obtener                     | `[0,200]` |
+| `time_limit_range` | Array (Integer) | 10, 20 según los requerimeintos del juego                  | `[10, 120]`    |
+|`seed.points`| int| puntos asignados por el juegoo para distribuir| 100 a 200|
+|`seed.time`|int | define cuantos segundos te da el juego| 0 a 120|
+|`seed.character`|string|define que caracter usas en el juego| `warrior`,`archer`, `guardian`, `mage` (cualquier opción de character_classes)|
 
-      - `replacement` : idema `parents` pero con otro objetivo
-         - `method` el metodo de seleccion de reemplazo. Las opciones son `elite`, `roulette`, `ranking`, `universal`, `deterministic_tournament`, `probabilistic_tournament`, `boltzmann`
-         - `weight` El peso normalizado de cada metodo de seleccion. La suma de todos los weights en elementos del array replacemente debe resultar 1
-
-   - `termination_criteria` objeto que contiene informacion sobre las diferentes condiciones de corte del algoritmo
-      - `max_generations` cantidad de generaciones maximas a generar
-
-- **`placeholder.json`** es un archivo opcional que indica los atributos que deberia tener la poblacion inicial
-   - `ignore` Valor booleano que identifica si los contenidos del archivo deberian ser ignorados en la generacion de poblacion inicial
-   - `strength`, `dexterity`, `intelligence`, `vigor`, `constitution` Objetos que contienen rangos de proporcion de puntos que se asignaran a la estadistica que comparte su nombre. Debido al proceso de normalizacion puede ocurrir que las proporciones finales sean proximas, en vez de pertenecer, al rango especificado.
-     - `min`, `max` las proporciones minimas y maximas de puntos que se asignaran al atributo. `min` debe ser menor o igual a `max` 
-   - `height` Objeto que contiene en rango de alturas otorgadas a los individuos de la poblacion inicial
-      - `min`, `max` el piso y el techo, respectivamente, de altura. `min` debe ser menor o igual a `max`, con un minimo de 1.3. `max` debe ser como maximo 2.
+>[!Note] 
+> No tocar este archivo a menos que se quieran cambiar las reglas del juego. En todo caso sólo sacar o agregar el seed.
 
 ## `algorithm_config.json`
 
@@ -168,3 +137,15 @@ Cada objeto dentro de `parents` o `replacement` incluye:
 | Clave                                  | Tipo   | Descripción                               | Valores posibles / Opciones |
 |----------------------------------------|--------|-------------------------------------------|-----------------------------|
 | `termination_criteria.max_generations` | Entero | Cantidad máxima de generaciones a generar | Cualquier entero positivo   |
+
+
+
+## `initial_population_see.json`
+
+| Clave                 | Tipo             | Descripción                                                                                             | Valores posibles                                      |
+|-----------------------|------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| `ignore`              | Boolean          | Indica si los contenidos del archivo deberían ser ignorados en la generación de población inicial        | `true`, `false`                                       |
+| `strength`, `dexterity`, `intelligence`, `vigor`, `constitution` | Objetos | Contiene el rango de las estadísticas | `{"min: , "max":}`        |
+| `min`, `max` (para `strength`, `dexterity`, etc.) | Float | Valores que representan el piso (`min`) y el techo (`max`) para la proporción de puntos                | `min` ≤ `max`, ambos entre 0 y 1                      |
+| `height`              | Objeto           | Contiene el rango de alturas otorgadas a los individuos de la población inicial                          | `{ "min": mínimo de 1.3, "max": máximo de 2 }`        |
+| `min`, `max` (para `height`) | Float    | El piso (`min`) y el techo (`max`) para la altura de los individuos. `min` debe ser menor o igual a `max` | `min` ≥ 1.3, `max` ≤ 2                                |
