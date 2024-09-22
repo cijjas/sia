@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Callable
 
 class Perceptron:
     def __init__(self, num_inputs, learning_rate = 0.01, debug = False) -> None:
@@ -22,14 +23,15 @@ class Perceptron:
         else:
             return np.hstack((np.ones((inputs.shape[0], 1)), inputs))
 
-    # Define the Heaviside Step function.
-    def heaviside_step_fn(self, z):
+    # Define the step function.
+    def step_fn(self, z: np.ndarray) -> np.ndarray:
         return np.where(z >= self.__THRESHOLD, 1, -1)
          
-    # Define the Prediction
-    def predict(self, inputs):
+    def predict(self, inputs: np.ndarray, activation_fn: Callable[[np.ndarray], np.ndarray] = None) -> np.ndarray:
         Z = self.linear(inputs)
-        return self.heaviside_step_fn(Z)
+        if activation_fn is None:
+            activation_fn = self.step_fn
+        return activation_fn(Z)
      
     # Define the Loss function
     def loss(self, prediction, target):
