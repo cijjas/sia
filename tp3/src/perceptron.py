@@ -1,13 +1,13 @@
 import numpy as np
 from typing import Callable
 
-class Perceptron:
-    def __init__(self, num_inputs, learning_rate = 0.01, debug = False) -> None:
+class SimplePerceptron:
+    def __init__(self, num_inputs, learning_rate = 0.01, threshold: float = 0.0, epsilon: float = 1e-5, debug = False) -> None:
         self.weights = np.random.rand(num_inputs + 1)
         self.learning_rate = learning_rate
         self.debug = debug
-        self.__THRESHOLD = 0.0
-        self.__EPSILON = 1e-5
+        self.__THRESHOLD = threshold
+        self.__EPSILON = epsilon
 
     def linear(self, inputs):
         # Add a bias constant term to the inputs
@@ -61,5 +61,5 @@ class Perceptron:
             if total_error < self.__EPSILON:
                 print(f'Converged after {epoch+1} epochs.')
                 break
-        else:
-            print(f'Did not converge after {num_epochs} epochs.')
+            else:
+                print(f'Did not converge after {num_epochs} epochs.')
