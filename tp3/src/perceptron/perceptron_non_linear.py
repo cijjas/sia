@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable
-from perceptron_base import PerceptronBase
+from perceptron.perceptron_base import PerceptronBase
 
 class PerceptronNonLinear(PerceptronBase):
 

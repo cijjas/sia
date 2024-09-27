@@ -4,7 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import imageio
 from io import BytesIO
-from perceptron_simple import PerceptronSimple
+from perceptron.perceptron_simple import PerceptronSimple
 
 # Function to plot the current state of the Perceptron's training
 def plot_perceptron(weights, X, y, epoch, config, grid_range=3):
