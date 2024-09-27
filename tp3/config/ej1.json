@@ -1,8 +1,8 @@
 {
     "epochs": 100,
-    "learning_rate": 0.03,
-    "bias": 0.5,
+    "learning_rate": 0.0002,
+    "bias": 0.02,
     "epsilon": 1e-4,
     "threshold": 0.0,
-    "debug": true
+    "debug": false
 }
