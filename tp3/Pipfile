@@ -10,6 +10,7 @@ plotly = "*"
 matplotlib = "*"
 openpyxl = "*"
 scipy = "*"
+imageio = "*"
 seaborn = "*"
 
 [dev-packages]

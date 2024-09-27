@@ -16,7 +16,7 @@ import random
 # Third-party libraries
 import numpy as np
 
-class Network(object):
+class MultilayerPerceptron(object):
 
     def __init__(self, sizes):
         """The list ``sizes`` contains the number of neurons in the
@@ -39,9 +39,10 @@ class Network(object):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
+            print(f"b: {b}, w: {w}, a: {a}")
         return a
 
-    def SGD(self, training_data, epochs, mini_batch_size, eta,
+    def fit(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
@@ -51,7 +52,7 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
-        if test_data: n_test = len(test_data)
+        if test_data is not None: n_test = len(test_data)
         n = len(training_data)
         for j in range(epochs):
             random.shuffle(training_data)
@@ -60,7 +61,7 @@ class Network(object):
                 for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
-            if test_data:
+            if test_data is not None:
                 print("Epoch {0}: {1} / {2}".format(
                     j, self.evaluate(test_data), n_test))
             else:
@@ -91,7 +92,8 @@ class Network(object):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # feedforward
         activation = x
-        activations = [x] # list to store all the activations, layer by layer
+        # activations is a list of arrays, where each array is the activations of the neurons in that layer
+        activations: list[np.ndarray] = [x] # list to store all the activations, layer by layer
         zs = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
             z = np.dot(w, activation)+b
@@ -99,10 +101,9 @@ class Network(object):
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
-        nabla_w[-1] = np.dot(delta, activations[-2].transpose())
+        nabla_w[-1] = np.dot(delta, activations[-2].T)
         # Note that the variable l in the loop below is used a little
         # differently to the notation in Chapter 2 of the book.  Here,
         # l = 1 means the last layer of neurons, l = 2 is the
@@ -124,11 +125,12 @@ class Network(object):
         neuron in the final layer has the highest activation."""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
-        return sum(int(x == y) for (x, y) in test_results)
+        a = sum(int(x == y) for (x, y) in test_results)
+        return a
 
     def cost_derivative(self, output_activations, y):
-        """Return the vector of partial derivatives \partial C_x /
-        \partial a for the output activations."""
+        """Return the vector of partial derivatives partial C_x
+        partial a for the output activations."""
         return (output_activations-y)
 
 #### Miscellaneous functions
@@ -139,3 +141,25 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
+
+
+def main2():
+    sizes = [2, 1]
+    multilayerPerceptron:MultilayerPerceptron = MultilayerPerceptron(sizes=sizes)
+    training_data = np.array([[-1, -1], [1, -1], [-1, 1], [1, 1]])
+    epochs:int = 10
+    mini_batch_size:int = 1
+    results = np.array([[-1], [1], [1], [-1]])
+    zip_test_data = list(zip(training_data, results))
+    eta = 0.1
+    multilayerPerceptron.fit(training_data=training_data, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta, test_data=zip_test_data)
+
+    print("Results:")
+    for x, y in zip_test_data:
+        print(f"Input: {x}, Expected: {y}, Predicted: {multilayerPerceptron.evaluate(test_data=x)}")
+
+    
+
+if __name__ == "__main__":
+    main2()
+
