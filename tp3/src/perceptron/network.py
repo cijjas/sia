@@ -15,6 +15,7 @@ import random
 
 # Third-party libraries
 import numpy as np
+from typing import Optional
 
 class MultilayerPerceptron(object):
 
@@ -29,21 +30,23 @@ class MultilayerPerceptron(object):
         layer is assumed to be an input layer, and by convention we
         won't set any biases for those neurons, since biases are only
         ever used in computing the outputs from later layers."""
-        self.num_layers = len(sizes)
-        self.sizes = sizes
-        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x)
-                        for x, y in zip(sizes[:-1], sizes[1:])]
+        self.num_layers: int = len(sizes)
+        self.sizes: list[int] = sizes
+        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in sizes[1:]]
+        self.weights: list[np.ndarray] = [np.random.randn(y, x)
+                                          for x, y in zip(sizes[:-1], sizes[1:])]
 
-    def feedforward(self, a):
+    def feedforward(self, a:np.ndarray) -> np.ndarray:
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
             a = sigmoid(np.dot(w, a)+b)
-            print(f"b: {b}, w: {w}, a: {a}")
+            #print(f"b: {b}, w: {w}, a: {a}")
         return a
 
-    def fit(self, training_data, epochs, mini_batch_size, eta,
-            test_data=None):
+    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float,
+            test_data: Optional[list[tuple[np.ndarray, int]]] = None) -> None:
+        # Optional is from python 2.7, it is used to indicate that a parameter is optional
+        # Here in python 3 we can use the optional this way: Optional[type]
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
         ``(x, y)`` representing the training inputs and the desired
@@ -53,10 +56,10 @@ class MultilayerPerceptron(object):
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
         if test_data is not None: n_test = len(test_data)
-        n = len(training_data)
+        n: int = len(training_data)
         for j in range(epochs):
             random.shuffle(training_data)
-            mini_batches = [
+            mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
                 training_data[k:k+mini_batch_size]
                 for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
@@ -67,13 +70,13 @@ class MultilayerPerceptron(object):
             else:
                 print("Epoch {0} complete".format(j))
 
-    def update_mini_batch(self, mini_batch, eta):
+    def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
         The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
         is the learning rate."""
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        nabla_b: list[np.ndarray] = [np.zeros(b.shape) for b in self.biases]
+        nabla_w: list[np.ndarray] = [np.zeros(w.shape) for w in self.weights]
         for x, y in mini_batch:
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
@@ -83,25 +86,25 @@ class MultilayerPerceptron(object):
         self.biases = [b-(eta/len(mini_batch))*nb
                        for b, nb in zip(self.biases, nabla_b)]
 
-    def backprop(self, x, y):
+    def backprop(self, x:np.ndarray, y:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
         gradient for the cost function C_x.  ``nabla_b`` and
         ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
         to ``self.biases`` and ``self.weights``."""
-        nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        nabla_b: list[np.ndarray] = [np.zeros(b.shape) for b in self.biases]
+        nabla_w: list[np.ndarray] = [np.zeros(w.shape) for w in self.weights]
         # feedforward
-        activation = x
+        activation: np.ndarray = x
         # activations is a list of arrays, where each array is the activations of the neurons in that layer
         activations: list[np.ndarray] = [x] # list to store all the activations, layer by layer
-        zs = [] # list to store all the z vectors, layer by layer
+        zs: list[np.ndarray] = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
-            z = np.dot(w, activation)+b
+            z: np.ndarray = np.dot(w, activation) + b
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
         # backward pass
-        delta = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
+        delta: np.ndarray = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].T)
         # Note that the variable l in the loop below is used a little
@@ -111,55 +114,63 @@ class MultilayerPerceptron(object):
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
         for l in range(2, self.num_layers):
-            z = zs[-l]
-            sp = sigmoid_prime(z)
+            z: np.ndarray = zs[-l]
+            sp: np.ndarray = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def evaluate(self, test_data):
+    def evaluate(self, test_data: list[tuple[np.ndarray, int]]) -> int:
         """Return the number of test inputs for which the neural
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        test_results = [(np.argmax(self.feedforward(x)), y)
+        test_results: list[tuple[int, int]] = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
         a = sum(int(x == y) for (x, y) in test_results)
         return a
 
-    def cost_derivative(self, output_activations, y):
+    def cost_derivative(self, output_activations: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Return the vector of partial derivatives partial C_x
         partial a for the output activations."""
         return (output_activations-y)
 
 #### Miscellaneous functions
-def sigmoid(z):
+def sigmoid(z: np.ndarray) -> np.ndarray:
     """The sigmoid function."""
     return 1.0/(1.0+np.exp(-z))
 
-def sigmoid_prime(z):
+def sigmoid_prime(z: np.ndarray) -> np.ndarray:
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
 
-def main2():
-    sizes = [2, 1]
-    multilayerPerceptron:MultilayerPerceptron = MultilayerPerceptron(sizes=sizes)
-    training_data = np.array([[-1, -1], [1, -1], [-1, 1], [1, 1]])
-    epochs:int = 10
-    mini_batch_size:int = 1
-    results = np.array([[-1], [1], [1], [-1]])
-    zip_test_data = list(zip(training_data, results))
-    eta = 0.1
-    multilayerPerceptron.fit(training_data=training_data, epochs=epochs, mini_batch_size=mini_batch_size, eta=eta, test_data=zip_test_data)
+def logicXor():
 
-    print("Results:")
-    for x, y in zip_test_data:
-        print(f"Input: {x}, Expected: {y}, Predicted: {multilayerPerceptron.evaluate(test_data=x)}")
+    X_logical = np.array([[-1, -1], [1, -1], [-1, 1], [1, 1]])
+    y_selected = np.array([-1, 1, 1, -1])
 
+    # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
+    # oculta y 1 neurona de salida.
+
+    net = MultilayerPerceptron([2, 2, 1])
+
+    # Se entrena la red neuronal con los datos de entrada y salida esperada
+    # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote    
+    # de 4.
+
+    net.fit(list(zip(X_logical, y_selected)), 1000, 4, 0.5)
+
+    # Se evalúa la red neuronal con los datos de entrada y salida esperada
+    # definidos anteriormente.
+
+    test_data = list(zip(X_logical, y_selected))
+    print(f"Accuracy: {net.evaluate(test_data)}")
+    
+    
     
 
 if __name__ == "__main__":
-    main2()
+    logicXor()
 
