@@ -18,7 +18,7 @@ import os
 # Third-party libraries
 import numpy as np
 from typing import Optional
-
+import json
 R_XOR_JSON = "xor.json"
 RESULTS_DIR = "../results"
 
@@ -164,28 +164,10 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
-def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.ndarray], test_results: list[tuple[int, int]], epochs: int) -> None:
-    # create directory if it does not exist
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
+################################################################################################################################################
 
-    import json
-    data = {
-        "weights": [w.tolist() for w in weights],
-        "biases": [b.tolist() for b in biases],
-        "test_results": {
-            "actual": [x.tolist() for x, y in test_results],
-            "expected" : [y.tolist() for x, y in test_results]
-        },
-        "epochs": epochs
-    }
-    with open(json_file, "w") as f:
-        # dump with indentation
-        json.dump(data, f, indent=4)
-
-
+# Exercise 1
 def logic_xor():
-
     X_logical = np.array([[[0], [0]], [[1], [0]], [[0], [1]], [[1], [1]]])
     y_selected = np.array([[0], [1], [1], [0]])
     test_data = list(zip(X_logical, y_selected))
@@ -217,11 +199,8 @@ def logic_xor():
 
     persist_results(f"{RESULTS_DIR}/{R_XOR_JSON}", weights, biases, test_results, epochs)
 
-
+# Exercise 2
 def numberIdentifier():
-    # Neuronas de entrada tiene 35 neuronas
-    # Una neurona de output, par o impar
-
     x = np.array([
     # 0
     [[0], [1], [1], [1], [0],
@@ -321,13 +300,99 @@ def numberIdentifier():
 
     test_data = list(zip(x, y))
 
+    # Our logic which the net probably doesnt follow is taking the 35 bits as input
+    # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
+    # Last layer simply activates with the neurons that represent the even numbers
     net = MultilayerPerceptron([35, 10, 1])
-    net.fit(test_data, 1400, 4, 5) # learning rate is divided by the mini_batch_update
+    net.fit(test_data, 1400, 4, 5) # ! learning rate is divided by the mini_batch_update
+
+    print(f"Accuracy: {net.evaluate(test_data)}")
+    return 1
+
+# Exercise 3
+def numberIdentifier():
+    x = np.array([
+    # 0
+    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [1], [1], [0], [1], [0], [1], [1], [1], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
+    # 1
+    [[0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [0]],
+    # 2
+    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [1], [1], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [1], [1], [1]],
+    # 3
+    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
+    # 4
+    [[0], [0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [0], [1], [0], [1], [0], [0], [1], [0], [1], [1], [1], [1], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0]],
+    # 5
+    [[1], [1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
+    # 6
+    [[0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
+    # 7
+    [[1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
+    # 8
+    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
+    # 9
+    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [1], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
+    ])
+
+    # Output data (even = 0, odd = 1)
+    y = np.array([
+        [0],  [1],  [0],  [1],  [0],  [1],  [0],  [1],  [0],  [1],
+    ])
+
+    test_data = list(zip(x, y))
+
+    # Our logic which the net probably doesnt follow is taking the 35 bits as input
+    # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
+    # Last layer simply activates with the neurons that represent the even numbers
+    net = MultilayerPerceptron([35, 10, 1])
+    net.fit(test_data, 1400, 4, 5) # ! learning rate is divided by the mini_batch_update
 
     print(f"Accuracy: {net.evaluate(test_data)}")
     return 1
 
 
+################################################################################################################################################
 
 if __name__ == "__main__":
     numberIdentifier()
+
+################################################################################################################################################
+
+def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.ndarray], test_results: list[tuple[int, int]], epochs: int) -> None:
+    # create directory if it does not exist
+    if not os.path.exists(RESULTS_DIR):
+        os.makedirs(RESULTS_DIR)
+
+    import json
+    data = {
+        "weights": [w.tolist() for w in weights],
+        "biases": [b.tolist() for b in biases],
+        "test_results": {
+            "actual": [x.tolist() for x, y in test_results],
+            "expected" : [y.tolist() for x, y in test_results]
+        },
+        "epochs": epochs
+    }
+    with open(json_file, "w") as f:
+        # dump with indentation
+        json.dump(data, f, indent=4)
+
+# TODO Maybe actually use function to parse the .txt this but the static definition also work
+# Using these could allow for the growing of the input data in a more maintainable way
+# Most of what could be gained from these will be gained in exercise 4!
+def parse_to_matrices(file_path: str) -> np.ndarray:
+    """ Parse a file with several digits represented as 7x5 1s and 0s into a list of matrices """
+    # first we load the grid
+    grid = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            # consider the 0's and 1's as integers and that they are separated by spaces
+            grid.append([int(x) for x in line.split()])
+    # now we have the grid with the digits, we need to split it into 7x5 matrices
+
+    # we need to split the grid into 7x5 matrices
+    matrices = []
+    for i in range(0, len(grid), 7):
+        matrix = grid[i:i+7]
+        matrices.append(matrix)
+    return matrices
