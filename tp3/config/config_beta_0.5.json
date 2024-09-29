@@ -1,0 +1,9 @@
+{
+    "epochs": 1000,
+    "learning_rate": 0.2,
+    "epsilon": 1e-4,
+    "threshold": 0.0,
+    "debug": false,
+    "non_linear_fn": "sigmoid",
+    "beta": 0.5
+}
