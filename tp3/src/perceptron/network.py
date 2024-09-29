@@ -60,7 +60,7 @@ class MultilayerPerceptron(object):
         for j in range(epochs):
             random.shuffle(training_data)
             mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
-                training_data[k:k+mini_batch_size]
+                training_data[k:k+mini_batch_size] 
                 for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
@@ -100,6 +100,7 @@ class MultilayerPerceptron(object):
         zs: list[np.ndarray] = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
             z: np.ndarray = np.dot(w, activation) + b
+    
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
@@ -148,8 +149,8 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
 
 def logicXor():
 
-    X_logical = np.array([[-1, -1], [1, -1], [-1, 1], [1, 1]])
-    y_selected = np.array([-1, 1, 1, -1])
+    X_logical = np.array([[[-1], [-1]], [[1], [-1]], [[-1], [1]], [[1], [1]]])
+    y_selected = np.array([[-1], [1], [1], [-1]])
 
     # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
     # oculta y 1 neurona de salida.
