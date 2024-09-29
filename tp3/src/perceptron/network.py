@@ -16,6 +16,7 @@ import random
 # Third-party libraries
 import numpy as np
 from typing import Optional
+import json
 
 class MultilayerPerceptron(object):
 
@@ -147,7 +148,7 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
     return sigmoid(z)*(1-sigmoid(z))
 
 
-def logicXor():
+def logic_xor():
 
     X_logical = np.array([[[-1], [-1]], [[1], [-1]], [[-1], [1]], [[1], [1]]])
     y_selected = np.array([[-1], [1], [1], [-1]])
@@ -168,10 +169,149 @@ def logicXor():
 
     test_data = list(zip(X_logical, y_selected))
     print(f"Accuracy: {net.evaluate(test_data)}")
+
+
+def parse_to_matrices(file_path: str) -> np.ndarray:
+    """ Parse a file with several digits represented as 7x5 1s and 0s into a list of matrices """
+    # first we load the grid
+    grid = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            # consider the 0's and 1's as integers and that they are separated by spaces
+            grid.append([int(x) for x in line.split()])
+    # now we have the grid with the digits, we need to split it into 7x5 matrices
+
+    # we need to split the grid into 7x5 matrices
+    matrices = []
+    for i in range(0, len(grid), 7):
+        matrix = grid[i:i+7]
+        matrices.append(matrix)
+    return matrices
+
+
+# determinar si un número es par/impar,
+# utilizando el conjunto de datos presente en el archivo
+# "TP3-ej3-digitos.txt" (con dígitos de 7 x 5 dimensiones)
+# Es decir, dígitos representados con 0s y 1s, donde cada
+# dígito es de 7 x 5 dimensiones.
+def parity():
+    # fitst we need to parse the data
+    #selected: list = parse_to_matrices('../loading_data/TP3-ej3-digitos.txt')
+    # i need to wrap the data into a 1D array
+
+    digits = [
+        # 0
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 1, 1],
+         [1, 0, 1, 0, 1],
+         [1, 1, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+        # 1
+        [[0, 0, 1, 0, 0],
+         [0, 1, 1, 0, 0],
+         [0, 0, 1, 0, 0],
+         [0, 0, 1, 0, 0],
+         [0, 0, 1, 0, 0],
+         [0, 0, 1, 0, 0],
+         [0, 1, 1, 1, 0]],
+        # 2
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [0, 0, 0, 0, 1],
+         [0, 0, 1, 1, 0],
+         [0, 1, 0, 0, 0],
+         [1, 0, 0, 0, 1],
+         [1, 1, 1, 1, 1]],
+        # 3
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [0, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0],
+         [0, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+        # 4
+        [[0, 0, 0, 1, 0],
+         [0, 0, 1, 1, 0],
+         [0, 1, 0, 1, 0],
+         [1, 0, 0, 1, 0],
+         [1, 1, 1, 1, 1],
+         [0, 0, 0, 1, 0],
+         [0, 0, 0, 1, 0]],
+        # 5
+        [[1, 1, 1, 1, 1],
+         [1, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0],
+         [1, 1, 1, 1, 0],
+         [0, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+        # 6
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 0, 0],
+         [1, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+        # 7
+        [[1, 1, 1, 1, 1],
+         [0, 0, 0, 0, 1],
+         [0, 0, 0, 1, 0],
+         [0, 0, 1, 0, 0],
+         [0, 1, 0, 0, 0],
+         [1, 0, 0, 0, 0],
+         [1, 0, 0, 0, 0]],
+        # 8
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+        # 9
+        [[0, 1, 1, 1, 0],
+         [1, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 1],
+         [0, 0, 0, 0, 1],
+         [1, 0, 0, 0, 1],
+         [0, 1, 1, 1, 0]],
+    ]
+
+    # Flatten each 7x5 matrix into a 35-element vector
+    selected = np.array([np.array(digit).flatten().reshape(-1, 1) for digit in digits])
+
+    # Output data (even = 0, odd = 1)
+    expected = np.array([
+        [0],  # 0 is even
+        [1],  # 1 is odd
+        [0],  # 2 is even
+        [1],  # 3 is odd
+        [0],  # 4 is even
+        [1],  # 5 is odd
+        [0],  # 6 is even
+        [1],  # 7 is odd
+        [0],  # 8 is even
+        [1],  # 9 is odd
+    ])
     
+
+    multilayerPerceptron = MultilayerPerceptron([35, 10, 1])
+
+    multilayerPerceptron.fit(list(zip(selected, expected)), 20000, 4, 5)
+
+    test_data = list(zip(selected, expected))
+    print(f"Accuracy: {multilayerPerceptron.evaluate(test_data)}")
+
+
     
     
 
 if __name__ == "__main__":
-    logicXor()
+    #logic_xor()
+    parity()
 
