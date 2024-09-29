@@ -103,22 +103,18 @@ class MultilayerPerceptron(object):
         # activations is a list of arrays, where each array is the activations of the neurons in that layer
         activations: list[np.ndarray] = [x] # list to store all the activations, layer by layer
         zs: list[np.ndarray] = [] # list to store all the z vectors, layer by layer
+        # Feed Foward that stores the values of the activations for later usage
         for b, w in zip(self.biases, self.weights):
             z: np.ndarray = np.dot(w, activation) + b
-
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
-        # backward pass
+        # Backpropagation
+        # Last layer needs special treatment
         delta: np.ndarray = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].T)
-        # Note that the variable l in the loop below is used a little
-        # differently to the notation in Chapter 2 of the book.  Here,
-        # l = 1 means the last layer of neurons, l = 2 is the
-        # second-last layer, and so on.  It's a renumbering of the
-        # scheme in the book, used here to take advantage of the fact
-        # that Python can use negative indices in lists.
+        # Now we go from the second to last to the input layer
         for l in range(2, self.num_layers):
             z: np.ndarray = zs[-l]
             sp: np.ndarray = sigmoid_prime(z)
@@ -136,10 +132,6 @@ class MultilayerPerceptron(object):
             arr: np.ndarray = self.feedforward(x)
             if test_results is not None:
                 test_results.append((arr, y))
-            print("================")
-            print(arr)
-            print(y)
-            print("================")
 
         # [(0 ,0), 0]
         # [(0 ,1), 1]
@@ -232,85 +224,85 @@ def numberIdentifier():
 
     x = np.array([
     # 0
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 1, 1,
-     1, 0, 1, 0, 1,
-     1, 1, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [1], [1],
+     [1], [0], [1], [0], [1],
+     [1], [1], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     # 1
-    [0, 0, 1, 0, 0,
-     0, 1, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 0, 1, 0, 0,
-     0, 1, 1, 1, 0],
+    [[0], [0], [1], [0], [0],
+     [0], [1], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [1], [1], [1], [0]],
     # 2
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     0, 0, 0, 0, 1,
-     0, 0, 1, 1, 0,
-     0, 1, 0, 0, 0,
-     1, 0, 0, 0, 1,
-     1, 1, 1, 1, 1],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [0], [0], [0], [0], [1],
+     [0], [0], [1], [1], [0],
+     [0], [1], [0], [0], [0],
+     [1], [0], [0], [0], [1],
+     [1], [1], [1], [1], [1]],
     # 3
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     0, 0, 0, 0, 1,
-     0, 1, 1, 1, 0,
-     0, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [0], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     # 4
-    [0, 0, 0, 1, 0,
-     0, 0, 1, 1, 0,
-     0, 1, 0, 1, 0,
-     1, 0, 0, 1, 0,
-     1, 1, 1, 1, 1,
-     0, 0, 0, 1, 0,
-     0, 0, 0, 1, 0],
+    [[0], [0], [0], [1], [0],
+     [0], [0], [1], [1], [0],
+     [0], [1], [0], [1], [0],
+     [1], [0], [0], [1], [0],
+     [1], [1], [1], [1], [1],
+     [0], [0], [0], [1], [0],
+     [0], [0], [0], [1], [0]],
     # 5
-    [1, 1, 1, 1, 1,
-     1, 0, 0, 0, 0,
-     1, 0, 0, 0, 0,
-     1, 1, 1, 1, 0,
-     0, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[1], [1], [1], [1], [1],
+     [1], [0], [0], [0], [0],
+     [1], [0], [0], [0], [0],
+     [1], [1], [1], [1], [0],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     # 6
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 0, 0,
-     1, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [0],
+     [1], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     # 7
-    [1, 1, 1, 1, 1,
-     0, 0, 0, 0, 1,
-     0, 0, 0, 1, 0,
-     0, 0, 1, 0, 0,
-     0, 1, 0, 0, 0,
-     1, 0, 0, 0, 0,
-     1, 0, 0, 0, 0],
+    [[1], [1], [1], [1], [1],
+     [0], [0], [0], [0], [1],
+     [0], [0], [0], [1], [0],
+     [0], [0], [1], [0], [0],
+     [0], [1], [0], [0], [0],
+     [1], [0], [0], [0], [0],
+     [1], [0], [0], [0], [0]],
     # 8
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     # 9
-    [0, 1, 1, 1, 0,
-     1, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 1,
-     0, 0, 0, 0, 1,
-     1, 0, 0, 0, 1,
-     0, 1, 1, 1, 0],
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [1],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
     ])
 
     # Output data (even = 0, odd = 1)
@@ -330,7 +322,7 @@ def numberIdentifier():
     test_data = list(zip(x, y))
 
     net = MultilayerPerceptron([35, 10, 1])
-    net.fit(test_data, 1000, 4, 5) # learning rate is divided by the mini_batch_update
+    net.fit(test_data, 1400, 4, 5) # learning rate is divided by the mini_batch_update
 
     print(f"Accuracy: {net.evaluate(test_data)}")
     return 1
@@ -338,4 +330,4 @@ def numberIdentifier():
 
 
 if __name__ == "__main__":
-    logic_xor()
+    numberIdentifier()
