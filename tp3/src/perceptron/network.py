@@ -166,29 +166,134 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
 
 
 def logicXor():
-
     X_logical = np.array([[[0], [0]], [[1], [0]], [[0], [1]], [[1], [1]]])
     y_selected = np.array([[0], [1], [1], [0]])
+    test_data = list(zip(X_logical, y_selected))
 
     # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
     # oculta y 1 neurona de salida.
-
-    net = MultilayerPerceptron([2, 2, 1])
+    net = MultilayerPerceptron([35, 10, 1])
 
     # Se entrena la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote
     # de 4.
-
-    net.fit(list(zip(X_logical, y_selected)), 1000, 4, 8) # learning rate is divided by the mini_batch_update
+    net.fit(test_data, 1000, 4, 8) # learning rate is divided by the mini_batch_update
 
     # Se evalúa la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente.
-
-    test_data = list(zip(X_logical, y_selected))
     print(f"Accuracy: {net.evaluate(test_data)}")
 
+
+def numberIdentifier():
+    # Neuronas de entrada tiene 35 neuronas
+    # Una neurona de output, par o impar
+
+    x = np.array([
+    # 0
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 1, 1,
+     1, 0, 1, 0, 1,
+     1, 1, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    # 1
+    [0, 0, 1, 0, 0,
+     0, 1, 1, 0, 0,
+     0, 0, 1, 0, 0,
+     0, 0, 1, 0, 0,
+     0, 0, 1, 0, 0,
+     0, 0, 1, 0, 0,
+     0, 1, 1, 1, 0],
+    # 2
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     0, 0, 0, 0, 1,
+     0, 0, 1, 1, 0,
+     0, 1, 0, 0, 0,
+     1, 0, 0, 0, 1,
+     1, 1, 1, 1, 1],
+    # 3
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     0, 0, 0, 0, 1,
+     0, 1, 1, 1, 0,
+     0, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    # 4
+    [0, 0, 0, 1, 0,
+     0, 0, 1, 1, 0,
+     0, 1, 0, 1, 0,
+     1, 0, 0, 1, 0,
+     1, 1, 1, 1, 1,
+     0, 0, 0, 1, 0,
+     0, 0, 0, 1, 0],
+    # 5
+    [1, 1, 1, 1, 1,
+     1, 0, 0, 0, 0,
+     1, 0, 0, 0, 0,
+     1, 1, 1, 1, 0,
+     0, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    # 6
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 0,
+     1, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    # 7
+    [1, 1, 1, 1, 1,
+     0, 0, 0, 0, 1,
+     0, 0, 0, 1, 0,
+     0, 0, 1, 0, 0,
+     0, 1, 0, 0, 0,
+     1, 0, 0, 0, 0,
+     1, 0, 0, 0, 0],
+    # 8
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    # 9
+    [0, 1, 1, 1, 0,
+     1, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 1,
+     0, 0, 0, 0, 1,
+     1, 0, 0, 0, 1,
+     0, 1, 1, 1, 0],
+    ])
+
+    # Output data (even = 0, odd = 1)
+    y = np.array([
+        [0],  # 0 is even
+        [1],  # 1 is odd
+        [0],  # 2 is even
+        [1],  # 3 is odd
+        [0],  # 4 is even
+        [1],  # 5 is odd
+        [0],  # 6 is even
+        [1],  # 7 is odd
+        [0],  # 8 is even
+        [1],  # 9 is odd
+    ])
+
+    test_data = list(zip(x, y))
+
+    net = MultilayerPerceptron([35, 10, 1])
+    net.fit(test_data, 1000, 4, 5) # learning rate is divided by the mini_batch_update
+
+    print(f"Accuracy: {net.evaluate(test_data)}")
+    return 1
 
 
 
 if __name__ == "__main__":
-    logicXor()
+    numberIdentifier()
