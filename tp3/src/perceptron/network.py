@@ -60,7 +60,7 @@ class MultilayerPerceptron(object):
         for j in range(epochs):
             random.shuffle(training_data)
             mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
-                training_data[k:k+mini_batch_size] 
+                training_data[k:k+mini_batch_size]
                 for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
@@ -100,7 +100,7 @@ class MultilayerPerceptron(object):
         zs: list[np.ndarray] = [] # list to store all the z vectors, layer by layer
         for b, w in zip(self.biases, self.weights):
             z: np.ndarray = np.dot(w, activation) + b
-    
+
             zs.append(z)
             activation = sigmoid(z)
             activations.append(activation)
@@ -127,9 +127,27 @@ class MultilayerPerceptron(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        test_results: list[tuple[int, int]] = [(np.argmax(self.feedforward(x)), y)
+        for (x, y) in test_data:
+            print("================")
+            print(self.feedforward(x))
+            print(y)
+            print("================")
+
+        # [(0 ,0), 0]
+        # [(0 ,1), 1]
+        # [(1 ,0), 1]
+        # [(1 ,0), 0]
+
+        # test_results: list[tuple[int, int]] = [(np.argmax(self.feedforward(x)), y)
+        #                for (x, y) in test_data]
+        test_results: list[tuple[int, int]] = [(self.feedforward(x), y)
                         for (x, y) in test_data]
-        a = sum(int(x == y) for (x, y) in test_results)
+
+        epsilon = 0.01
+        a = sum(
+            int(np.abs(x - y) < epsilon)
+            for (x, y) in test_results
+        )
         return a
 
     def cost_derivative(self, output_activations: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -149,8 +167,8 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
 
 def logicXor():
 
-    X_logical = np.array([[[-1], [-1]], [[1], [-1]], [[-1], [1]], [[1], [1]]])
-    y_selected = np.array([[-1], [1], [1], [-1]])
+    X_logical = np.array([[[0], [0]], [[1], [0]], [[0], [1]], [[1], [1]]])
+    y_selected = np.array([[0], [1], [1], [0]])
 
     # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
     # oculta y 1 neurona de salida.
@@ -158,20 +176,19 @@ def logicXor():
     net = MultilayerPerceptron([2, 2, 1])
 
     # Se entrena la red neuronal con los datos de entrada y salida esperada
-    # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote    
+    # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote
     # de 4.
 
-    net.fit(list(zip(X_logical, y_selected)), 1000, 4, 0.5)
+    net.fit(list(zip(X_logical, y_selected)), 1000, 4, 8) # learning rate is divided by the mini_batch_update
 
     # Se evalúa la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente.
 
     test_data = list(zip(X_logical, y_selected))
     print(f"Accuracy: {net.evaluate(test_data)}")
-    
-    
-    
+
+
+
 
 if __name__ == "__main__":
     logicXor()
-
