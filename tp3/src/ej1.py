@@ -2,7 +2,7 @@ import numpy as np
 import sys
 import json
 import matplotlib.pyplot as plt
-import imageio
+import imageio.v2 as imageio
 from io import BytesIO
 from perceptron.perceptron_simple import PerceptronSimple
 
@@ -26,7 +26,7 @@ def plot_perceptron(weights, X, y, epoch, config, grid_range=3):
         ax.plot(x_values, x_values * slope + intercept, 'k')
     
     # Include hyperparameter information in the plot
-    hyperparams_info = f"LR: {config.get('learning_rate', 0.01)}, Epochs: {config.get('epochs', 1)}"
+    hyperparams_info = f"$\eta$: {config.get('learning_rate', 0.01)}, Epochs: {config.get('epochs', 1)}"
     ax.set_title(f'Epoch: {epoch+1} - {hyperparams_info}')
     ax.legend()
 
@@ -55,14 +55,13 @@ def main():
     y_selected = outputs.get(config_file.get('function', 'AND'))
 
     perceptron = PerceptronSimple(
-        num_inputs=X_logical.shape[1],
+        num_features=X_logical.shape[1],
         learning_rate=config_file.get('learning_rate', 0.01),
         epsilon=config_file.get('epsilon', 1e-5),
-        threshold=config_file.get('threshold', 0.0),
     )
 
     num_epochs = config_file.get('epochs', 50)
-    perceptron.fit(X_logical, y_selected, num_epochs)
+    perceptron.train(X_logical, y_selected, num_epochs)
 
     with imageio.get_writer('perceptron_training.gif', mode='I', duration=0.5) as writer:
         for epoch, weights in enumerate(perceptron.weights_history):

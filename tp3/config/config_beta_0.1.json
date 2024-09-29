@@ -1,0 +1,7 @@
+{
+    "epochs": 1000,
+    "learning_rate": 0.2,
+    "epsilon": 1e-4,
+    "non_linear_fn": "sigmoid",
+    "beta": 0.1
+}
