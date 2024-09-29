@@ -12,10 +12,15 @@ and omits many desirable features.
 #### Libraries
 # Standard library
 import random
+import os
+
 
 # Third-party libraries
 import numpy as np
 from typing import Optional
+
+R_XOR_JSON = "xor.json"
+RESULTS_DIR = "../results"
 
 class MultilayerPerceptron(object):
 
@@ -122,14 +127,17 @@ class MultilayerPerceptron(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def evaluate(self, test_data: list[tuple[np.ndarray, int]]) -> int:
+    def evaluate(self, test_data: list[tuple[np.ndarray, int]], test_results: list[tuple[int, int]] = None) -> int:
         """Return the number of test inputs for which the neural
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
         for (x, y) in test_data:
+            arr: np.ndarray = self.feedforward(x)
+            if test_results is not None:
+                test_results.append((arr, y))
             print("================")
-            print(self.feedforward(x))
+            print(arr)
             print(y)
             print("================")
 
@@ -164,24 +172,58 @@ def sigmoid_prime(z: np.ndarray) -> np.ndarray:
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
+def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.ndarray], test_results: list[tuple[int, int]], epochs: int) -> None:
+    # create directory if it does not exist
+    if not os.path.exists(RESULTS_DIR):
+        os.makedirs(RESULTS_DIR)
 
-def logicXor():
+    import json
+    data = {
+        "weights": [w.tolist() for w in weights],
+        "biases": [b.tolist() for b in biases],
+        "test_results": {
+            "actual": [x.tolist() for x, y in test_results],
+            "expected" : [y.tolist() for x, y in test_results]
+        },
+        "epochs": epochs
+    }
+    with open(json_file, "w") as f:
+        # dump with indentation
+        json.dump(data, f, indent=4)
+
+
+def logic_xor():
+
     X_logical = np.array([[[0], [0]], [[1], [0]], [[0], [1]], [[1], [1]]])
     y_selected = np.array([[0], [1], [1], [0]])
     test_data = list(zip(X_logical, y_selected))
 
     # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
     # oculta y 1 neurona de salida.
-    net = MultilayerPerceptron([35, 10, 1])
+    net = MultilayerPerceptron([2, 2, 1])
 
     # Se entrena la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote
     # de 4.
+
+    epochs = 1000
+
+    net.fit(list(zip(X_logical, y_selected)), epochs, 4, 8) # learning rate is divided by the mini_batch_update
     net.fit(test_data, 1000, 4, 8) # learning rate is divided by the mini_batch_update
 
     # Se evalúa la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente.
-    print(f"Accuracy: {net.evaluate(test_data)}")
+
+    test_results = []
+
+    test_data = list(zip(X_logical, y_selected))
+    print(f"Accuracy: {net.evaluate(test_data, test_results)}")
+
+    # Se guardan los pesos y sesgos de la red neuronal en un archivo JSON.
+    weights = net.weights
+    biases = net.biases
+
+    persist_results(f"{RESULTS_DIR}/{R_XOR_JSON}", weights, biases, test_results, epochs)
 
 
 def numberIdentifier():
@@ -296,4 +338,4 @@ def numberIdentifier():
 
 
 if __name__ == "__main__":
-    numberIdentifier()
+    logic_xor()
