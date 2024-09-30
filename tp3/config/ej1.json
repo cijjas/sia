@@ -1,0 +1,6 @@
+{
+    "function": "AND",
+    "learning_rate": 0.01,
+    "epochs": 50,
+    "epsilon": 1e-5
+}
