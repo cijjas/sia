@@ -22,7 +22,7 @@ import json
 
 from activation_function import ActivationFunction, Sigmoid, str_to_activation_function
 
-from optimizer import Optimizer, str_to_optimizer, MiniBatchGradientDescent 
+from optimizer import Optimizer
 R_XOR_JSON = "xor.json"
 RESULTS_DIR = "../results"
 PATH_TO_CONFIG = "../../config"
@@ -93,7 +93,8 @@ class MultilayerPerceptron(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights, self.biases = self.optimizer.update(self.weights, self.biases, nabla_w, nabla_b, eta, len(mini_batch))
+        self.weights, self.biases = self.optimizer.update(self.weights, self.biases, nabla_w, nabla_b, len(mini_batch))
+
 
     def backprop(self, predicted:np.ndarray, expected:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
@@ -148,7 +149,7 @@ class MultilayerPerceptron(object):
                         for (x, y) in test_data]
 
         a = sum(
-            int(np.abs(x - y) < epsilon)
+            int(np.all(np.abs(x - y) < epsilon))
             for (x, y) in test_results
         )
         return a
@@ -297,7 +298,9 @@ def numberIdentifier():
     # Our logic which the net probably doesnt follow is taking the 35 bits as input
     # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
     # Last layer simply activates with the neurons that represent the even numbers
-    net = MultilayerPerceptron([35, 10, 1], Sigmoid, MiniBatchGradientDescent(0.1))
+
+    optimizer = Optimizer(method="adam", eta=0.01)
+    net = MultilayerPerceptron([35, 10, 1], Sigmoid, optimizer=optimizer)
     net.fit(test_data, 1400, 4, 5, 0.01) # ! learning rate is divided by the mini_batch_update
 
     print(f"Accuracy: {net.evaluate(test_data=test_data, epsilon=0.01)}")
@@ -345,7 +348,8 @@ def numberIdentifier():
     # Our logic which the net probably doesnt follow is taking the 35 bits as input
     # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
     # Last layer simply activates with the neurons that represent the even numbers
-    net = MultilayerPerceptron([35, 10, 1], str_to_activation_function(activation_function), str_to_optimizer(optimizer))
+    optimizer = Optimizer(method="adam", eta=0.01)
+    net = MultilayerPerceptron([35, 10, 1], str_to_activation_function(activation_function), optimizer=optimizer)
     net.fit(test_data, config.get('epochs'), config.get('k'), config.get('learning_rate'), epsilon) # ! learning rate is divided by the mini_batch_update
 
     print(f"Accuracy: {net.evaluate(test_data, epsilon)}")
