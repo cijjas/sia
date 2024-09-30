@@ -9,20 +9,99 @@ from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, r
 from sklearn.model_selection import KFold
 from perceptron.perceptron_simple import PerceptronSimple
 
-# Function to plot the current state of the Perceptron's training
+def transform_features(X):
+    z = X[:, 0] * X[:, 1]
+    return np.column_stack((X, z))
+
+from mpl_toolkits.mplot3d import Axes3D
+
+def plot_3d_decision_boundary(weights, X, y, epoch, config):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.set_xlim([-2, 2])
+    ax.set_ylim([-2, 2])
+    ax.set_zlim([-2, 2])
+
+    for class_value in np.unique(y):
+        row_ix = np.where(y == class_value)
+        ax.scatter(X[row_ix, 0], X[row_ix, 1], X[row_ix, 2], label=f'Class {class_value}', depthshade=True)
+
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.1),
+                           np.arange(x2_min, x2_max, 0.1))
+
+    w1, w2, w3 = weights[1], weights[2], weights[3]
+    b = weights[0]
+
+    if w3 != 0:
+        zz = -(w1 * xx1 + w2 * xx2 + b) / w3
+    else:
+        zz = np.zeros_like(xx1)
+
+    ax.plot_surface(xx1, xx2, zz, alpha=0.5, color='green')
+
+    ax.set_xlabel('X1')
+    ax.set_ylabel('X2')
+    ax.set_zlabel('Z = X1 * X2')
+
+    ax.set_title(f'Epoch {epoch + 1} - 3D Decision Boundary')
+    ax.legend()
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close(fig)
+    return buf
+
+
+def plot_2d_projected_decision_boundary(weights, X, y, epoch, config, grid_range=3):
+    fig, ax = plt.subplots()
+    ax.set_xlim([-grid_range, grid_range])
+    ax.set_ylim([-grid_range, grid_range])
+    ax.grid(True)
+
+    for class_value in np.unique(y):
+        row_ix = np.where(y == class_value)
+        ax.scatter(X[row_ix, 0], X[row_ix, 1], label=f'Class {class_value}')
+
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, 0.1),
+                           np.arange(x2_min, x2_max, 0.1))
+
+    z = xx1 * xx2
+    grid = np.c_[xx1.ravel(), xx2.ravel(), z.ravel()]
+
+    z_values = np.dot(grid, weights[1:]) + weights[0]
+    z_values = np.where(z_values >= 0, 1, -1)
+
+    z_values = z_values.reshape(xx1.shape)
+
+    ax.contourf(xx1, xx2, z_values, alpha=0.3, cmap=plt.cm.Paired)
+
+    ax.set_title(f'Epoch {epoch + 1} - 2D Decision Boundary')
+    ax.legend()
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    plt.close(fig)
+    return buf
+
+
 def plot_perceptron(weights, X, y, epoch, config, grid_range=3):
     fig, ax = plt.subplots()
     ax.set_xlim([-grid_range, grid_range])
     ax.set_ylim([-grid_range, grid_range])
     ax.grid(True)
 
-    # Plot data points
     for class_value in np.unique(y):
         row_ix = np.where(y == class_value)
         ax.scatter(X[row_ix, 0], X[row_ix, 1], label=f'Class {class_value}')
     
-    # Plot decision boundary using current weights
-    if weights[2] != 0:
+    if weights[3] != 0:
         x_values = np.linspace(-grid_range, grid_range, 100)
         slope = -(weights[1] / weights[2])
         intercept = -(weights[0] / weights[2])
@@ -40,7 +119,6 @@ def plot_perceptron(weights, X, y, epoch, config, grid_range=3):
     plt.close(fig)
     return buf
 
-# Function to evaluate and display classification results with a confusion matrix heatmap
 def evaluate_classification(y_true, y_pred, title):
     cm = confusion_matrix(y_true, y_pred)
     accuracy = accuracy_score(y_true, y_pred)
@@ -48,14 +126,12 @@ def evaluate_classification(y_true, y_pred, title):
     recall = recall_score(y_true, y_pred, average='binary')
     f1 = f1_score(y_true, y_pred, average='binary')
     
-    # Print the classification metrics
     print(f"Classification Report for {title}:")
     print(f"Accuracy: {accuracy:.2f}")
     print(f"Precision: {precision:.2f}")
     print(f"Recall: {recall:.2f}")
     print(f"F1 Score: {f1:.2f}")
     
-    # Plot confusion matrix heatmap
     plt.figure(figsize=(6, 4))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
     plt.title(f'Confusion Matrix - {title}')
@@ -63,7 +139,6 @@ def evaluate_classification(y_true, y_pred, title):
     plt.ylabel('Actual')
     plt.show()
 
-# Function to perform K-Fold Cross Validation
 def cross_validate(X, y, config, n_splits=2):
     print(f"Performing {n_splits}-Fold Cross Validation...")
     kfold = KFold(n_splits=n_splits, shuffle=True)
@@ -88,7 +163,6 @@ def cross_validate(X, y, config, n_splits=2):
         recall_list.append(recall_score(y_test, y_pred, average='binary'))
         f1_list.append(f1_score(y_test, y_pred, average='binary'))
 
-    # Print cross-validation results
     print("\nCross-Validation Results:")
     print(f"Accuracy: {np.mean(accuracy_list):.2f} (+/- {np.std(accuracy_list):.2f})")
     print(f"Precision: {np.mean(precision_list):.2f} (+/- {np.std(precision_list):.2f})")
@@ -111,36 +185,40 @@ def main():
         'XOR': np.array([-1, 1, 1, -1])
     }
     
-    # Choose between AND and XOR
-    selected_function = config_file.get('function', 'AND')
+    selected_function = config_file.get('function', 'XOR')
     y_selected = outputs.get(selected_function)
 
-    # Perform cross-validation
-    cross_validate(X_logical, y_selected, config_file)
+    X_transformed = transform_features(X_logical)
 
-    # Train final perceptron model on the entire dataset
+    cross_validate(X_transformed, y_selected, config_file)
+
     perceptron = PerceptronSimple(
         seed=config_file.get('seed', 42),
-        num_features=X_logical.shape[1],
+        num_features=X_transformed.shape[1],
         learning_rate=config_file.get('learning_rate', 0.01),
         epsilon=config_file.get('epsilon', 1e-5),
     )
 
     num_epochs = config_file.get('epochs', 50)
-    perceptron.train(X_logical, y_selected, num_epochs)
+    perceptron.train(X_transformed, y_selected, num_epochs)
 
-    # Predict on the entire dataset after training
-    y_pred = perceptron.predict(X_logical)
+    y_pred = perceptron.predict(X_transformed)
 
-    # Evaluate the classification performance on the entire dataset
     evaluate_classification(y_selected, y_pred, selected_function)
 
-    # Create GIF of training process
-    with imageio.get_writer('perceptron_training.gif', mode='I', duration=0.5) as writer:
+    with imageio.get_writer('perceptron_training_2d_projected.gif', mode='I', duration=0.5) as writer_2d:
         for epoch, weights in enumerate(perceptron.weights_history):
-            img_data = plot_perceptron(weights, X_logical, y_selected, epoch, config_file)
+            img_data = plot_2d_projected_decision_boundary(weights, X_logical, y_selected, epoch, config_file)
             image = imageio.imread(img_data)
-            writer.append_data(image)
+            writer_2d.append_data(image)
+
+    with imageio.get_writer('perceptron_training_3d_boundary.gif', mode='I', duration=0.5) as writer_3d:
+        for epoch, weights in enumerate(perceptron.weights_history):
+            img_data2 = plot_3d_decision_boundary(weights, X_transformed, y_selected, epoch, config_file)
+            image2 = imageio.imread(img_data2)
+            writer_3d.append_data(image2)
+
+
 
 if __name__ == "__main__":
     main()
