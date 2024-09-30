@@ -1,8 +1,8 @@
 {
-    "epochs": 1000,
+    "epochs": 100,
     "learning_rate": 0.001,
     "epsilon": 1e-5,
-    "non_linear_fn": "sigmoid",
+    "non_linear_fn": "relu",
     "beta": 2.0,
     "seed": 42
 }
