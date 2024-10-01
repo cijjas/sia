@@ -5,7 +5,7 @@ from models.perceptrons.perceptron_linear import PerceptronLinear
 from models.perceptrons.perceptron_non_linear import PerceptronNonLinear
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import MinMaxScaler
+from utils.scaler import MinMaxScaler
 
 # This script compares the loss history of linear and non-linear perceptrons across epochs
 def main():
