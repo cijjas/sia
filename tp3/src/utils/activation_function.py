@@ -1,28 +1,36 @@
 import numpy as np
 
 class ActivationFunction:
-    def __init__(self):
-        pass
+    def __init__(self, method: str, beta: float = 1.0):
+        self.method = method
+        self.beta = beta
+        self.activation, self.activation_prime = self.get_activation()
 
-    def activation(self, z: np.ndarray) -> np.ndarray:
-        pass
+    def get_activation(self) -> tuple:
+        if self.method == "sigmoid":
+            return self.sigmoid, self.sigmoid_prime
+        elif self.method == "tanh":
+            return self.tanh, self.tanh_prime
+        elif self.method == "relu":
+            return self.relu, self.relu_prime
+        else:
+            raise ValueError(f"Unknown activation function: {self.method}")
 
-    def activation_prime(self, z: np.ndarray) -> np.ndarray:
-        pass
+    def sigmoid(self, z: np.ndarray) -> np.ndarray:
+        return 1.0 / (1.0 + np.exp(-self.beta * z))
 
-class Sigmoid(ActivationFunction):
-    def activation(self, z: np.ndarray) -> np.ndarray:
-        """The sigmoid function."""
-        return 1.0/(1.0+np.exp(-z))
+    def sigmoid_prime(self, z: np.ndarray) -> np.ndarray:
+        sig = self.sigmoid(z)
+        return self.beta * sig * (1 - sig)
 
-    def activation_prime(self, z: np.ndarray) -> np.ndarray:
-        """Derivative of the sigmoid function."""
-        return self.activation(z)*(1-self.activation(z))
+    def tanh(self, z: np.ndarray) -> np.ndarray:
+        return np.tanh(self.beta * z)
 
-def str_to_activation_function(activation_function_str: str) -> ActivationFunction:
-    if activation_function_str == 'sigmoid':
-        return Sigmoid()
-    else:
-        raise ValueError(f"Unknown activation function: {activation_function_str}")
+    def tanh_prime(self, z: np.ndarray) -> np.ndarray:
+        return self.beta * (1 - np.tanh(self.beta * z) ** 2)
 
+    def relu(self, z: np.ndarray) -> np.ndarray:
+        return np.maximum(0, z)
 
+    def relu_prime(self, z: np.ndarray) -> np.ndarray:
+        return np.where(z >= 0, 1, 0)

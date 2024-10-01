@@ -1,14 +1,11 @@
-### EJ3 XOR
-
-```json
 {
     "problem": {
-        "type": "xor",
-        "data": "../res/ej3/xor.txt",
-        "output": "output/ej3/xor.csv"
+        "type": "parity",
+        "data": "../res/ej3/TP3-ej3-digitos.txt",
+        "output": "output/ej3/parity.csv"
     },
     "network": {
-        "topology": [2,2,1],
+        "topology": [35,10,1],
         "activation_function": {
             "method": "sigmoid",
             "beta": 1
@@ -26,6 +23,4 @@
     }
   
 }
-```
 
-### EJ3 Parity
