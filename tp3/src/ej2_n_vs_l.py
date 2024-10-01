@@ -5,8 +5,8 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, median_absolute_error
 import matplotlib.pyplot as plt
 
-from perceptron.perceptron_non_linear import PerceptronNonLinear
-from perceptron.perceptron_linear import PerceptronLinear
+from models.perceptrons.perceptron_non_linear import PerceptronNonLinear
+from models.perceptrons.perceptron_linear import PerceptronLinear
 
 # Cargar datos
 data = pd.read_csv('../res/TP3-ej2-conjunto.csv')

@@ -12,6 +12,7 @@ openpyxl = "*"
 scipy = "*"
 imageio = "*"
 seaborn = "*"
+tensorflow = "*"
 
 [dev-packages]
 

@@ -1,8 +1,5 @@
 import numpy as np
 from typing import Callable
-import sys
-import math
-## Fue copiado exactamente de las presentaciones.
 
 class PerceptronBase:
     def __init__(self,seed, num_features,  weights=None, learning_rate = 0.01, epsilon: float = 1e-5) -> None:

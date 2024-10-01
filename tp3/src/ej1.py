@@ -7,7 +7,7 @@ import imageio.v2 as imageio
 from io import BytesIO
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
 from sklearn.model_selection import KFold
-from perceptron.perceptron_simple import PerceptronSimple
+from models.perceptrons.perceptron_simple import PerceptronSimple
 
 def transform_features(X):
     z = X[:, 0] * X[:, 1]
@@ -206,13 +206,13 @@ def main():
 
     evaluate_classification(y_selected, y_pred, selected_function)
 
-    with imageio.get_writer('perceptron_training_2d_projected.gif', mode='I', duration=0.5) as writer_2d:
+    with imageio.get_writer('./output/ej1/perceptron_training_2d_projected.gif', mode='I', duration=0.5) as writer_2d:
         for epoch, weights in enumerate(perceptron.weights_history):
             img_data = plot_2d_projected_decision_boundary(weights, X_logical, y_selected, epoch, config_file)
             image = imageio.imread(img_data)
             writer_2d.append_data(image)
 
-    with imageio.get_writer('perceptron_training_3d_boundary.gif', mode='I', duration=0.5) as writer_3d:
+    with imageio.get_writer('./output/ej1/perceptron_training_3d_boundary.gif', mode='I', duration=0.5) as writer_3d:
         for epoch, weights in enumerate(perceptron.weights_history):
             img_data2 = plot_3d_decision_boundary(weights, X_transformed, y_selected, epoch, config_file)
             image2 = imageio.imread(img_data2)

@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable
-from perceptron.perceptron_base import PerceptronBase
+from models.perceptrons.perceptron_base import PerceptronBase 
 
 class PerceptronLinear(PerceptronBase):
     
@@ -16,10 +16,7 @@ class PerceptronLinear(PerceptronBase):
     def compute_error(self, expected, actual):
         error = 0
         for i in range(len(expected)):
-            #string  = "Expected: " + str(expected[i]) + " Actual: " + str(actual[i]) + " Error: " + str((expected[i] - actual[i])**2)
-            #print(i, string)
             error += (expected[i] - actual[i])**2
 
-        #print("Error: ", error/len(expected))
         return error/len(expected)
             
