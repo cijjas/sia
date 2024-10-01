@@ -1,0 +1,6 @@
+{
+    "epochs": 1000,
+    "learning_rate": 0.01,
+    "epsilon": 1e-5,
+    "seed": 42
+}

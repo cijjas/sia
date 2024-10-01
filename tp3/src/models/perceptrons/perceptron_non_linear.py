@@ -1,7 +1,6 @@
 import numpy as np
 from typing import Callable
-from perceptron.perceptron_base import PerceptronBase
-
+from models.perceptrons.perceptron_base import PerceptronBase
 
 def stable_sigmoid(x, beta):
     return 1 / (1 + np.exp(-beta * x))

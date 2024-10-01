@@ -22,13 +22,16 @@ import numpy as np
 from typing import Optional
 import json
 
-# Persistence Strategi
+from activation_function import ActivationFunction, Sigmoid, str_to_activation_function
+
+from optimizer import Optimizer
 R_XOR_JSON = "xor.json"
 RESULTS_DIR = "../results"
+PATH_TO_CONFIG = "../../config"
 
 class MultilayerPerceptron(object):
 
-    def __init__(self, sizes):
+    def __init__(self, sizes:list[int], activationFunction: ActivationFunction, optimizer:Optimizer):
         """The list ``sizes`` contains the number of neurons in the
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -44,15 +47,17 @@ class MultilayerPerceptron(object):
         self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights: list[np.ndarray] = [np.random.randn(y, x)
                                           for x, y in zip(sizes[:-1], sizes[1:])]
+        self.activationFunction = activationFunction
+        self.optimizer = optimizer
 
     def feedforward(self, a:np.ndarray) -> np.ndarray:
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
-            a = sigmoid(np.dot(w, a)+b)
+            a = self.activationFunction.activation(np.dot(w, a)+b)
             #print(f"b: {b}, w: {w}, a: {a}")
         return a
 
-    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float,
+    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float, epsilon: float,
             test_data: Optional[list[tuple[np.ndarray, int]]] = None) -> None:
         # Optional is from python 2.7, it is used to indicate that a parameter is optional
         # Here in python 3 we can use the optional this way: Optional[type]
@@ -75,7 +80,7 @@ class MultilayerPerceptron(object):
                 self.update_mini_batch(mini_batch, eta)
             if test_data is not None:
                 print("Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test))
+                    j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
             else:
                 print("Epoch {0} complete".format(j))
 
@@ -90,44 +95,42 @@ class MultilayerPerceptron(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
+        self.weights, self.biases = self.optimizer.update(self.weights, self.biases, nabla_w, nabla_b, len(mini_batch))
 
-    def backprop(self, x:np.ndarray, y:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
+
+    def backprop(self, predicted:np.ndarray, expected:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
         gradient for the cost function C_x.  ``nabla_b`` and
         ``nabla_w`` are layer-by-layer lists of numpy arrays, similar
         to ``self.biases`` and ``self.weights``."""
         nabla_b: list[np.ndarray] = [np.zeros(b.shape) for b in self.biases]
         nabla_w: list[np.ndarray] = [np.zeros(w.shape) for w in self.weights]
-        # Feedforward
-        activation: np.ndarray = x
+        # feedforward
+        activation: np.ndarray = predicted
         # activations is a list of arrays, where each array is the activations of the neurons in that layer
-        activations: list[np.ndarray] = [x] # list to store all the activations, layer by layer
+        activations: list[np.ndarray] = [predicted] # list to store all the activations, layer by layer
         zs: list[np.ndarray] = [] # list to store all the z vectors, layer by layer
         # Feed Foward that stores the values of the activations for later usage
         for b, w in zip(self.biases, self.weights):
             z: np.ndarray = np.dot(w, activation) + b
             zs.append(z)
-            activation = sigmoid(z)
+            activation = self.activationFunction.activation(z)
             activations.append(activation)
         # Backpropagation
         # Last layer needs special treatment
-        delta: np.ndarray = self.cost_derivative(activations[-1], y) * sigmoid_prime(zs[-1])
+        delta: np.ndarray = self.cost_derivative(activations[-1], expected) * self.activationFunction.activation_prime(zs[-1])
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].T)
         # Now we go from the second to last to the input layer
         for l in range(2, self.num_layers):
             z: np.ndarray = zs[-l]
-            sp: np.ndarray = sigmoid_prime(z)
+            sp: np.ndarray = self.activationFunction.activation_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def evaluate(self, test_data: list[tuple[np.ndarray, int]], test_results: list[tuple[int, int]] = None) -> int:
+    def evaluate(self, test_data: list[tuple[np.ndarray, int]], epsilon: float, test_results: list[tuple[int, int]] = None) -> int:
         """Return the number of test inputs for which the neural
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
@@ -144,12 +147,9 @@ class MultilayerPerceptron(object):
 
         # test_results: list[tuple[int, int]] = [(np.argmax(self.feedforward(x)), y)
         #                for (x, y) in test_data]
-
         test_results: list[tuple[int, int]] = [(self.feedforward(x), y)
                         for (x, y) in test_data]
 
-        # print(test_results)
-        epsilon = 0.01
         a = sum(
             int(np.all(np.abs(x - y) < epsilon))
             for (x, y) in test_results
@@ -161,15 +161,6 @@ class MultilayerPerceptron(object):
         partial a for the output activations."""
         return (output_activations-y)
 
-#### Miscellaneous functions
-def sigmoid(z: np.ndarray) -> np.ndarray:
-    """The sigmoid function."""
-    return 1.0/(1.0+np.exp(-z))
-
-def sigmoid_prime(z: np.ndarray) -> np.ndarray:
-    """Derivative of the sigmoid function."""
-    return sigmoid(z)*(1-sigmoid(z))
-
 ################################################################################################################################################
 
 # Exercise 1
@@ -180,28 +171,146 @@ def logic_xor():
 
     # Se crea una red neuronal con 2 neuronas de entrada, 2 neuronas en la capa
     # oculta y 1 neurona de salida.
-    net = MultilayerPerceptron([2, 2, 1])
+    net = MultilayerPerceptron([2, 2, 1], Sigmoid, MiniBatchGradientDescent(0.1))
 
     # Se entrena la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente. Se utilizan 1000 épocas y un tamaño de mini-lote
     # de 4.
 
-    net.fit(test_data, 10000, 4, 8) # learning rate is divided by the mini_batch_update
+    epochs = 1000
+
+    net.fit(list(zip(X_logical, y_selected)), epochs, 4, 8, 0.01) # learning rate is divided by the mini_batch_update
+    net.fit(test_data, 1000, 4, 8, 0.01) # learning rate is divided by the mini_batch_update
 
     # Se evalúa la red neuronal con los datos de entrada y salida esperada
     # definidos anteriormente.
 
     test_results = []
+
+    test_data = list(zip(X_logical, y_selected))
+
     print(f"Accuracy: {net.evaluate(test_data, test_results)}")
 
     # Se guardan los pesos y sesgos de la red neuronal en un archivo JSON.
     weights = net.weights
     biases = net.biases
 
-    # persist_results(f"{RESULTS_DIR}/{R_XOR_JSON}", weights, biases, test_results, epochs)
+    persist_results(f"{RESULTS_DIR}/{R_XOR_JSON}", weights, biases, test_results, epochs)
 
 # Exercise 2
-def parity():
+def numberIdentifier():
+    x = np.array([
+    # 0
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [1], [1],
+     [1], [0], [1], [0], [1],
+     [1], [1], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    # 1
+    [[0], [0], [1], [0], [0],
+     [0], [1], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [0], [1], [0], [0],
+     [0], [1], [1], [1], [0]],
+    # 2
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [0], [0], [0], [0], [1],
+     [0], [0], [1], [1], [0],
+     [0], [1], [0], [0], [0],
+     [1], [0], [0], [0], [1],
+     [1], [1], [1], [1], [1]],
+    # 3
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [0], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    # 4
+    [[0], [0], [0], [1], [0],
+     [0], [0], [1], [1], [0],
+     [0], [1], [0], [1], [0],
+     [1], [0], [0], [1], [0],
+     [1], [1], [1], [1], [1],
+     [0], [0], [0], [1], [0],
+     [0], [0], [0], [1], [0]],
+    # 5
+    [[1], [1], [1], [1], [1],
+     [1], [0], [0], [0], [0],
+     [1], [0], [0], [0], [0],
+     [1], [1], [1], [1], [0],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    # 6
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [0],
+     [1], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    # 7
+    [[1], [1], [1], [1], [1],
+     [0], [0], [0], [0], [1],
+     [0], [0], [0], [1], [0],
+     [0], [0], [1], [0], [0],
+     [0], [1], [0], [0], [0],
+     [1], [0], [0], [0], [0],
+     [1], [0], [0], [0], [0]],
+    # 8
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    # 9
+    [[0], [1], [1], [1], [0],
+     [1], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [1],
+     [0], [0], [0], [0], [1],
+     [1], [0], [0], [0], [1],
+     [0], [1], [1], [1], [0]],
+    ])
+
+    # Output data (even = 0, odd = 1)
+    y = np.array([
+        [0],  # 0 is even
+        [1],  # 1 is odd
+        [0],  # 2 is even
+        [1],  # 3 is odd
+        [0],  # 4 is even
+        [1],  # 5 is odd
+        [0],  # 6 is even
+        [1],  # 7 is odd
+        [0],  # 8 is even
+        [1],  # 9 is odd
+    ])
+
+    test_data = list(zip(x, y))
+
+    # Our logic which the net probably doesnt follow is taking the 35 bits as input
+    # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
+    # Last layer simply activates with the neurons that represent the even numbers
+
+    optimizer = Optimizer(method="adam", eta=0.01)
+    net = MultilayerPerceptron([35, 10, 1], Sigmoid, optimizer=optimizer)
+    net.fit(test_data, 1400, 4, 5, 0.01) # ! learning rate is divided by the mini_batch_update
+
+    print(f"Accuracy: {net.evaluate(test_data=test_data, epsilon=0.01)}")
+    return 1
+
+# Exercise 3
+def numberIdentifier():
     x = np.array([
     # 0
     [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [1], [1], [0], [1], [0], [1], [1], [1], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
@@ -232,137 +341,28 @@ def parity():
 
     test_data = list(zip(x, y))
 
+    with open(f"{PATH_TO_CONFIG}/ej3_paridad.json", "r") as f:
+        config = json.load(f)
+
+    activation_function = config.get('activation_function')
+    optimizer = config.get('optimizer')
+    epsilon = config.get('epsilon')
+
     # Our logic which the net probably doesnt follow is taking the 35 bits as input
     # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
-    # Last layer simply activates taking into account only the neurons that represent the even numbers
-    net = MultilayerPerceptron([35, 10, 1])
-    net.fit(test_data, 2000, 4, 5) # ! learning rate is divided by the mini_batch_update
+    # Last layer simply activates with the neurons that represent the even numbers
+    optimizer = Optimizer(method="adam", eta=0.01)
+    net = MultilayerPerceptron([35, 10, 1], str_to_activation_function(activation_function), optimizer=optimizer)
+    net.fit(test_data, config.get('epochs'), config.get('k'), config.get('learning_rate'), epsilon) # ! learning rate is divided by the mini_batch_update
 
-    print(f"Accuracy: {net.evaluate(test_data)}")
+    print(f"Accuracy: {net.evaluate(test_data, epsilon)}")
     return 1
-
-# Exercise 3
-def number_identifier_2():
-    x = np.array([
-    # 0
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [1], [1], [0], [1], [0], [1], [1], [1], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 1
-    [[0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [0]],
-    # 2
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [1], [1], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [1], [1], [1]],
-    # 3
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 4
-    [[0], [0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [0], [1], [0], [1], [0], [0], [1], [0], [1], [1], [1], [1], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0]],
-    # 5
-    [[1], [1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 6
-    [[0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
-    # 7
-    [[1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
-    # 8
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 9
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [1], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    ])
-
-    y = np.array([
-        [[1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
-        [[0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
-        [[0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
-        [[0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0]],
-        [[0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0]],
-        [[0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0]],
-        [[0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0]],
-        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0]],
-        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0]],
-        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1]],
-    ])
-
-    test_data = list(zip(x, y))
-
-    net = MultilayerPerceptron([35, 10])
-    net.fit(test_data, 2000, 4, 5) # ! learning rate is divided by the mini_batch_update
-
-    print(f"Accuracy: {net.evaluate(test_data)}")
-    return 1
-
-# Exercise 3
-def number_identifier_2():
-    x = np.array([
-    # 0
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [1], [1], [0], [1], [0], [1], [1], [1], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 1
-    [[0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [0]],
-    # 2
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [1], [1], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [1], [1], [1], [1], [1]],
-    # 3
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 4
-    [[0], [0], [0], [1], [0], [0], [0], [1], [1], [0], [0], [1], [0], [1], [0], [1], [0], [0], [1], [0], [1], [1], [1], [1], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0]],
-    # 5
-    [[1], [1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0], [1], [1], [1], [1], [0], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 6
-    [[0], [1], [1], [1], [0], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
-    # 7
-    [[1], [1], [1], [1], [1], [0], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [1], [0], [0], [0], [0], [1], [0], [0], [0], [0]],
-    # 8
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    # 9
-    [[0], [1], [1], [1], [0], [1], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [1], [0], [0], [0], [0], [1], [1], [0], [0], [0], [1], [0], [1], [1], [1], [0]],
-    ])
-
-    y = np.array([
-        [0],  [0.1],  [0.2],  [0.3],  [0.4],  [0.5],  [0.6],  [0.7],  [0.8],  [0.9],
-    ])
-
-    test_data = list(zip(x, y))
-
-    net = MultilayerPerceptron([35, 10, 1])
-    net.fit(test_data, 2000, 4, 5) # ! learning rate is divided by the mini_batch_update
-
-    print(f"Accuracy: {net.evaluate(test_data)}")
-    return 1
-
-# Exercise 4
-
-# Loading the MNIST dataset and adapting it for the neural network
-def prepare_mnist_data():
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-
-    # Normalizing the input data
-    # The reshaping is to flatten out the matrix thats originally 28*28 and we want the 768 elements in one column
-    # The division normalizes each pixel which has a value between 0 and 255, into a value between 0 and 1
-    x_train = x_train.reshape(-1, 28*28).astype('float32') / 255
-    x_test = x_test.reshape(-1, 28*28).astype('float32') / 255
-
-    # This takes the expected output which is simply the integer and translates it into a the 10 elements version
-    # So for example, if y_train[i] = 3, it replaces it with [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-    # Inputting y train which is an array simply does the same operation for all the values in the array
-    y_train = np.eye(10)[y_train]
-    y_test = np.eye(10)[y_test]
-
-    # Reshaping the data so it is coherent with how the network expects it
-    training_data = [(x.reshape(784, 1), y.reshape(10, 1)) for x, y in zip(x_train, y_train)]
-    test_data = [(x.reshape(784, 1), y.reshape(10, 1)) for x, y in zip(x_test, y_test)]
-
-    return training_data, test_data
-
-def mnist_classifier():
-    training_data, test_data = prepare_mnist_data()
-
-    net = MultilayerPerceptron([784, 30, 10])
-
-    net.fit(training_data, epochs=30, mini_batch_size=10, eta=15, test_data=test_data)
-
-    accuracy = net.evaluate(test_data)
-    print(f"Accuracy: {accuracy} / {len(test_data)}")
 
 
 ################################################################################################################################################
 
 if __name__ == "__main__":
-    mnist_classifier()
+    numberIdentifier()
 
 ################################################################################################################################################
 
