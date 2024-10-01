@@ -1,15 +1,15 @@
 import numpy as np
 
 class Optimizer:
-    def __init__(self, method="gradient_descent", eta=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8):
+    def __init__(self, method="gradient_descent", eta=0.01, beta1=0.9, beta2=0.999, epsilon=1e-8, m=None, v=None, t=0):
         self.method = method
         self.eta = eta 
         self.beta1 = beta1  
         self.beta2 = beta2  
         self.epsilon = epsilon  
-        self.m = None  
-        self.v = None  
-        self.t = 0  
+        self.m = m
+        self.v = v  
+        self.t = t  
 
 
     def update(self, weights, biases, grads_w, grads_b, mini_batch_size):
