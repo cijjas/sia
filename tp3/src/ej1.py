@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import imageio.v2 as imageio
 from io import BytesIO
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.model_selection import KFold
 from models.perceptrons.perceptron_simple import PerceptronSimple
-from utils.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 def transform_features(X):
     z = X[:, 0] * X[:, 1]
     return np.column_stack((X, z))
 
+from mpl_toolkits.mplot3d import Axes3D
 
 def plot_3d_decision_boundary(weights, X, y, epoch, config):
     fig = plt.figure()
@@ -119,10 +121,10 @@ def plot_perceptron(weights, X, y, epoch, config, grid_range=3):
 
 def evaluate_classification(y_true, y_pred, title):
     cm = confusion_matrix(y_true, y_pred)
-    accuracy = accuracy_score(cm)
-    precision = precision_score(cm, average='binary')
-    recall = recall_score(cm, average='binary')
-    f1 = f1_score(cm, average='binary')
+    accuracy = accuracy_score(y_true, y_pred)
+    precision = precision_score(y_true, y_pred, average='binary')
+    recall = recall_score(y_true, y_pred, average='binary')
+    f1 = f1_score(y_true, y_pred, average='binary')
     
     print(f"Classification Report for {title}:")
     print(f"Accuracy: {accuracy:.2f}")
@@ -131,7 +133,7 @@ def evaluate_classification(y_true, y_pred, title):
     print(f"F1 Score: {f1:.2f}")
     
     plt.figure(figsize=(6, 4))
-    sns.heatmap(cm, annot=True, fmt='.2f', cmap='Blues', cbar=False)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False)
     plt.title(f'Confusion Matrix - {title}')
     plt.xlabel('Predicted')
     plt.ylabel('Actual')
@@ -139,25 +141,13 @@ def evaluate_classification(y_true, y_pred, title):
 
 def cross_validate(X, y, config, n_splits=2):
     print(f"Performing {n_splits}-Fold Cross Validation...")
-    
-    # Shuffle the data
-    indices = np.arange(X.shape[0])
-    np.random.shuffle(indices)
-    X, y = X[indices], y[indices]
-    
-    # Split the data into k folds
-    fold_size = X.shape[0] // n_splits
-    folds = [(X[i*fold_size:(i+1)*fold_size], y[i*fold_size:(i+1)*fold_size]) for i in range(n_splits)]
-    
+    kfold = KFold(n_splits=n_splits, shuffle=True)
     accuracy_list, precision_list, recall_list, f1_list = [], [], [], []
 
-    for i in range(n_splits):
-        # Create training and validation sets
-        X_test, y_test = folds[i]
-        X_train = np.vstack([folds[j][0] for j in range(n_splits) if j != i])
-        y_train = np.hstack([folds[j][1] for j in range(n_splits) if j != i])
+    for train_index, test_index in kfold.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
 
-        # Initialize and train the perceptron
         perceptron = PerceptronSimple(
             seed=config.get('seed', 42),
             num_features=X_train.shape[1],
@@ -168,14 +158,11 @@ def cross_validate(X, y, config, n_splits=2):
         perceptron.train(X_train, y_train, config.get('epochs', 50))
         y_pred = perceptron.predict(X_test)
 
-        # Collect evaluation metrics
-        cm = confusion_matrix(y_test, y_pred)
-        accuracy_list.append(accuracy_score(cm))
-        precision_list.append(precision_score(cm, average='binary'))
-        recall_list.append(recall_score(cm, average='binary'))
-        f1_list.append(f1_score(cm, average='binary'))
+        accuracy_list.append(accuracy_score(y_test, y_pred))
+        precision_list.append(precision_score(y_test, y_pred, average='binary'))
+        recall_list.append(recall_score(y_test, y_pred, average='binary'))
+        f1_list.append(f1_score(y_test, y_pred, average='binary'))
 
-    # Print cross-validation results
     print("\nCross-Validation Results:")
     print(f"Accuracy: {np.mean(accuracy_list):.2f} (+/- {np.std(accuracy_list):.2f})")
     print(f"Precision: {np.mean(precision_list):.2f} (+/- {np.std(precision_list):.2f})")
