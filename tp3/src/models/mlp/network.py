@@ -42,10 +42,9 @@ class MultilayerPerceptron(object):
             np.random.seed(seed)
         self.num_layers: int = len(topology)
         self.topology: list[int] = topology
-        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]]
-        self.weights: list[np.ndarray] = [np.random.randn(y, x)
-                                          for x, y in zip(topology[:-1], topology[1:])]
-        self.activation_function = activation_function
+        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]] # crea vector de bias para cada capa
+        self.weights: list[np.ndarray] = [np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])] # crea matriz de pesos para cada lazo
+        self.activation_function = activation_function 
         self.optimizer = optimizer
 
     def feedforward(self, a: np.ndarray) -> np.ndarray:
@@ -77,6 +76,8 @@ class MultilayerPerceptron(object):
             if test_data is not None:
                 print("Epoch {0}: {1} / {2}".format(
                     j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
+            else:
+                print("Epoch {0} complete".format(j))
             
 
     def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
@@ -145,7 +146,6 @@ class MultilayerPerceptron(object):
         #                for (x, y) in test_data]
         test_results: list[tuple[int, int]] = [(self.feedforward(x), y)
                         for (x, y) in test_data]
-        print(f"test_results: {test_results}")
         a = sum(
             int(np.all(np.abs(x - y) < epsilon))
             for (x, y) in test_results
