@@ -1,31 +1,16 @@
-from models.mlp.network import MultilayerPerceptron
+from tp3.src.models.mlp.network_naked import MultilayerPerceptron
 from utils.activation_function import ActivationFunction
 from utils.optimizer import Optimizer
 import numpy as np
 import os
 import json
 import sys
-from typing import NamedTuple, Optional
+from utils.config import Config
 
 RESULTS_DIR="output/ej3"
 XOR_FILE = "xor.json"
 PARITY_FILE = "parity.json"
 DIGIT_FILE = "digit.json"
-
-class Config(NamedTuple):
-    type: Optional[str] = None
-    data: Optional[str] = None
-    output: Optional[str] = None
-    topology: Optional[list] = None
-    activation_function: Optional[ActivationFunction] = None
-    optimizer: Optional[Optimizer] = None
-    epochs: Optional[int] = None
-    mini_batch_size: Optional[int] = None
-    learning_rate: Optional[float] = None
-    epsilon: Optional[float] = None
-    seed: Optional[int] = None
-
-
 
 def convert_file_to_numpy(file_path: str, bits_per_element: int) -> np.ndarray:
     with open(file_path, 'r') as file:
@@ -67,7 +52,8 @@ def logic_xor(config: Config):
     test_results: list[tuple[int, int]] = []
 
     net.fit(
-        training_data=training_data,
+        X_train=X_logical,
+        Y_train=y_selected,
         epochs=config.epochs, 
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate, 
@@ -201,38 +187,7 @@ def main():
         print("Usage: python script.py <config_file>")
         sys.exit(1)
 
-    with open(sys.argv[1], 'r') as file:
-        data = json.load(file)
-
-  
-
-    config = Config(
-        type=data['problem'].get("type", None),  # Uses None if 'type' is missing
-        data=data['problem'].get("data", None),
-        output=data['problem'].get("output", None),
-        topology=data['network'].get('topology', None),
-        activation_function=ActivationFunction(
-            method=data['network']['activation_function'].get('method', None),
-            beta=data['network']['activation_function'].get('beta', None)
-        ),
-        optimizer=Optimizer(
-            method=data['network']['optimizer'].get('method', None),
-            eta=data['training'].get('learning_rate', None), # nasty sori
-            beta1=data['network']['optimizer'].get('beta1', None),
-            beta2=data['network']['optimizer'].get('beta2', None),
-            epsilon=data['network']['optimizer'].get('epsilon', None),
-            m=data['network']['optimizer'].get('m', None),
-            v=data['network']['optimizer'].get('v', None),
-            t=data['network']['optimizer'].get('t', None)
-        ),
-        epochs=data['training'].get('epochs', None),
-        mini_batch_size=data['training'].get('mini_batch_size', None),
-        learning_rate=data['training'].get('learning_rate', None),
-        epsilon=data['training'].get('epsilon', None),
-        seed=data['training'].get('seed', None)
-    )
-
-
+    config = Config().read_config(sys.argv[1])
 
     # Now you can use these NamedTuple instances in your logic
     if config.type == "xor":

@@ -1,0 +1,24 @@
+{
+    "problem": {
+        "type": "mnist_digits",
+        "data": "../res/ej4/xor.txt",
+        "output": "output/ej4/xor.csv"
+    },
+    "network": {
+        "topology": [784,30, 30,10],
+        "activation_function": {
+            "method": "relu"
+        },
+        "optimizer": {
+            "method": "gradient_descent"
+        }
+    },
+    "training": {
+        "seed": 23,
+        "epochs": 1000,
+        "mini_batch_size": 4,
+        "learning_rate": 8,
+        "epsilon": 0.01
+    }
+  
+}
