@@ -42,9 +42,8 @@ class MultilayerPerceptron(object):
             np.random.seed(seed)
         self.num_layers: int = len(topology)
         self.topology: list[int] = topology
-        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]]
-        self.weights: list[np.ndarray] = [np.random.randn(y, x)
-                                          for x, y in zip(topology[:-1], topology[1:])]
+        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]] # crea vector de bias para cada capa
+        self.weights: list[np.ndarray] = [np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])] # crea matriz de pesos para cada lazo
         self.activation_function = activation_function
         self.optimizer = optimizer
 
@@ -83,6 +82,8 @@ class MultilayerPerceptron(object):
                 else:
                     print("Epoch {0}: {1} / {2}".format(
                         j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
+            else:
+                print("Epoch {0} complete".format(j))
             
 
     def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
@@ -97,10 +98,10 @@ class MultilayerPerceptron(object):
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         self.weights, self.biases = self.optimizer.update(
-            weights=self.weights, 
-            biases=self.biases, 
-            grads_w=nabla_w, 
-            grads_b=nabla_b, 
+            weights=self.weights,
+            biases=self.biases,
+            grads_w=nabla_w,
+            grads_b=nabla_b,
             mini_batch_size=len(mini_batch)
         )
 
@@ -151,7 +152,6 @@ class MultilayerPerceptron(object):
         #                for (x, y) in test_data]
         test_results: list[tuple[int, int]] = [(self.feedforward(x), y)
                         for (x, y) in test_data]
-        print(f"test_results: {test_results}")
         a = sum(
             int(np.all(np.abs(x - y) < epsilon))
             for (x, y) in test_results
@@ -162,4 +162,3 @@ class MultilayerPerceptron(object):
         """Return the vector of partial derivatives partial C_x
         partial a for the output activations."""
         return (output_activations-y)
-

@@ -13,6 +13,8 @@ class ActivationFunction:
             return self.tanh, self.tanh_prime
         elif self.method == "relu":
             return self.relu, self.relu_prime
+        elif self.method == "softmax":
+            return self.softmax, self.softmax_prime
         else:
             raise ValueError(f"Unknown activation function: {self.method}")
 
@@ -34,3 +36,10 @@ class ActivationFunction:
 
     def relu_prime(self, z: np.ndarray) -> np.ndarray:
         return np.where(z >= 0, 1, 0)
+
+    def softmax(self, z: np.ndarray) -> np.ndarray:
+        exps = np.exp(z - np.max(z, axis=-1, keepdims=True))  
+        return exps / np.sum(exps, axis=-1, keepdims=True) 
+    
+    def softmax_prime(self, z: np.ndarray) -> np.ndarray:
+        return self.softmax(z) 
