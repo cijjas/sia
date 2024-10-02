@@ -54,7 +54,8 @@ class MultilayerPerceptron(object):
             a = self.activation_function.activation(np.dot(w, a) + b)
         return a
 
-    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float, epsilon: float, test_data: Optional[list[tuple[np.ndarray, int]]] = None) -> None:
+    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float, 
+            epsilon: float, test_data: Optional[list[tuple[np.ndarray, int]]] = None, test_results:list[tuple[int, int]] = None) -> None:
         # Optional is from python 2.7, it is used to indicate that a parameter is optional
         # Here in python 3 we can use the optional this way: Optional[type]
         """Train the neural network using mini-batch stochastic
@@ -75,8 +76,13 @@ class MultilayerPerceptron(object):
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
             if test_data is not None:
-                print("Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
+                if test_results is not None:
+                    test_result = []
+                    self.evaluate(test_data=test_data, epsilon=epsilon, test_results=test_result)
+                    test_results.append(test_result)
+                else:
+                    print("Epoch {0}: {1} / {2}".format(
+                        j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
             
 
     def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:

@@ -7,6 +7,11 @@ import json
 import sys
 from typing import NamedTuple, Optional
 
+RESULTS_DIR="output/ej3"
+XOR_FILE = "xor.json"
+PARITY_FILE = "parity.json"
+DIGIT_FILE = "digit.json"
+
 class Config(NamedTuple):
     type: Optional[str] = None
     data: Optional[str] = None
@@ -57,13 +62,21 @@ def logic_xor(config: Config):
         optimizer=config.optimizer
     )
 
+    test_data = list(zip(X_logical, y_selected))
+
+    test_results: list[tuple[int, int]] = []
+
     net.fit(
         training_data=training_data,
         epochs=config.epochs, 
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate, 
-        epsilon=config.epsilon
+        epsilon=config.epsilon,
+        test_data=test_data,
+        test_results=test_results
     )
+
+    persist_results(f'{RESULTS_DIR}/{XOR_FILE}', net.weights, net.biases, test_results, config.epochs)
 
     print(f"Accuracy: {net.evaluate(test_data=training_data, epsilon=config.epsilon)}")
 
@@ -93,17 +106,22 @@ def parity(config: Config):
         activation_function=config.activation_function,
         optimizer=config.optimizer
     )
+
+    test_results: list[tuple[int, int]] = []
+
     net.fit(
         training_data=training_data,
         epochs=config.epochs,
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate,
-        epsilon=config.epsilon
+        epsilon=config.epsilon,
+        test_data=training_data,
+        test_results=test_results
         ) # ! learning rate is divided by the mini_batch_update
+    
+    persist_results(f'{RESULTS_DIR}/{PARITY_FILE}', net.weights, net.biases, test_results, config.epochs)
 
-    print(f"Accuracy: {net.evaluate(
-        test_data=training_data, 
-        epsilon=config.epsilon)}")
+    print(f"Accuracy: {net.evaluate(test_data=training_data, epsilon=config.epsilon)}")
     return 1
 
 
@@ -148,26 +166,30 @@ def number_identifier(config: Config):
 
 ################################################################################################################################################
 
-def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.ndarray], test_results: list[tuple[int, int]], epochs: int) -> None:
-    # create directory if it does not exist
+def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.ndarray], test_results: list[list[tuple[np.ndarray, np.ndarray]]], epochs: int) -> None:
+    # Create directory if it does not exist
     if not os.path.exists(RESULTS_DIR):
         os.makedirs(RESULTS_DIR)
 
-    import json
+    def convert_test_results(test_results):
+        # Convert numpy arrays to lists and unwrap single-element arrays
+        def unwrap(array):
+            if array.size == 1:
+                return array.item()
+            else:
+                return array.tolist()
+        
+        return [[(unwrap(pred), unwrap(true)) for pred, true in epoch] for epoch in test_results]
+
     data = {
         "weights": [w.tolist() for w in weights],
         "biases": [b.tolist() for b in biases],
-        "test_results": {
-            "actual": [x.tolist() for x, y in test_results],
-            "expected" : [y.tolist() for x, y in test_results]
-        },
+        "test_results": convert_test_results(test_results),
         "epochs": epochs
     }
+    
     with open(json_file, "w") as f:
-        # dump with indentation
         json.dump(data, f, indent=4)
-
-
 
 
 ################################################################################################################################################
