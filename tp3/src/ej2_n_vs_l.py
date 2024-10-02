@@ -33,10 +33,7 @@ def main():
     beta = 2.0
     num_epochs = 1000
 
-    for i in range(n_splits):
-        test_index = folds[i]
-        train_index = np.concatenate([folds[j] for j in range(n_splits) if j != i])
-        
+    for train_index, test_index in folds.split(X_scaled):
         X_train, X_test = X_scaled[train_index], X_scaled[test_index]
         y_train, y_test = y_scaled[train_index], y_scaled[test_index]
         
