@@ -31,12 +31,13 @@ class PerceptronNonLinear(PerceptronBase):
     }    
 
 
-    def __init__(self, seed, num_features,  weights=None, learning_rate = 0.01, epsilon: float = 1e-5, non_linear_fn ="sigmoid", beta = 0.9) -> None:
+    def __init__(self, seed, num_features,  weights=None, learning_rate = 0.01, epsilon: float = 1e-5, non_linear_fn ="sigmoid", beta = 0.9, beta_learning_rate = 0.1, optimizer:bool=False) -> None:
         self.fn_name = non_linear_fn
         self.fn = self.non_linear_functions[non_linear_fn]
         self.gr = self.non_linear_gradients[non_linear_fn]
         self.beta = beta
-        super().__init__(seed, num_features, weights, learning_rate, epsilon)
+        self.beta_learning_rate = beta_learning_rate
+        super().__init__(seed, num_features, weights, learning_rate, epsilon, optimizer)
 
 
     def compute_activation(self, h_mu):
@@ -50,3 +51,7 @@ class PerceptronNonLinear(PerceptronBase):
         for i in range(len(expected)):
             error += (expected[i] - actual[i])**2
         return error/len(expected)
+    
+    def compute_beta(self, y, o, h):
+        self.beta = self.beta + self.beta_learning_rate * (y - o) * h * self.compute_gradient(h)
+        return 
