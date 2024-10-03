@@ -1,5 +1,5 @@
 import tensorflow as tf
-from models.mlp.network import MultilayerPerceptron
+from models.mlp.network_2 import MultilayerPerceptron
 import numpy as np
 from utils.config import Config
 import sklearn.metrics as metrics

@@ -16,7 +16,7 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 10000,
+        "epochs": 40,
         "mini_batch_size": 4,
         "learning_rate": 8,
         "epsilon": 0.01
