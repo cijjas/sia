@@ -1,24 +1,7 @@
-"""
-network.py
-~~~~~~~~~~
-
-A module to implement the stochastic gradient descent learning
-algorithm for a feedforward neural network.  Gradients are calculated
-using backpropagation.  Note that I have focused on making the code
-simple, easily readable, and easily modifiable.  It is not optimized,
-and omits many desirable features.
-"""
-
-#### Libraries
-# Standard library
 import random
-
-
-# Third-party libraries
 import numpy as np
 from typing import Optional
 from sklearn.metrics import accuracy_score
-
 
 from utils.optimizer import Optimizer
 from utils.activation_function import ActivationFunction
@@ -30,18 +13,25 @@ class MultilayerPerceptron(object):
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
         first layer containing 2 neurons, the second layer 3 neurons,
-        and the third layer 1 neuron.  The biases and weights for the
-        network are initialized randomly, using a Gaussian
-        distribution with mean 0, and variance 1.  Note that the first
-        layer is assumed to be an input layer, and by convention we
-        won't set any biases for those neurons, since biases are only
-        ever used in computing the outputs from later layers."""
+        and the third layer 1 neuron.
+
+        The biases and weights for the network are initialized
+        randomly, using a Gaussian distribution with mean 0, and
+        variance 1.
+
+        Note that the first layer is assumed to be an input layer, and
+        by convention we won't set any biases for those neurons, since
+        biases are only ever used in computing the outputs from later
+        layers."""
+
         if seed is not None:
             np.random.seed(seed)
-        self.num_layers: int = len(topology)
-        self.topology: list[int] = topology
         self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]] # crea vector de bias para cada capa
         self.weights: list[np.ndarray] = [np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])] # crea matriz de pesos para cada lazo
+
+        self.num_layers: int = len(topology)
+        self.topology: list[int] = topology
+
         self.activation_function = activation_function
         self.optimizer = optimizer
 
@@ -51,20 +41,22 @@ class MultilayerPerceptron(object):
             a = self.activation_function.activation(np.dot(w, a) + b)
         return a
 
-    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float, 
+    def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float,
             epsilon: float, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None, test_results:list[tuple[int, int]] = None) -> None:
-        # Optional is from python 2.7, it is used to indicate that a parameter is optional
-        # Here in python 3 we can use the optional this way: Optional[type]
         """Train the neural network using mini-batch stochastic
-        gradient descent.  The ``training_data`` is a list of tuples
-        ``(x, y)`` representing the training inputs and the desired
-        outputs.  The other non-optional parameters are
-        self-explanatory.  If ``test_data`` is provided then the
-        network will be evaluated against the test data after each
-        epoch, and partial progress printed out.  This is useful for
-        tracking progress, but slows things down substantially."""
-        if test_data is not None: n_test = len(test_data)
+        gradient descent.
+
+        The ``training_data`` is a list of tuples ``(x, y)``
+        representing the training inputs and the desired outputs.
+
+        If ``test_data`` is provided then the network will be
+        evaluated against the test data after each epoch, and
+        partial progress printed out. """
+
+        if test_data is not None:
+            n_test = len(test_data)
         n: int = len(training_data)
+
         for j in range(epochs):
             random.shuffle(training_data)
             mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
@@ -82,7 +74,7 @@ class MultilayerPerceptron(object):
                         j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
             else:
                 print("Epoch {0} complete".format(j))
-            
+
 
     def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
         """Update the network's weights and biases by applying
@@ -152,7 +144,7 @@ class MultilayerPerceptron(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        
+
         # Initialize test_results if it's not provided
         if test_results is None:
             test_results = []
@@ -164,11 +156,11 @@ class MultilayerPerceptron(object):
 
         y_true = [true for _, true in test_results]
         print("True labels:", y_true)
-        
+
         # y_pred rounds the predicted values to the nearest integer
         y_pred = [int(np.round(pred)) for pred, _ in test_results]
         print("Predicted labels:", y_pred)
-        
+
         accuracy = accuracy_score(y_true, y_pred)
         return accuracy
 
@@ -177,7 +169,7 @@ class MultilayerPerceptron(object):
         network outputs the correct result. Note that the neural
         network's output is assumed to be the index of whichever
         neuron in the final layer has the highest activation."""
-        
+
         # Initialize test_results if it's not provided
         if test_results is None:
             test_results = []
@@ -189,13 +181,12 @@ class MultilayerPerceptron(object):
 
         y_true = [true for _, true in test_results]
         #print("True labels:", y_true)
-        
+
         # Assuming the network outputs an array, we can use argmax to find the most activated neuron
         y_pred = [np.argmax(pred) for pred, _ in test_results]
         y_true = [np.argmax(true) for true in y_true]
-        
+
         #print("Predicted labels:", y_pred)
-        
+
         accuracy = accuracy_score(y_true, y_pred)
         return accuracy
-
