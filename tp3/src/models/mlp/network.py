@@ -18,7 +18,7 @@ import random
 import numpy as np
 from typing import Optional
 from sklearn.metrics import accuracy_score
-
+from sklearn.model_selection import KFold
 
 from utils.optimizer import Optimizer
 from utils.activation_function import ActivationFunction
@@ -83,6 +83,50 @@ class MultilayerPerceptron(object):
             else:
                 print("Epoch {0} complete".format(j))
             
+    def fit_with_cross_validation(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, eta: float, mini_batch_size: int,
+                                epsilon: float, n_splits: int, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None,
+                                test_results: list[tuple[int, int]] = None, training_results: list[tuple[int, int]] = None) -> None:
+        kf = KFold(n_splits=n_splits, shuffle=True, random_state=None)
+        
+        for epoch in range(epochs):
+            print(f"Epoch {epoch + 1}/{epochs}")
+            
+            for train_index, val_index in kf.split(training_data):
+                train_set = [training_data[i] for i in train_index]
+                val_set = [training_data[i] for i in val_index]
+                
+                # Shuffle the training set
+                random.shuffle(train_set)
+                
+                # Split the training set into mini-batches
+                mini_batches = [
+                    train_set[k:k + mini_batch_size]
+                    for k in range(0, len(train_set), mini_batch_size)
+                ]
+                
+                # Train on each mini-batch
+                for mini_batch in mini_batches:
+                    self.update_mini_batch(mini_batch, eta)
+                
+                # Evaluate on the validation set
+                #if test_results is not None:
+                #    val_results = []
+                #    self.evaluate(test_data=val_set, epsilon=epsilon, test_results=val_results)
+                #    test_results.append(val_results)
+                #else:
+                #    accuracy = self.evaluate(test_data=val_set, epsilon=epsilon)
+                #    print(f"Validation accuracy: {accuracy}")
+            
+            # Optionally evaluate on the provided test data
+            if test_data is not None:
+                if test_results is not None:
+                    test_result = []
+                    self.evaluate(test_data=test_data, epsilon=epsilon, test_results=test_result)
+                    test_results.append(test_result)
+                else:
+                    accuracy = self.evaluate(test_data=test_data, epsilon=epsilon)
+                    print(f"Test accuracy after epoch {epoch + 1}: {accuracy}")
+
 
     def update_mini_batch(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
         """Update the network's weights and biases by applying
