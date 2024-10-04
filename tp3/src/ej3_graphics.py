@@ -84,6 +84,6 @@ def plot_multi_output_accuracy_vs_epochs(json_file: str, png_name: str):
     plt.close()  # Close the figure to free up memory
 
 if __name__ == "__main__":
-    plot_single_output_accuracy_vs_epochs(XOR_FILE, "xor_accuracy_vs_epochs.png")
-    plot_single_output_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
+    #plot_single_output_accuracy_vs_epochs(XOR_FILE, "xor_accuracy_vs_epochs.png")
+    #plot_single_output_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
     plot_multi_output_accuracy_vs_epochs(NUM_TEST_PREDICTION_FILE, "digit_accuracy_vs_epochs.png")
