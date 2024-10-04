@@ -7,7 +7,7 @@
     "network": {
         "topology": [784,30, 30,10],
         "activation_function": {
-            "method": "relu"
+            "method": "softmax"
         },
         "optimizer": {
             "method": "gradient_descent"
@@ -15,7 +15,7 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 1000,
+        "epochs": 100,
         "mini_batch_size": 4,
         "learning_rate": 8,
         "epsilon": 0.01

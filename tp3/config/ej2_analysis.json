@@ -1,6 +1,8 @@
 {
     "epochs": 1000,
-    "learning_rate": 0.01,
+    "learning_rate": 0.001,
     "epsilon": 1e-5,
+    "non_linear_fn": "sigmoid",
+    "beta": 50,
     "seed": 42
 }
