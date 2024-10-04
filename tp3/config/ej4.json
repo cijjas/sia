@@ -5,9 +5,14 @@
         "output": "output/ej4/xor.csv"
     },
     "network": {
-        "topology": [784,30, 30,10],
+        "topology": [
+            784,
+            30,
+            10
+        ],
         "activation_function": {
-            "method": "softmax"
+            "method": "sigmoid",
+            "beta": 1
         },
         "optimizer": {
             "method": "gradient_descent"
@@ -15,10 +20,9 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 100,
+        "epochs": 30,
         "mini_batch_size": 4,
         "learning_rate": 8,
         "epsilon": 0.01
     }
-  
 }
