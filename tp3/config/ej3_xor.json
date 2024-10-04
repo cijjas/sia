@@ -5,7 +5,11 @@
         "output": "output/ej3/xor.csv"
     },
     "network": {
-        "topology": [2,2,1],
+        "topology": [
+            2,
+            3,
+            1
+        ],
         "activation_function": {
             "method": "sigmoid",
             "beta": 1
@@ -16,11 +20,9 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 20,
+        "epochs": 200,
         "mini_batch_size": 4,
         "learning_rate": 8,
         "epsilon": 0.01
     }
-  
 }
-
