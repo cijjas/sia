@@ -6,9 +6,13 @@ from sklearn.metrics import accuracy_score
 RESULTS_DIR = "output/ej3"
 XOR_FILE = "xor.json"
 PARITY_FILE = "parity.json"
-NUMBER_PREDICTION_FILE = "digit.json"
+NUM_TRAIN_PREDICTION_FILE = "digit_train.json"
+NUM_TEST_PREDICTION_FILE = "test_digit.json"
 
 def plot_single_output_accuracy_vs_epochs(json_file: str, png_name: str):
+    # Create a new figure
+    plt.figure()
+    
     # Load the JSON data
     with open(f'{RESULTS_DIR}/{json_file}', 'r') as f:
         data = json.load(f)
@@ -40,9 +44,13 @@ def plot_single_output_accuracy_vs_epochs(json_file: str, png_name: str):
     plt.title('Accuracy vs Epochs')
     plt.grid(True)
     plt.savefig(f'{RESULTS_DIR}/{png_name}')
-    plt.show()
+    #plt.show()
+    plt.close()  # Close the figure to free up memory
 
 def plot_multi_output_accuracy_vs_epochs(json_file: str, png_name: str):
+    # Create a new figure
+    plt.figure()
+    
     # Load the JSON data
     with open(f'{RESULTS_DIR}/{json_file}', 'r') as f:
         data = json.load(f)
@@ -72,10 +80,10 @@ def plot_multi_output_accuracy_vs_epochs(json_file: str, png_name: str):
     plt.title('Accuracy vs Epochs')
     plt.grid(True)
     plt.savefig(f'{RESULTS_DIR}/{png_name}')
-    plt.show()
+    #plt.show()
+    plt.close()  # Close the figure to free up memory
 
 if __name__ == "__main__":
-    #plot_accuracy_vs_epochs(XOR_FILE, "xor_accuracy_vs_epochs.png")
-    #plot_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
-    plot_multi_output_accuracy_vs_epochs(NUMBER_PREDICTION_FILE, "digit_accuracy_vs_epochs.png")
-
+    plot_single_output_accuracy_vs_epochs(XOR_FILE, "xor_accuracy_vs_epochs.png")
+    plot_single_output_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
+    plot_multi_output_accuracy_vs_epochs(NUM_TEST_PREDICTION_FILE, "digit_accuracy_vs_epochs.png")

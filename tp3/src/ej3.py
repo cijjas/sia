@@ -10,7 +10,8 @@ from utils.config import Config
 RESULTS_DIR="output/ej3"
 XOR_FILE = "xor.json"
 PARITY_FILE = "parity.json"
-DIGIT_FILE = "digit.json"
+DIGIT_TRAIN_FILE = "digit_train.json"
+DIGIT_TEST_FILE = "test_digit.json"
 
 def convert_file_to_numpy(file_path: str, bits_per_element: int) -> np.ndarray:
     with open(file_path, 'r') as file:
@@ -128,6 +129,9 @@ def number_identifier(config: Config):
         [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1]],
     ])
 
+    while len(y) < len(x):
+        y = np.append(y, y, axis=0)
+
     training_data = list(zip(x, y))
 
     net = MultilayerPerceptron(
@@ -154,11 +158,12 @@ def number_identifier(config: Config):
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate,
         epsilon=config.epsilon,
+        #n_splits=config.n_splits,
         test_data=test_data,
         test_results=test_results
     ) # ! learning rate is divided by the mini_batch_update
 
-    persist_results(f'{RESULTS_DIR}/{DIGIT_FILE}', net.weights, net.biases, test_results, config.epochs)
+    persist_results(f'{RESULTS_DIR}/{DIGIT_TEST_FILE}', net.weights, net.biases, test_results, config.epochs)
 
     print(f"Accuracy: {net.evaluate(test_data, epsilon=config.epsilon)}")
     return 1
