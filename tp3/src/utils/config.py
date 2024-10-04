@@ -6,6 +6,7 @@ import json
 class Config(NamedTuple):
     type: Optional[str] = None
     data: Optional[str] = None
+    testing_data: Optional[str] = None
     output: Optional[str] = None
     topology: Optional[list] = None
     activation_function: Optional[ActivationFunction] = None
@@ -24,6 +25,7 @@ class Config(NamedTuple):
         return Config(
             type=data['problem'].get("type", None),  # Uses None if 'type' is missing
             data=data['problem'].get("data", None),
+            testing_data=data['problem'].get("testing_data", None),
             output=data['problem'].get("output", None),
             topology=data['network'].get('topology', None),
             activation_function=ActivationFunction(

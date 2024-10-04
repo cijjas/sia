@@ -1,11 +1,12 @@
 {
     "problem": {
-        "type": "parity",
+        "type": "number_identifier",
         "data": "../res/ej3/TP3-ej3-digitos.txt",
-        "output": "output/ej3/parity.csv"
+        "output": "output/ej3/parity.csv",
+        "testing_data": "../res/ej3/TP3-ej3-noise.txt"
     },
     "network": {
-        "topology": [35,10,1],
+        "topology": [35,10,10],
         "activation_function": {
             "method": "sigmoid",
             "beta": 1
@@ -16,7 +17,7 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 20,
+        "epochs": 100000,
         "mini_batch_size": 4,
         "learning_rate": 8,
         "epsilon": 0.01
