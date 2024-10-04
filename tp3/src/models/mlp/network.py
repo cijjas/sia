@@ -12,14 +12,12 @@ and omits many desirable features.
 #### Libraries
 # Standard library
 import random
-import os
-
 
 
 # Third-party libraries
 import numpy as np
 from typing import Optional
-import json
+from sklearn.metrics import accuracy_score
 
 
 from utils.optimizer import Optimizer
@@ -54,7 +52,7 @@ class MultilayerPerceptron(object):
         return a
 
     def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float, 
-            epsilon: float, test_data: Optional[list[tuple[np.ndarray, int]]] = None, test_results:list[tuple[int, int]] = None) -> None:
+            epsilon: float, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None, test_results:list[tuple[int, int]] = None) -> None:
         # Optional is from python 2.7, it is used to indicate that a parameter is optional
         # Here in python 3 we can use the optional this way: Optional[type]
         """Train the neural network using mini-batch stochastic
@@ -138,27 +136,66 @@ class MultilayerPerceptron(object):
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
 
-    def evaluate(self, test_data: list[tuple[np.ndarray, int]], epsilon: float, test_results: list[tuple[int, int]] = None) -> int:
-        """Return the number of test inputs for which the neural
-        network outputs the correct result. Note that the neural
-        network's output is assumed to be the index of whichever
-        neuron in the final layer has the highest activation."""
-        for (x, y) in test_data:
-            arr: np.ndarray = self.feedforward(x)
-            if test_results is not None:
-                test_results.append((arr, y))
-
-        # test_results: list[tuple[int, int]] = [(np.argmax(self.feedforward(x)), y)
-        #                for (x, y) in test_data]
-        test_results: list[tuple[int, int]] = [(self.feedforward(x), y)
-                        for (x, y) in test_data]
-        a = sum(
-            int(np.all(np.abs(x - y) < epsilon))
-            for (x, y) in test_results
-        )
-        return a
+    def evaluate(self, test_data: list[tuple[np.ndarray, np.ndarray]], epsilon: float, test_results: list[tuple[np.ndarray, np.ndarray]] = None) -> float:
+        if self.topology[-1] == 1:
+            return self.single_output_evaluation(test_data, epsilon, test_results)
+        else:
+            return self.multi_output_evaluation(test_data, epsilon, test_results)
 
     def cost_derivative(self, output_activations: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Return the vector of partial derivatives partial C_x
         partial a for the output activations."""
         return (output_activations-y)
+
+    def single_output_evaluation(self, test_data: list[tuple[np.ndarray, np.ndarray]], epsilon: float, test_results: list[tuple[np.ndarray, np.ndarray]] = None) -> float:
+        """Return the number of test inputs for which the neural
+        network outputs the correct result. Note that the neural
+        network's output is assumed to be the index of whichever
+        neuron in the final layer has the highest activation."""
+        
+        # Initialize test_results if it's not provided
+        if test_results is None:
+            test_results = []
+
+        # Collect predictions and true labels
+        for (x, y) in test_data:
+            arr = self.feedforward(x)
+            test_results.append((arr, y))
+
+        y_true = [true for _, true in test_results]
+        print("True labels:", y_true)
+        
+        # y_pred rounds the predicted values to the nearest integer
+        y_pred = [int(np.round(pred)) for pred, _ in test_results]
+        print("Predicted labels:", y_pred)
+        
+        accuracy = accuracy_score(y_true, y_pred)
+        return accuracy
+
+    def multi_output_evaluation(self, test_data: list[tuple[np.ndarray, np.ndarray]], epsilon: float, test_results: list[tuple[np.ndarray, np.ndarray]] = None) -> float:
+        """Return the number of test inputs for which the neural
+        network outputs the correct result. Note that the neural
+        network's output is assumed to be the index of whichever
+        neuron in the final layer has the highest activation."""
+        
+        # Initialize test_results if it's not provided
+        if test_results is None:
+            test_results = []
+
+        # Collect predictions and true labels
+        for (x, y) in test_data:
+            arr = self.feedforward(x)
+            test_results.append((arr, y))
+
+        y_true = [true for _, true in test_results]
+        #print("True labels:", y_true)
+        
+        # Assuming the network outputs an array, we can use argmax to find the most activated neuron
+        y_pred = [np.argmax(pred) for pred, _ in test_results]
+        y_true = [np.argmax(true) for true in y_true]
+        
+        #print("Predicted labels:", y_pred)
+        
+        accuracy = accuracy_score(y_true, y_pred)
+        return accuracy
+

@@ -6,8 +6,9 @@ from sklearn.metrics import accuracy_score
 RESULTS_DIR = "output/ej3"
 XOR_FILE = "xor.json"
 PARITY_FILE = "parity.json"
+NUMBER_PREDICTION_FILE = "digit.json"
 
-def plot_accuracy_vs_epochs(json_file: str, png_name: str):
+def plot_single_output_accuracy_vs_epochs(json_file: str, png_name: str):
     # Load the JSON data
     with open(f'{RESULTS_DIR}/{json_file}', 'r') as f:
         data = json.load(f)
@@ -41,7 +42,40 @@ def plot_accuracy_vs_epochs(json_file: str, png_name: str):
     plt.savefig(f'{RESULTS_DIR}/{png_name}')
     plt.show()
 
+def plot_multi_output_accuracy_vs_epochs(json_file: str, png_name: str):
+    # Load the JSON data
+    with open(f'{RESULTS_DIR}/{json_file}', 'r') as f:
+        data = json.load(f)
+    
+    # Extract test results
+    test_results = data['test_results']
+    
+    # Calculate accuracy for each epoch
+    accuracies = []
+    for epoch_results in test_results:
+        predicted = [pred for pred, _ in epoch_results]
+        actual = [true for _, true in epoch_results]
+        
+        # For each output, find the index of the max value (predicted label)
+        predicted_labels = [np.argmax(pred) for pred in predicted]
+        actual_labels = [np.argmax(true) for true in actual]
+        
+        # Calculate accuracy
+        accuracy = accuracy_score(actual_labels, predicted_labels)
+        accuracies.append(accuracy)
+    
+    # Plot the accuracy vs epochs
+    epochs = range(1, len(accuracies) + 1)
+    plt.plot(epochs, accuracies, linestyle='-', color='b')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy vs Epochs')
+    plt.grid(True)
+    plt.savefig(f'{RESULTS_DIR}/{png_name}')
+    plt.show()
+
 if __name__ == "__main__":
     #plot_accuracy_vs_epochs(XOR_FILE, "xor_accuracy_vs_epochs.png")
-    plot_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
+    #plot_accuracy_vs_epochs(PARITY_FILE, "parity_accuracy_vs_epochs.png")
+    plot_multi_output_accuracy_vs_epochs(NUMBER_PREDICTION_FILE, "digit_accuracy_vs_epochs.png")
 
