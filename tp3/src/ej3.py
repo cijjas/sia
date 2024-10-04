@@ -1,4 +1,4 @@
-from tp3.src.models.mlp.network_naked import MultilayerPerceptron
+from models.mlp.network import MultilayerPerceptron
 from utils.activation_function import ActivationFunction
 from utils.optimizer import Optimizer
 import numpy as np
@@ -52,8 +52,7 @@ def logic_xor(config: Config):
     test_results: list[tuple[int, int]] = []
 
     net.fit(
-        X_train=X_logical,
-        Y_train=y_selected,
+        training_data=training_data,
         epochs=config.epochs, 
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate, 
@@ -137,14 +136,31 @@ def number_identifier(config: Config):
         activation_function=config.activation_function,
         optimizer=config.optimizer  
     )
+
+    test_results: list[tuple[int, int]] = []
+
+    test_data = None
+    digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    if config.testing_data is not None:
+        test_data = list(zip(
+            convert_file_to_numpy(config.testing_data, bits_per_element=35),
+            [np.array([[1] if i == digit else [0] for digit in digits]) for i in range(10)]
+        ))
+
     net.fit(
         training_data=training_data,
         epochs=config.epochs,
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate,
+        epsilon=config.epsilon,
+        test_data=test_data,
+        test_results=test_results
     ) # ! learning rate is divided by the mini_batch_update
 
-    print(f"Accuracy: {net.evaluate(training_data)}")
+    persist_results(f'{RESULTS_DIR}/{DIGIT_FILE}', net.weights, net.biases, test_results, config.epochs)
+
+    print(f"Accuracy: {net.evaluate(test_data, epsilon=config.epsilon)}")
     return 1
 
 
