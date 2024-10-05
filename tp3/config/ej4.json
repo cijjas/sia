@@ -19,10 +19,10 @@
         }
     },
     "training": {
-        "seed": 23,
-        "epochs": 30,
-        "mini_batch_size": 4,
-        "learning_rate": 8,
+        "seed": 42,
+        "epochs": 20,
+        "mini_batch_size": 16,
+        "learning_rate": 0.5,
         "epsilon": 0.01
     }
 }
