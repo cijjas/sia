@@ -15,6 +15,8 @@ class Config(NamedTuple):
     mini_batch_size: Optional[int] = None
     learning_rate: Optional[float] = None
     epsilon: Optional[float] = None
+    path_to_weights_and_biases: Optional[str] = None
+    n_splits: Optional[int] = None
     seed: Optional[int] = None
 
 
@@ -40,9 +42,10 @@ class Config(NamedTuple):
             ),
             epochs=data['training'].get('epochs', None),
             mini_batch_size=data['training'].get('mini_batch_size', None),
+            n_splits=data['training'].get('n_splits', None),
             learning_rate=data['training'].get('learning_rate', None),
             epsilon=data['training'].get('epsilon', None),
-            seed=data['training'].get('seed', None)
+            path_to_weights_and_biases=data['training'].get('path_to_weights_and_biases', None)
         )
         
 

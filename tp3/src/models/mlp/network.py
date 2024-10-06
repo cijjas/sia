@@ -2,13 +2,14 @@ import random
 import numpy as np
 from typing import Optional
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 
 from utils.optimizer import Optimizer
 from utils.activation_function import ActivationFunction
 
 class MultilayerPerceptron(object):
 
-    def __init__(self, seed, topology:list[int], activation_function: ActivationFunction, optimizer:Optimizer):
+    def __init__(self, seed, topology:list[int], activation_function: ActivationFunction, optimizer:Optimizer, weights: list[np.ndarray] = None, biases: list[np.ndarray] = None):
         """The list ``topology`` contains the number of neurons in the
         respective layers of the network.  For example, if the list
         was [2, 3, 1] then it would be a three-layer network, with the
@@ -27,8 +28,15 @@ class MultilayerPerceptron(object):
         if seed is not None:
             np.random.seed(seed)
 
-        self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]] # Bias vector of matrixes ignores the input layer
-        self.weights: list[np.ndarray] = [np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])] # Matches each layer with the next, ignoring the output layer
+        if weights is not None:
+            self.weights = weights
+        else:
+            self.weights: list[np.ndarray] = [np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])] # Matches each layer with the next, ignoring the output layer
+
+        if biases is not None:
+            self.biases = biases
+        else:
+            self.biases: list[np.ndarray] = [np.random.randn(y, 1) for y in topology[1:]] # Bias vector of matrixes ignores the input layer
 
         self.num_layers: int = len(topology)
         self.topology: list[int] = topology
@@ -44,7 +52,8 @@ class MultilayerPerceptron(object):
 
     # TODO Remove test_data comment, parameter and logic, unnecesarry overhead
     def fit(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float,
-            epsilon: float, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None, test_results:list[tuple[int, int]] = None) -> None:
+            epsilon: float, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None, test_results:list[tuple[int, int]] = None,
+            training_results:list[tuple[int,int]]=None) -> None:
         """Train the neural network using mini-batch stochastic
         gradient descent.
 
@@ -74,10 +83,47 @@ class MultilayerPerceptron(object):
                     self.evaluate(test_data=test_data, epsilon=epsilon, test_results=test_result)
                     test_results.append(test_result)
                 else:
-                    print("Epoch {0}: {1} / {2}".format(
-                        j, self.evaluate(test_data=test_data, epsilon=epsilon), n_test))
+                    print("Epoch {0}: {1}".format(j, self.evaluate(test_data=test_data, epsilon=epsilon)))
             else:
                 print("Epoch {0} complete".format(j))
+            if training_results is not None:
+                training_result = []
+                self.evaluate(test_data=training_data[:10], epsilon=epsilon, test_results=training_result)
+                training_results.append(training_result)
+            
+    def fit_with_cross_validation(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, eta: float, mini_batch_size: int,
+                                epsilon: float, n_splits: int, test_results: list[tuple[int, int]]) -> None:
+        if len(training_data) % n_splits != 0:
+            raise ValueError("The number of splits must be a divisor of the number of training samples")
+
+        k_fold_size = len(training_data) // n_splits
+        if mini_batch_size > k_fold_size * (n_splits - 1):
+            print(f"Warning: mini_batch_size (={mini_batch_size}) is larger than the number of samples used for training \
+                  ({n_splits-1} groups of {k_fold_size} samples each, which equals a training set of {k_fold_size*(n_splits-1)} samples)\
+                  . (which means the training is done with one big mini batch instead of many smaller ones)")
+
+        if epochs%n_splits != 0:
+            epochs = epochs + n_splits - epochs%n_splits
+            print(f"Epochs were adjusted to {epochs} to match the number of splits")
+
+        for i in range(0, epochs, n_splits):
+            random.shuffle(training_data)
+            kf = KFold(n_splits=n_splits, shuffle=True, random_state=None)
+            for train_index, test_index in kf.split(training_data):
+                training_data_cv = [training_data[i] for i in train_index]
+                test_data_cv = [training_data[i] for i in test_index]
+                mini_batches: list[list[tuple[np.ndarray, np.ndarray]]] = [
+                    training_data_cv[k:k + mini_batch_size]
+                    for k in range(0, len(training_data_cv), mini_batch_size)]
+                for mini_batch in mini_batches:
+                    self.update_weights_and_biases(mini_batch, eta)
+
+                
+                test_result = []
+                self.evaluate(test_data=test_data_cv, epsilon=epsilon, test_results=test_result)
+                test_results.append(test_result)
+
+            print(f"Epoch {i}")
 
 
     def update_weights_and_biases(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:

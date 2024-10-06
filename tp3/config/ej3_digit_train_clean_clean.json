@@ -1,7 +1,7 @@
 {
     "problem": {
-        "type": "number_identifier",
-        "data": "../res/ej3/big/TP3-ej3-digitos.txt",
+        "type": "number_identifier_1",
+        "data": "../res/ej3/TP3-ej3-digitos.txt",
         "output": "output/ej3/parity.csv",
         "testing_data": "../res/ej3/TP3-ej3-digitos.txt"
     },
@@ -17,11 +17,10 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 20,
-        "mini_batch_size": 50,
-        "learning_rate": 16,
-        "epsilon": 0.01,
-        "n_splits": 10, "REMEMBER":"currently, the training set is big/TP3-ej3-digitos.txt, which has 1000 digits"
+        "epochs": 1000,
+        "mini_batch_size": 5,
+        "learning_rate": 8,
+        "epsilon": 0.01
     }
   
 }
