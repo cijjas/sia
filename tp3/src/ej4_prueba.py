@@ -1,26 +1,55 @@
 import sys
 import pygame
 import numpy as np
-from models.mlp.network_2 import MultilayerPerceptron
+import matplotlib.pyplot as plt
+from models.mlp.network import MultilayerPerceptron
 from utils.config import Config
 import tensorflow as tf
+from io import BytesIO
 
-# Constants for the drawing window
-DRAW_AREA_SIZE = 280  # Drawing area size (pixels)
-WINDOW_WIDTH = 1000  # Total window width (pixels)
-WINDOW_HEIGHT = DRAW_AREA_SIZE
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BRUSH_RADIUS = 12  # Brush size
-BUTTON_COLOR = (70, 130, 180)
-BUTTON_HOVER_COLOR = (100, 149, 237)
-TEXT_COLOR = (255, 255, 255)
+# Constants for the window
+WINDOW_WIDTH = 900
+WINDOW_HEIGHT = 600
+
+LEFT_WIDTH = WINDOW_WIDTH // 3   # 1/3 of the screen width
+RIGHT_WIDTH = WINDOW_WIDTH - LEFT_WIDTH  # 2/3 of the screen width
+
+# Grid settings
+GRID_SIZE = 28  # 28x28 grid
+CELL_SIZE = min(RIGHT_WIDTH, WINDOW_HEIGHT) // GRID_SIZE  # Size of each cell
+GRID_OFFSET_X = LEFT_WIDTH  # Start drawing grid from here
+GRID_OFFSET_Y = (WINDOW_HEIGHT - (CELL_SIZE * GRID_SIZE)) // 2  # Center the grid vertically
+
+# Colors
+BACKGROUND_COLOR = (0, 0, 0)  # Black
+CELL_ON_COLOR = (255, 255, 255)  # White
+CELL_OFF_COLOR = (0, 0, 0)  # Black
+GRID_LINE_COLOR = (50, 50, 50)  # Dark gray lines for the grid
+BUTTON_COLOR = (0,101,107)  # Apple's blue color
+BUTTON_HOVER_COLOR = (10, 132, 255)
+TEXT_COLOR = (255, 255, 255)  # White
+PREDICTION_COLOR = (255, 255, 255)  # White
+
+
+# Fonts
+pygame.font.init()
+FONT_SIZE_SMALL = 18
+FONT_SIZE_LARGE = 24
+
+font_small = pygame.font.Font('../res/fonts/NeueHaasDisplayRoman.ttf',FONT_SIZE_SMALL)  # Larger font for algorithm buttons and map name
+font_large = pygame.font.Font('../res/fonts/NeueHaasDisplayMediu.ttf',FONT_SIZE_LARGE)  # Larger font for algorithm buttons and map name
+
+# Confidence Colors
+CONFIDENCE_COLOR_VERY = (0, 255, 0)        # Green
+CONFIDENCE_COLOR_SOMEWHAT = (255, 255, 0)  # Yellow
+CONFIDENCE_COLOR_NOT = (255, 0, 0)         # Red
+
 
 def prepare_mnist_data():
     """
     Prepares the MNIST dataset for training.
     """
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
 
     x_train = x_train.reshape(-1, 28*28).astype('float32') / 255
     x_test = x_test.reshape(-1, 28*28).astype('float32') / 255
@@ -34,11 +63,10 @@ def prepare_mnist_data():
     return training_data, test_data
 
 def train_mnist_classifier(config):
-    
     training_data, test_data = prepare_mnist_data()
     net = MultilayerPerceptron(
         seed=config.seed,
-        topology=config.topology,
+        sizes=config.topology,
         activation_function=config.activation_function,
         optimizer=config.optimizer
     )
@@ -47,141 +75,280 @@ def train_mnist_classifier(config):
         epochs=config.epochs,
         mini_batch_size=config.mini_batch_size,
         eta=config.learning_rate,
-        epsilon=config.epsilon,
     )
     return net
 
-def preprocess_drawing(surface):
-    
-    # Get the pixel data from the surface
-    image = pygame.transform.scale(surface, (28, 28))
-    # Convert to a numpy array and normalize
-    image_array = pygame.surfarray.array3d(image)
-    # Convert to grayscale
-    image_array = np.dot(image_array[..., :3], [0.2989, 0.5870, 0.1140])
-    image_array = image_array / 255.0
-    # Flatten the array to a vector
-    input_vector = image_array.reshape(784, 1)
-    return input_vector
+def apply_blur(grid_array):
+    # Simple average blur using a convolution kernel
+    kernel = np.array([[1/16, 1/8, 1/16],
+                       [1/8,  1/4, 1/8],
+                       [1/16, 1/8, 1/16]])
+    # Pad the grid_array
+    padded_array = np.pad(grid_array, pad_width=1, mode='constant', constant_values=0)
+    blurred_array = np.zeros_like(grid_array)
+    for i in range(grid_array.shape[0]):
+        for j in range(grid_array.shape[1]):
+            region = padded_array[i:i+3, j:j+3]
+            blurred_array[i, j] = np.sum(kernel * region)
+    return blurred_array
+
+def preprocess_grid(grid_array):
+    # Apply blur to the grid_array
+    blurred_grid_array = apply_blur(grid_array)
+    # Flatten the grid array to create the input vector
+    input_vector = blurred_grid_array.flatten().reshape(784, 1)
+    return input_vector, blurred_grid_array
 
 def create_button(rect, text, font):
-    """
-    Creates a button as a dictionary containing its rect, text, and surface.
-
-    Parameters:
-    - rect: A pygame.Rect defining the button's position and size.
-    - text: The text to display on the button.
-    - font: The font to use for the button text.
-
-    Returns:
-    - dict: A dictionary representing the button.
-    """
     text_surface = font.render(text, True, TEXT_COLOR)
     text_rect = text_surface.get_rect(center=rect.center)
     return {'rect': rect, 'text_surface': text_surface, 'text_rect': text_rect}
 
+def plot_probability_distribution(probabilities):
+    """
+    Creates a smaller bar plot of the probability distribution of each digit (0-9).
+    Returns a Pygame surface of the plot.
+    """
+    # Generate the plot using Matplotlib
+    custom_colors = [
+        [c / 255 for c in BUTTON_COLOR]   # Normalize BUTTON_COLOR
+        
+    ]
+    plt.figure(figsize=(2, 1))  # Reduced size of plot
+    plt.bar(range(10), probabilities, tick_label=range(10), color=custom_colors)
+    plt.ylabel("Probability", fontsize=8)
+    plt.title("Probability Distribution", fontsize=10)
+    plt.xticks(fontsize=8)
+    plt.yticks(fontsize=8)
+
+    # Save the plot to an in-memory buffer
+    buf = BytesIO()
+    plt.savefig(buf, format="png", bbox_inches='tight')  # `bbox_inches='tight'` ensures the plot fits snugly
+    buf.seek(0)
+    plt.close()
+
+    # Load the image into Pygame
+    plot_surface = pygame.image.load(buf)
+    buf.close()
+    return plot_surface
+
 def run_pygame_interface(net):
-   
     pygame.init()
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption("Draw a digit and click 'Predict'")
+    pygame.display.set_caption("MNIST Digit Recognizer")
     clock = pygame.time.Clock()
-    drawing_surface = pygame.Surface((DRAW_AREA_SIZE, DRAW_AREA_SIZE))
-    drawing_surface.fill(BLACK)
-    is_drawing = False
 
-    # Fonts
-    font_small = pygame.font.SysFont(None, 24)
-    font_large = pygame.font.SysFont(None, 36)
+    # Initialize the grid array
+    grid_array = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.float32)
 
     # Buttons
-    button_width = WINDOW_WIDTH - DRAW_AREA_SIZE - 20
+    button_width = 200  # Fixed button width
     button_height = 50
-    button_x = DRAW_AREA_SIZE + 10
-    button_y_start = 50
+    button_x = LEFT_WIDTH // 2 - button_width // 2
+    button_y_start = 30
     button_spacing = 20
 
     predict_button_rect = pygame.Rect(
         button_x, button_y_start, button_width, button_height)
     clear_button_rect = pygame.Rect(
         button_x, button_y_start + button_height + button_spacing, button_width, button_height)
-    quit_button_rect = pygame.Rect(
-        button_x, button_y_start + 2 * (button_height + button_spacing), button_width, button_height)
 
     predict_button = create_button(predict_button_rect, 'Predict', font_large)
     clear_button = create_button(clear_button_rect, 'Clear', font_large)
-    quit_button = create_button(quit_button_rect, 'Quit', font_large)
 
-    buttons = [predict_button, clear_button, quit_button]
+    buttons = [predict_button, clear_button]
 
-    prediction_text = ''
+    # Processed image display parameters
+    processed_image_width = 150  # Adjusted size
+    processed_image_height = 150
+    processed_image_x = LEFT_WIDTH // 2 - processed_image_width // 2
+    processed_image_y = None  # Will be set after rendering prediction text
+
+    # Probability distribution plot
+    prob_plot_surface = None
+
+    prediction_text = 'Draw a digit ->'
+    processed_image_surface = None
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
+        mouse_buttons = pygame.mouse.get_pressed()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            # Start drawing when mouse button is pressed
+            # Handle mouse clicks
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # Left mouse button
-                    if drawing_surface.get_rect().collidepoint(event.pos):
-                        is_drawing = True
+                if event.button in (1, 3):  # Left or right mouse button
+                    # Check if any button was clicked
+                    for button in buttons:
+                        if button['rect'].collidepoint(event.pos):
+                            if button == predict_button:
+                                input_vector, processed_image = preprocess_grid(grid_array)
+                                output = net.feedforward(input_vector)
+                                predicted_digit = np.argmax(output)
+                                max_prob = np.max(output)
+                                # Determine confidence level
+                                if max_prob >= 0.9:
+                                    confidence_msg = "Model is very confident."
+                                elif max_prob >= 0.5:
+                                    confidence_msg = "Model is somewhat confident."
+                                else:
+                                    confidence_msg = "Model is not confident."
+                                prediction_text = f"Predicted {predicted_digit}\n{confidence_msg}"
+
+                                # Rotate and flip the processed image for correct display
+                                processed_image_rotated = np.rot90(processed_image, k=3)
+                                processed_image_flipped = np.fliplr(processed_image_rotated)
+
+                                # Convert processed_image to a pygame surface for display
+                                processed_image_surface = pygame.surfarray.make_surface(
+                                    np.repeat(processed_image_flipped[:, :, np.newaxis], 3, axis=2) * 255
+                                )
+                                processed_image_surface = pygame.transform.scale(
+                                    processed_image_surface, (processed_image_width, processed_image_height)
+                                )
+
+                                # Generate the probability distribution plot
+                                prob_plot_surface = plot_probability_distribution(output.flatten())
+
+                            elif button == clear_button:
+                                grid_array.fill(0)
+                                prediction_text = 'Draw a digit ->'
+                                processed_image_surface = None
+                                prob_plot_surface = None
+                            break  # Break after handling button click
                     else:
-                        # Check if any button was clicked
-                        for button in buttons:
-                            if button['rect'].collidepoint(event.pos):
-                                if button == predict_button:
-                                    input_vector = preprocess_drawing(drawing_surface)
-                                    output = net.feedforward(input_vector)
-                                    predicted_digit = np.argmax(output)
-                                    prediction_text = f"Predicted Digit: {predicted_digit}"
-                                elif button == clear_button:
-                                    drawing_surface.fill(BLACK)
-                                    prediction_text = ''
-                                elif button == quit_button:
-                                    pygame.quit()
-                                    sys.exit()
+                        # Handle grid cell setting
+                        grid_x = (event.pos[0] - GRID_OFFSET_X) // CELL_SIZE
+                        grid_y = (event.pos[1] - GRID_OFFSET_Y) // CELL_SIZE
+                        if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                            if event.button == 1:  # Left click
+                                grid_array[grid_y, grid_x] = 1.0  # Set cell to 'on'
+                            elif event.button == 3:  # Right click
+                                grid_array[grid_y, grid_x] = 0.0  # Set cell to 'off'
 
-            # Stop drawing when mouse button is released
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    is_drawing = False
+            elif event.type == pygame.MOUSEMOTION:
+                if mouse_buttons[0] or mouse_buttons[2]:  # Left or right button is held down
+                    mouse_pos = pygame.mouse.get_pos()
+                    grid_x = (mouse_pos[0] - GRID_OFFSET_X) // CELL_SIZE
+                    grid_y = (mouse_pos[1] - GRID_OFFSET_Y) // CELL_SIZE
+                    if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                        if mouse_buttons[0]:  # Left button held down
+                            grid_array[grid_y, grid_x] = 1.0  # Set cell to 'on'
+                        elif mouse_buttons[2]:  # Right button held down
+                            grid_array[grid_y, grid_x] = 0.0  # Set cell to 'off'
 
-        # Draw on the surface
-        if is_drawing:
-            mouse_position = pygame.mouse.get_pos()
-            # Adjust mouse position relative to drawing surface
-            adjusted_position = (mouse_position[0], mouse_position[1])
-            if drawing_surface.get_rect().collidepoint(adjusted_position):
-                adjusted_position = (adjusted_position[0], adjusted_position[1])
-                pygame.draw.circle(drawing_surface, WHITE, adjusted_position, BRUSH_RADIUS)
+        # Draw the grid
+        screen.fill(BACKGROUND_COLOR)
 
-        # Draw the drawing surface onto the main screen
-        screen.fill(BLACK)
-        screen.blit(drawing_surface, (0, 0))
+        for row in range(GRID_SIZE):
+            for col in range(GRID_SIZE):
+                cell_rect = pygame.Rect(
+                    GRID_OFFSET_X + col * CELL_SIZE,
+                    GRID_OFFSET_Y + row * CELL_SIZE,
+                    CELL_SIZE,
+                    CELL_SIZE
+                )
+                color = CELL_ON_COLOR if grid_array[row, col] > 0 else CELL_OFF_COLOR
+                pygame.draw.rect(screen, color, cell_rect)
+        # Draw grid lines
+        for i in range(GRID_SIZE + 1):
+            # Vertical lines
+            pygame.draw.line(screen, GRID_LINE_COLOR,
+                             (GRID_OFFSET_X + i * CELL_SIZE, GRID_OFFSET_Y),
+                             (GRID_OFFSET_X + i * CELL_SIZE, GRID_OFFSET_Y + GRID_SIZE * CELL_SIZE))
+            # Horizontal lines
+            pygame.draw.line(screen, GRID_LINE_COLOR,
+                             (GRID_OFFSET_X, GRID_OFFSET_Y + i * CELL_SIZE),
+                             (GRID_OFFSET_X + GRID_SIZE * CELL_SIZE, GRID_OFFSET_Y + i * CELL_SIZE))
 
-        # Draw buttons
+        # Draw buttons with rounded rectangles
         for button in buttons:
             # Change color on hover
             if button['rect'].collidepoint(mouse_pos):
                 color = BUTTON_HOVER_COLOR
             else:
                 color = BUTTON_COLOR
-            pygame.draw.rect(screen, color, button['rect'])
+            pygame.draw.rect(screen, color, button['rect'], border_radius=10)
             screen.blit(button['text_surface'], button['text_rect'])
 
+        # Calculate prediction text position below buttons
+        prediction_text_y = clear_button_rect.bottom + 40
+
+        processed_image_y = clear_button_rect.bottom + 40
+
+        if processed_image_surface:
+            processed_image_rect = screen.blit(processed_image_surface, (processed_image_x, processed_image_y))
+            # Draw border around the processed image
+            border_thickness = 5  # Adjust thickness to your liking
+            pygame.draw.rect(screen, BUTTON_COLOR, processed_image_rect.inflate(border_thickness * 2, border_thickness * 2), border_thickness)
+
+            # Label for the processed image
+            processed_image_label = font_small.render("Input Image", True, PREDICTION_COLOR)
+            label_rect = processed_image_label.get_rect(
+                center=(processed_image_x + processed_image_width // 2, processed_image_y - 20))
+            screen.blit(processed_image_label, label_rect)
+
+            # Draw the probability distribution plot below the processed image
+            prob_plot_y = processed_image_y + processed_image_height + 20
+            if prob_plot_surface:
+                screen.blit(prob_plot_surface, (processed_image_x-30, prob_plot_y))
+
+
+        # Calculate prediction text position below the probability plot
+        if prob_plot_surface:
+            prediction_text_y = prob_plot_y + 180  # Or any suitable offset
+        else:
+            prediction_text_y = processed_image_y + processed_image_height + 20  # Fallback position
+
+        # Render prediction text
+        # Render prediction text right-justified
         # Render prediction text
         if prediction_text:
-            text_surface = font_small.render(prediction_text, True, (0, 255, 0))
-            text_rect = text_surface.get_rect(
-                center=(DRAW_AREA_SIZE + (WINDOW_WIDTH - DRAW_AREA_SIZE) // 2, 10))
-            screen.blit(text_surface, text_rect)
+            lines = prediction_text.split('\n')
+            right_align_x = LEFT_WIDTH - 20  # Right margin, adjust as needed
+            for i, line in enumerate(lines):
+                if line.startswith("Model is"):
+                    # Split the line into words
+                    words = line.split()
+                    word_surfaces = []
+                    total_width = 0
+                    for word in words:
+                        # Determine the color based on the word
+                        if word in ["very", "somewhat", "not"]:
+                            if word == "very":
+                                color = CONFIDENCE_COLOR_VERY
+                            elif word == "somewhat":
+                                color = CONFIDENCE_COLOR_SOMEWHAT
+                            elif word == "not":
+                                color = CONFIDENCE_COLOR_NOT
+                        else:
+                            color = PREDICTION_COLOR  # Default color
+                        word_surface = font_small.render(word + ' ', True, color)
+                        word_width = word_surface.get_width()
+                        word_surfaces.append((word_surface, word_width))
+                        total_width += word_width
+                    # Compute the starting x position for right alignment
+                    x = right_align_x - total_width
+                    y = prediction_text_y + i * (FONT_SIZE_LARGE + 5)
+                    # Render each word
+                    for word_surface, word_width in word_surfaces:
+                        word_rect = word_surface.get_rect()
+                        word_rect.topleft = (x, y)
+                        screen.blit(word_surface, word_rect)
+                        x += word_width  # Move x to the right by the word's width
+                else:
+                    # Regular rendering for other lines
+                    text_surface = font_large.render(line, True, PREDICTION_COLOR)
+                    text_rect = text_surface.get_rect(
+                        topright=(right_align_x, prediction_text_y + i * (FONT_SIZE_LARGE + 5)))
+                    screen.blit(text_surface, text_rect)
+
 
         pygame.display.flip()
-        clock.tick(60)  # Limit to 60 frames per second
-import cProfile
+        clock.tick(60)
 
 def main():
     if len(sys.argv) < 2:
@@ -189,18 +356,22 @@ def main():
         sys.exit(1)
 
     config = Config().read_config(sys.argv[1])
-    training_data, test_data = prepare_mnist_data()
 
-    # Create an instance of your model
-    net = MultilayerPerceptron(
-        seed=config.seed,
-        topology=config.topology,
-        activation_function=config.activation_function,
-        optimizer=config.optimizer
-    )
+    import os
+    model_path = "store/model_.npz"
 
-    # Profile the fit function with runctx
-    cProfile.runctx('net.fit(training_data, config.epochs, config.mini_batch_size, config.learning_rate, config.epsilon)', globals(), locals())
+    if os.path.exists(model_path):
+        net = MultilayerPerceptron.load_model(
+            model_path,
+            config.activation_function,
+            config.optimizer
+        )
+    else:
+        net = train_mnist_classifier(config)
+        net.save_model(model_path)
+
+    run_pygame_interface(net)
 
 if __name__ == "__main__":
     main()
+
