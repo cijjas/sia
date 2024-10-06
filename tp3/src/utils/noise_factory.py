@@ -11,9 +11,8 @@ class NoiseType(Enum):
 class NoiseFactory:
     
     @staticmethod
-    def generate_numbers(size=(7, 5)) -> np.ndarray:
-        # Generates a 7x5 matrix of random 0s and 1s
-        return np.random.choice([0, 1], size=size)
+    def generate_zeros(size=(7, 5)) -> np.ndarray:
+        return np.zeros(size, dtype=int)
     
     @staticmethod
     def add_gaussian_noise(binary_matrix, noise_mean=0, noise_std=0.5):
@@ -45,7 +44,7 @@ class NoiseFactory:
 
     @classmethod
     def generate_noisy_numbers(cls, noise_type: NoiseType, file_path: str, config=None):
-        binary_matrix = cls.generate_numbers()
+        binary_matrix = cls.generate_zeros()
         
         if noise_type == NoiseType.GAUSSIAN:
             noisy_matrix = cls.add_gaussian_noise(binary_matrix, noise_mean=config.get('mean', 0), noise_std=config.get('stddev', 0.5))
