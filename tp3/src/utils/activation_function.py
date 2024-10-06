@@ -6,6 +6,9 @@ class ActivationFunction:
         self.beta = beta
         self.activation, self.activation_prime = self.get_activation()
 
+    def get_method(self) -> str:
+        return self.method
+    
     def get_activation(self) -> tuple:
         if self.method == "sigmoid":
             return self.sigmoid, self.sigmoid_prime
