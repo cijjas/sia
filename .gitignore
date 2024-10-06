@@ -164,3 +164,6 @@ cython_debug/
 # VS Code
 #  This ignores the .vscode/ folder which might contain user-specific settings
 .vscode/
+
+# big txt
+tp3/res/ej3/big/*.txt

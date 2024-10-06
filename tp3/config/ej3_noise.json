@@ -1,10 +1,14 @@
 {
     "noise": "gaussian",
-    "output_noise": "../res/ej3/TP3-ej3-noise.txt",
-    "output_xor": "../res/ej3/TP3-ej3-xor.txt",
-    "nums_path": "../res/ej3/TP3-ej3-digitos.txt",
-    "mean": -0.8,
-    "stddev": 0.5,
+    "output_noise": "../res/ej3/big/TP3-ej3-noise.txt",
+    "output_xor": "../res/ej3/big/TP3-ej3-xor.txt",
+    "nums_path": "../res/ej3/big/TP3-ej3-digitos.txt",
+    "test-file": "../res/ej3/TP3-ej3-xor.txt",
+    "test-noise": "../res/ej3/TP3-ej3-noise.txt",
+    "original-digits": "../res/ej3/TP3-ej3-digitos.txt",
+    "mean": 0,
+    "stddev": 0.2,
     "salt_prob": 0.01,
-    "pepper_prob": 0.01
+    "pepper_prob": 0.01,
+    "numbers": 1000
 }
