@@ -1,9 +1,9 @@
 {
     "problem": {
         "type": "number_identifier",
-        "data": "../res/ej3/big/TP3-ej3-digitos.txt",
+        "data": "../res/ej3/TP3-ej3-digitos.txt",
         "output": "output/ej3/parity.csv",
-        "testing_data": "../res/ej3/TP3-ej3-digitos.txt"
+        "testing_data": "../res/ej3/TP3-ej3-xor.txt"
     },
     "network": {
         "topology": [35,20,10],
