@@ -1,32 +1,56 @@
-# Perceptrons and MLP
+# Perceptrones y MLP
 
-This project has core implementations of linear, non-linear, and multi-layered perceptrons. The implementations can be found in [the models directory](./src/models/).
+Este proyecto tiene implementaciones básicas de perceptrones lineales, no lineales y perceptrones multicapa (MLP). Las implementaciones se pueden encontrar en [el directorio de modelos](./src/models/).
 
-En la carpeta [`./src`](./src) se encuentran varios archivos usados para hacer análisis de los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#Archivos).
+![mlp-interface-demo](./assets/adam_95.gif)
+
+En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para analizar los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#archivos).
+
+## Índice
+
+- [Cómo usarlos](#cómo-usarlos)
+  - [Perceptrones escalón, lineales y no lineales](#perceptrones-escalón-lineales-y-no-lineales)
+    - [Perceptrón escalón](#perceptrón-escalón)
+      - [Configuración](#configuración)
+      - [Instanciación y entrenamiento](#instanciación-y-entrenamiento)
+      - [Predicción](#predicción)
+    - [Perceptrón lineal y no lineal](#perceptrón-lineal-y-no-lineal)
+      - [Configuración](#configuración-1)
+      - [Instanciación y entrenamiento](#instanciación-y-entrenamiento-1)
+      - [Predicción](#predicción-1)
+  - [Perceptrón multicapa](#perceptrón-multicapa)
+    - [Configuración](#configuración-2)
+    - [Instanciación y entrenamiento](#instanciación-y-entrenamiento-2)
+    - [Predicción](#predicción-2)
+- [Archivos](#archivos)
+  - [Ejercicio 1](#ejercicio-1)
+  - [Ejercicio 2](#ejercicio-2)
+  - [Ejercicio 3](#ejercicio-3)
+  - [Ejercicio 4](#ejercicio-4)
 
 ## Cómo usarlos
 
 Esta sección tiene como objetivo explicar cómo se pueden usar nuestras implementaciones de perceptrones para poder instanciarlos, entrenarlos y luego realizar predicciones.
 
-Primero es relevante mencionar que para que los perceptrones funcionen, los datos de entrada tienen que estar bien confeccionados, ya que se espera el correcto formato para que numpy pueda armar vectores de n-dimensiones. Esto queda más que nada del lado del que usa los perceptrones. Recomendamos colocarlo en la carpeta [./res](./res/) donde ya hay algunos de ejemplo. No nos metemos mucho en explicar cómo hacer la confección necesaria, porque varía mucho del formato de los datos, y puede ser distinto en la mayoría de las fuentes.
+Primero, es importante mencionar que para que los perceptrones funcionen, los datos de entrada deben estar bien confeccionados, ya que se espera el formato correcto para que NumPy pueda armar vectores de n-dimensiones. Esto queda del lado del usuario. Recomendamos colocar los datos en la carpeta [./res](./res/), donde ya hay algunos ejemplos disponibles. No profundizamos en cómo hacer la confección necesaria, porque depende del formato de los datos, y puede variar considerablemente entre diferentes fuentes.
 
 ### Perceptrones escalón, lineales y no lineales
 
-Por un lado se encuentran los perceptrones simples lineales y no lineales de la carpeta [perceptrons](./src/models/perceptrons) que se usaron para el ejercicio 1 y 2. Para instanciar un modelo se debe configurar un archivo `.json` que se ve de la siguiente forma:
+Por un lado, se encuentran los perceptrones simples (lineales y no lineales) en la carpeta [perceptrons](./src/models/perceptrons), que se usaron para los ejercicios 1 y 2. Para instanciar un modelo, se debe configurar un archivo `.json` de la siguiente forma:
 
 #### Perceptrón escalón
 
 ##### Configuración
 
-Por ejemplo, para el ejercicio 1 en particular se usó el perceptrón escalón:
+Por ejemplo, para el ejercicio 1 se usó el perceptrón escalón:
 
 ```json
 {
-	"epochs": 100,
-	"learning_rate": 0.001,
-	"epsilon": 1e-5,
-	"seed": 42,
-	"function": "AND"
+    "epochs": 100,
+    "learning_rate": 0.001,
+    "epsilon": 1e-5,
+    "seed": 42,
+    "function": "AND"
 }
 ```
 
@@ -34,22 +58,22 @@ Por ejemplo, para el ejercicio 1 en particular se usó el perceptrón escalón:
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | `epochs`        | Número de épocas o iteraciones sobre el conjunto de datos durante el entrenamiento del modelo. Más épocas implican más oportunidades de aprendizaje.                                          | `>0`                                                 |
 | `learning_rate` | Tasa de aprendizaje utilizada en el optimizador para ajustar los pesos del modelo. Controla la magnitud de los cambios realizados en cada actualización.                                      | `>0` idealmente `<1` pero no hay restricción lógica. |
-| `epsilon`       | Pequeño valor utilizado para condición de corte cuando el error ya es despreciable.                                                                                                           | `número pequeño`                                     |
+| `epsilon`       | Pequeño valor utilizado para la condición de corte cuando el error ya es despreciable.                                                                                                           | `número pequeño`                                     |
 | `seed`          | Semilla utilizada para inicializar los generadores de números aleatorios. Garantiza que los resultados sean reproducibles si se vuelve a entrenar el modelo. Se puede evitar sin problema.    | `número`                                             |
 
 > [!note]
-> El parámetro "function" es solo auxiliar y no es necesario en otras situaciones, muchas veces tuvimos distintas funciones diferentes para modelar y nos servía tener un parámetro que nos diga cuál es la función del problema. Esta misma lógica se usa en otros lados y es un caso de uso particular que se puede no usar y será lo mismo.
+> El parámetro "function" es solo auxiliar y no es necesario en otras situaciones. Muchas veces tuvimos distintas funciones para modelar y nos servía tener un parámetro que indicara cuál era la función del problema. Esta misma lógica se usa en otros lados y es un caso particular que se puede omitir sin afectar el funcionamiento.
 
 ##### Instanciación y entrenamiento
 
-Se instancia de esta forma:
+Se instancia de la siguiente forma:
 
 ```python
 step_perceptron = PerceptronSimple(
-	seed=config_file.get('seed', None),
-	num_features=X.shape[1], # tamaño del input en cuanto a features dado por el set de datos
-	learning_rate=config_file.get('learning_rate', 0.01),
-	epsilon=config_file.get('epsilon', 1e-5),
+    seed=config_file.get('seed', None),
+    num_features=X.shape[1], # tamaño del input en cuanto a features dado por el set de datos
+    learning_rate=config_file.get('learning_rate', 0.01),
+    epsilon=config_file.get('epsilon', 1e-5),
 )
 ```
 
@@ -61,7 +85,7 @@ perceptron.train(X, y, config_file.get('epochs', 50))
 
 ##### Predicción
 
-Finalmente, una vez entrenado se puede usar el método
+Finalmente, una vez entrenado, se puede usar el método
 
 ```python
 prediction = perceptron.predict(X)
@@ -72,20 +96,20 @@ prediction = perceptron.predict(X)
 
 ##### Configuración
 
-Para los perceptrones lineales y no lineales el archivo es el mismo excepto cuando se quiere usar un perceptrón no lineal donde se debe además agregar la función de activación que se usará.
+Para los perceptrones lineales y no lineales, el archivo es el mismo, excepto cuando se quiere usar un perceptrón no lineal, donde se debe agregar la función de activación que se usará.
 
 ```json
 {
-	"epochs": 1000,
-	"learning_rate": 0.01,
-	"epsilon": 1e-5,
-	"seed": 42,
-	"non_linear_fn": "sigmoid",
-	"beta": 2.0
+    "epochs": 1000,
+    "learning_rate": 0.01,
+    "epsilon": 1e-5,
+    "seed": 42,
+    "non_linear_fn": "sigmoid",
+    "beta": 2.0
 }
 ```
 
-Similar al perceptrón escalón pero con dos parámetros adicionales:
+Similar al perceptrón escalón, pero con dos parámetros adicionales:
 
 | Parámetro       | Descripción                                                                                                                                                              | Valores posibles          |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------- |
@@ -94,31 +118,31 @@ Similar al perceptrón escalón pero con dos parámetros adicionales:
 
 ##### Instanciación y entrenamiento
 
-Sus formas de instanciación es similar al perceptrón base
+Su forma de instanciación es similar al perceptrón base:
 
 ```python
 linear_perceptron = PerceptronLinear(
-	seed,
-	num_features,
-	learning_rate,
-	epsilon,
+    seed,
+    num_features,
+    learning_rate,
+    epsilon,
 )
 
 non_linear_perceptron = PerceptronNonLinear(
-	seed,
-	num_features,
-	learning_rate,
-	epsilon,
-	non_linear_fn,
-	beta
+    seed,
+    num_features,
+    learning_rate,
+    epsilon,
+    non_linear_fn,
+    beta
 )
 ```
 
-y para entrenar el modelo es idéntico al [entrenamiento del perceptrón lineal](#instanciacion-y-entrenamiento).
+y para entrenar el modelo es idéntico al [entrenamiento del perceptrón lineal](#instanciación-y-entrenamiento-1).
 
 ##### Predicción
 
-Finalmente, una vez entrenado se puede usar el método
+Finalmente, una vez entrenado, se puede usar el método
 
 ```python
 prediction = perceptron.predict(X)
@@ -130,40 +154,40 @@ prediction = perceptron.predict(X)
 
 #### Configuración
 
-Para usar el MLP el archivo de configuración es más grande pero semejante,
+Para usar el MLP, el archivo de configuración es más grande pero similar:
 
 ```json
 {
-	"problem": {
-		"type": "mnist_digits",
-		"data": "../res/mnist.pkl.gz",
-		"output": "./output/ej4/digits.csv"
-	},
-	"network": {
-		"topology": [
-			784,
-			30,
-			10
-		],
-		"activation_function": {
-			"method": "sigmoid",
-			"beta": 1
-		},
-		"optimizer": {
-			"method": "gradient_descent"
-		}
-	},
-	"training": {
-		"seed": 42,
-		"epochs": 20,
-		"mini_batch_size": 16,
-		"learning_rate": 0.5,
-		"epsilon": 0.01
-	}
+    "problem": {
+        "type": "mnist_digits",
+        "data": "../res/mnist.pkl.gz",
+        "output": "./output/ej4/digits.csv"
+    },
+    "network": {
+        "topology": [
+            784,
+            30,
+            10
+        ],
+        "activation_function": {
+            "method": "sigmoid",
+            "beta": 1
+        },
+        "optimizer": {
+            "method": "gradient_descent"
+        }
+    },
+    "training": {
+        "seed": 42,
+        "epochs": 20,
+        "mini_batch_size": 16,
+        "learning_rate": 0.5,
+        "epsilon": 0.01
+    }
 }
 ```
 
-Al igual que la configuración del perceptrón escalón, tiene parámetros que son accesorios para los problemas particulares y pueden ser ignorados
+Al igual que la configuración del perceptrón escalón, tiene parámetros que son accesorios para problemas particulares y pueden ser ignorados.
 
 | Sección    | Parámetro                    | Descripción                                                                                                                                                                                                | Valor Ejemplo               |
 | ---------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -172,13 +196,13 @@ Al igual que la configuración del perceptrón escalón, tiene parámetros que s
 |            | `output`                     | Accesorio: Ruta donde se guardará el archivo con los resultados de las predicciones.                                                                                                                       | `"./output/ej4/digits.csv"` |
 | `network`  | `topology`                   | Estructura de la red neuronal, define el número de neuronas en cada capa (entrada, oculta, salida). Se pueden definir varias capas ocultas.                                                                | `[784, 30, 10]`             |
 |            | `activation_function.method` | Función de activación utilizada en las neuronas. Ejemplos: `sigmoid`, `tanh`.                                                                                                                              | `"sigmoid"`                 |
-|            | `activation_function.beta`   | Parámetro adicional para ajustar la forma de la función de activación (aplicable para algunas funciones como `sigmoid` o `tanh`) ver [parámetros adicionales](#parametros-adicionales-para-optimizadores). | `1`                         |
-|            | `optimizer.method`           | Método de optimización para ajustar los pesos de la red. Puede ser `gradient_descent`, `adam`, o `momentum`.                                                                                               | `"gradient_descent"`        |
+|            | `activation_function.beta`   | Parámetro adicional para ajustar la forma de la función de activación (aplicable para algunas funciones como `sigmoid` o `tanh`).                                                                       | `1`                         |
+|            | `optimizer.method`           | Método de optimización para ajustar los pesos de la red. Puede ser `gradient_descent`, `adam`, o `momentum` ver [parámetros adicionales](#parámetros-adicionales-para-optimizadores).                                         | `"gradient_descent"`        |
 | `training` | `seed`                       | Semilla para generar números aleatorios, garantiza reproducibilidad.                                                                                                                                       | `42`                        |
 |            | `epochs`                     | Número de épocas (iteraciones completas sobre el conjunto de entrenamiento) que se ejecutarán.                                                                                                             | `20`                        |
 |            | `mini_batch_size`            | Tamaño de los mini-batches utilizados durante el entrenamiento.                                                                                                                                            | `16`                        |
 |            | `learning_rate`              | Tasa de aprendizaje utilizada para el optimizador, controla la magnitud de los ajustes en cada actualización de los pesos.                                                                                 | `0.01`                      |
-|            | `epsilon`                    | Valor pequeño para determinar convergencia.                                                                                                                                                                     | `0.01`                      |
+|            | `epsilon`                    | Valor pequeño para determinar la convergencia.                                                                                                                                                                     | `0.01`                      |
 
 ##### Parámetros adicionales para optimizadores
 
@@ -195,27 +219,28 @@ Al igual que la configuración del perceptrón escalón, tiene parámetros que s
 
 #### Instanciación y entrenamiento
 
-Usando la utilidad de la clase Config en [utils](./src/utils/). Es necesario usar Config para poder pasar la funcion de activación y de optimización correctamente. En caso de no querer usarlo se deberan crear instancias de `ActivationFunction` y `Optimizer` para pasarle como parámetros a la instancia de la red neuronal.
+Usando la utilidad de la clase Config en [utils](./src/utils/). Es necesario usar Config para poder pasar la función de activación y de optimización correctamente. En caso de no querer usarla, se deberán crear instancias de `ActivationFunction` y `Optimizer` para pasarlas como parámetros a la instancia de la red neuronal.
+
 ```python
 config = Config().read_config("./ruta/al/archivo.json")
 
 net = MultilayerPerceptron(
-	seed=config.seed,
-	topology=config.topology,
-	activation_function=config.activation_function,
-	optimizer=config.optimizer,
+    seed=config.seed,
+    topology=config.topology,
+    activation_function=config.activation_function,
+    optimizer=config.optimizer,
 )
 
 net.fit(
-	training_data=X,
-	epochs=config.epochs,
-	mini_batch_size=config.mini_batch_size,
+    training_data=X,
+    epochs=config.epochs,
+    mini_batch_size=config.mini_batch_size,
 )
 ```
 
 #### Predicción
 
-Semejante a los otros perceptrones, se predice tal que:
+Similar a los otros perceptrones, se predice de la siguiente manera:
 
 ```python
 net.feedforward(X)
@@ -225,12 +250,12 @@ net.feedforward(X)
 
 # Archivos
 
-## ejercicio 1
+## Ejercicio 1
 
 ### `ej1.py`
 Este script implementa un perceptrón simple para resolver problemas de lógica como AND y XOR. Utiliza visualizaciones 2D para mostrar la evolución del límite de decisión a lo largo del entrenamiento, y genera un GIF animado que muestra las diferentes etapas de aprendizaje del modelo a través de las épocas.
 
-## ejercicio 2
+## Ejercicio 2
 
 ### `ej2_analysis.ipynb`
 Análisis de resultados y visualizaciones relacionados con perceptrones lineales y no lineales, evaluando métricas de rendimiento y explorando diferencias entre los métodos.
@@ -244,7 +269,7 @@ Este script compara la evolución de la pérdida entre perceptrones lineales y n
 ### `ej2_n_vs_l.py`
 Este script realiza una comparación entre perceptrones lineales y no lineales utilizando métricas de regresión como MSE, MAE, R2 y RMSE. Emplea validación cruzada para evaluar el rendimiento de cada modelo, mostrando los resultados a través de gráficos.
 
-## ejercicio 3
+## Ejercicio 3
 
 ### `ej3.py`
 Este script entrena un MLP (Multilayer Perceptron) para varias tareas lógicas, como XOR, paridad y reconocimiento de números. Incluye diferentes configuraciones de entrenamiento que involucran datos limpios y ruidosos, aplicando validación cruzada y evaluando la precisión del modelo en distintos conjuntos de pruebas.
@@ -258,13 +283,10 @@ Script que genera gráficos para evaluar la precisión de modelos entrenados en 
 ### `ej3z5_optimizers.ipynb`
 Notebook para el análisis y comparación de optimizadores en el entrenamiento de modelos, explorando sus efectos en el rendimiento y la convergencia del aprendizaje. En realidad, se usó el dataset MNIST para esta comparación.
 
-## ejercicio 4
+## Ejercicio 4
 
 ### `ej4.py`
 Script que carga el conjunto de datos MNIST y entrena un MLP para clasificar los dígitos escritos a mano. Realiza la normalización y preparación de datos, y evalúa la precisión del modelo sobre el conjunto de pruebas.
 
-### `mnist_interface.py`
+### `ej4_interface.py`
 Este script implementa una interfaz gráfica con Pygame para dibujar dígitos y predecirlos usando un modelo entrenado de MLP (Multilayer Perceptron). Permite al usuario dibujar un dígito y recibir una predicción en tiempo real sobre el dígito dibujado, mostrando también la distribución de probabilidades para cada posible dígito.
-
-### `mnist_test.py`
-Script que prepara el conjunto de datos MNIST y entrena un modelo de MLP para clasificar dígitos escritos a mano. También se utiliza para evaluar la precisión del modelo sobre el conjunto de pruebas, mostrando el porcentaje de aciertos y la cantidad total de ejemplos correctamente clasificados.
