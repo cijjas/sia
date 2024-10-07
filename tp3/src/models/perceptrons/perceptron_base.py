@@ -23,17 +23,17 @@ class PerceptronBase:
 
     def compute_error(self, expected, actual):
         pass
-   
-    
+
+
     def predict(self, X):
         X_bias = np.hstack((np.ones((X.shape[0], 1)), X))
-        
+
         h = X_bias @ self.weights
 
         O_h = self.compute_activation(h)
 
         return O_h
-    
+
     def compute_beta(self, y, o, h, ):
         pass
 
@@ -48,16 +48,19 @@ class PerceptronBase:
                 # Add the bias to the feature vector
                 X_mu = np.concatenate(([1], X[mu]))
 
-                # 1. calculate the weighted sum 
+                # 1. calculate the weighted sum
                 h_mu = self.weights @ X_mu
-                
+
                 # 2. Compute the activation given by theta(h_mu)
                 O_h_mu = self.compute_activation(h_mu)
-                
+
                 # 3. update the weights and bias
                 for i in range(len(self.weights)):
+                    # ∂E/∂w_i = ∂E/∂a ⋅ ∂a/∂z ⋅ ∂z/∂w_i = (predicted - expected) ⋅ (a^prime) ⋅ (input_i)
+                    # ∂E/∂b = ∂E/∂a ⋅ ∂a/∂z ⋅ ∂z/∂b = (predicted - expected) ⋅ (a^prime) ⋅ (1)
+                    # a^prime = 1 for simple and linear
                     self.weights[i] += self.learning_rate * (y[mu] - O_h_mu) * X_mu[i] * self.compute_gradient(h_mu)
-                
+
                 # also optimize beta and eta
                 if self.optimizer:
                     self.beta += self.beta_learning_rate * (y[mu] - O_h_mu) * h_mu * self.compute_gradient(h_mu)
@@ -80,8 +83,5 @@ class PerceptronBase:
             print(f"Perceptron did not converge in {num_epochs} epochs with error {error}")
         else:
             print(f"Perceptron converged in {epoch+1} epochs with error {error}")
-        
-        return converged
 
-                
-          
+        return converged
