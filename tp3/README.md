@@ -23,7 +23,7 @@ En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para ana
     - [Configuración](#configuración-2)
     - [Instanciación y entrenamiento](#instanciación-y-entrenamiento-2)
     - [Predicción](#predicción-2)
-- [Archivos](#archivos-y-ejemplos-de-ejecucion)
+- [Archivos y Ejemplos de Ejecución](#archivos-y-ejemplos-de-ejecucion)
   - [Ejercicio 1](#ejercicio-1)
   - [Ejercicio 2](#ejercicio-2)
   - [Ejercicio 3](#ejercicio-3)
