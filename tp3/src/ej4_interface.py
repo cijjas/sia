@@ -6,6 +6,9 @@ from models.mlp.network_2 import MultilayerPerceptron
 from utils.config import Config
 import tensorflow as tf
 from io import BytesIO
+import gzip
+import pickle
+import numpy as np
 
 # Constants for the window
 WINDOW_WIDTH = 900
@@ -60,11 +63,29 @@ CONFIDENCE_COLOR_SOMEWHAT = (255, 255, 0)  # Yellow
 CONFIDENCE_COLOR_NOT = (255, 0, 0)         # Red
 
 
-def prepare_mnist_data():
+
+def load_mnist(path):
+    with gzip.open(path, 'rb') as f:
+        train_set, valid_set, test_set = pickle.load(f, encoding='latin1')
+    return train_set, valid_set, test_set
+
+
+def prepare_mnist_data(path):
     """
     Prepares the MNIST dataset for training.
     """
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
+    train_set, valid_set, test_set = load_mnist(path)
+    x_train, y_train = train_set
+    x_valid, y_valid = valid_set
+    x_test, y_test = test_set
+
+    # Convert to numpy arrays if necessary
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
     x_train = x_train.reshape(-1, 28*28).astype('float32') / 255
     x_test = x_test.reshape(-1, 28*28).astype('float32') / 255
@@ -77,8 +98,8 @@ def prepare_mnist_data():
                  for x, y in zip(x_test, y_test)]
     return training_data, test_data
 
-def train_mnist_classifier(config):
-    training_data, test_data = prepare_mnist_data()
+def train_mnist_classifier(config, path):
+    training_data, test_data = prepare_mnist_data(path)
     net = MultilayerPerceptron(
         seed=config.seed,
         sizes=config.topology,
@@ -407,28 +428,34 @@ def run_pygame_interface(net):
         pygame.display.flip()
         clock.tick(120)
 
+import os
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python script.py <config_file>")
+        print("Usage: python script.py <config_file> [model_path]")
         sys.exit(1)
 
+    # Load the configuration
     config = Config().read_config(sys.argv[1])
 
-    import os
-    model_path = "store/adam_95.npz"
+    # Get model path from CLI or use default
+    model_path = sys.argv[2] if len(sys.argv) > 2 else "store/adam_95.npz"
 
+    # Check if the model exists
     if os.path.exists(model_path):
+        print(f"Loading model from: {model_path}")
         net = MultilayerPerceptron.load_model(
             model_path,
             config.activation_function,
             config.optimizer
         )
     else:
-        net = train_mnist_classifier(config)
+        print(f"Model not found at {model_path}, starting training...")
+        net = train_mnist_classifier(config, "../res/mnist.pkl.gz")
         net.save_model(model_path)
 
+    # Run the interface
     run_pygame_interface(net)
-
 if __name__ == "__main__":
     main()
 
