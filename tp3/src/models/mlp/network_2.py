@@ -1,5 +1,4 @@
 import numpy as np
-from typing import Optional
 from utils.optimizer import Optimizer
 from utils.activation_function import ActivationFunction
 
@@ -8,7 +7,7 @@ class MultilayerPerceptron(object):
     def __init__(
         self,
         seed,
-        sizes,
+        topology,
         activation_function: ActivationFunction,
         optimizer: Optimizer,
         weights=None,
@@ -17,18 +16,18 @@ class MultilayerPerceptron(object):
         if seed is not None:
             np.random.seed(seed)
 
-        self.num_layers = len(sizes)
+        self.num_layers = len(topology)
         self.sigma = activation_function
         self.optimizer = optimizer
-        self.sizes = sizes
+        self.topology= topology
 
         if weights is not None and biases is not None:
             self.weights = weights
             self.biases = biases
         else:
-            self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
+            self.biases = [np.random.randn(y, 1) for y in topology[1:]]
             self.weights = [
-                np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])
+                np.random.randn(y, x) for x, y in zip(topology[:-1], topology[1:])
             ]
 
     # Returns the output of the neural network when 'a' is giving as input
@@ -116,13 +115,13 @@ class MultilayerPerceptron(object):
     def save_model(self, filename):
         weights_array = np.array(self.weights, dtype=object)
         biases_array = np.array(self.biases, dtype=object)
-        sizes_array = np.array(self.sizes, dtype=object)
+        topology_array = np.array(self.topology, dtype=object)
 
         np.savez_compressed(
             filename,
             weights=weights_array,
             biases=biases_array,
-            sizes=sizes_array,
+            topology=topology_array,
         )
 
     @classmethod
@@ -130,14 +129,14 @@ class MultilayerPerceptron(object):
         data = np.load(filename, allow_pickle=True)
         weights = data["weights"]
         biases = data["biases"]
-        sizes = data["sizes"].tolist()
+        topology = data["topology"].tolist()
 
         weights = weights.tolist()
         biases = biases.tolist()
 
         model = cls(
             seed=seed,
-            sizes=sizes,
+            topology=topology,
             activation_function=activation_function,
             optimizer=optimizer,
             weights=weights,

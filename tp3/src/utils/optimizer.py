@@ -1,20 +1,23 @@
 import numpy as np
 
 class Optimizer:
-    def __init__(self, method="gradient_descent", mini_batch_size=16, eta=0.01,
-                 alpha=0.9, beta_1=0.9, beta_2=0.999, epsilon=1e-8):
+    def __init__(self, method="gradient_descent", mini_batch_size=16, eta=0.01, alpha=0.9, beta_1=0.9, beta_2=0.999, epsilon=1e-8):
         self.method = method
-        self.eta = eta # aka alpha= stepsize of momentum
+        self.eta = eta
         self.mini_batch_size = mini_batch_size
+
+        # Momentum parameters
         self.alpha = alpha
+
+        # Adam parameters
         self.beta_1 = beta_1 # require exponential decay rates for the moment estimates [0,1)
         self.beta_2 = beta_2
         self.epsilon = epsilon
-        self.v_w = None  # For momentum and Adam
+        self.v_w = None
         self.v_b = None
-        self.m_w = None  # For Adam
+        self.m_w = None
         self.m_b = None
-        self.t = 0       # Time step for Adam
+        self.t = 0
 
     def get_method(self):
         return self.method

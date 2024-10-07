@@ -1,4 +1,4 @@
-from models.mlp.network import MultilayerPerceptron
+from models.mlp.network_2 import MultilayerPerceptron
 from utils.activation_function import ActivationFunction
 from utils.optimizer import Optimizer
 import numpy as np
@@ -30,9 +30,9 @@ def convert_file_to_numpy(file_path: str, bits_per_element: int) -> np.ndarray:
         current_element.extend(row)
 
         while len(current_element) >= bits_per_element:
-            element_bits = current_element[:bits_per_element] 
-            output.append([[bit] for bit in element_bits])  
-            current_element = current_element[bits_per_element:] 
+            element_bits = current_element[:bits_per_element]
+            output.append([[bit] for bit in element_bits])
+            current_element = current_element[bits_per_element:]
 
     if current_element:
         raise ValueError(f"Leftover bits that do not form a complete element: {current_element}")
@@ -44,10 +44,10 @@ def logic_xor(config: Config):
     X_logical = convert_file_to_numpy(config.data, bits_per_element=2)
     y_selected = np.array([[0], [1], [1], [0]])
     training_data = list(zip(X_logical, y_selected))
-    
+
     net = MultilayerPerceptron(
         seed=config.seed,
-        topology=config.topology, 
+        topology=config.topology,
         activation_function=config.activation_function,
         optimizer=config.optimizer
     )
@@ -58,9 +58,9 @@ def logic_xor(config: Config):
 
     net.fit(
         training_data=training_data,
-        epochs=config.epochs, 
+        epochs=config.epochs,
         mini_batch_size=config.mini_batch_size,
-        eta=config.learning_rate, 
+        eta=config.learning_rate,
         epsilon=config.epsilon,
         test_data=test_data,
         test_results=test_results
@@ -70,9 +70,9 @@ def logic_xor(config: Config):
 
     print(f"Accuracy: {net.evaluate(test_data=training_data, epsilon=config.epsilon)}")
 
-    
 
-    
+
+
 
 
 # Exercise 2
@@ -107,7 +107,7 @@ def parity(config: Config):
         test_data=training_data,
         test_results=test_results
         ) # ! learning rate is divided by the mini_batch_update
-    
+
     persist_results(f'{RESULTS_DIR}/{PARITY_FILE}', net.weights, net.biases, test_results, config.epochs)
 
     print(f"Accuracy: {net.evaluate(test_data=training_data, epsilon=config.epsilon)}")
@@ -139,7 +139,7 @@ def number_identifier(config: Config):
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
-        optimizer=config.optimizer  
+        optimizer=config.optimizer
     )
 
     test_results: list[tuple[int, int]] = []
@@ -204,7 +204,7 @@ def number_identifier_clean_clean(config: Config):
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
-        optimizer=config.optimizer  
+        optimizer=config.optimizer
     )
 
     test_results: list[tuple[int, int]] = []
@@ -255,7 +255,7 @@ def number_identifier_clean_noisy1(config: Config):
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
-        optimizer=config.optimizer  
+        optimizer=config.optimizer
     )
 
     test_results: list[tuple[int, int]] = []
@@ -369,7 +369,7 @@ def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.n
                 return array.item()
             else:
                 return array.tolist()
-        
+
         return [[(unwrap(pred), unwrap(true)) for pred, true in epoch] for epoch in test_results]
 
     data = {
@@ -378,7 +378,7 @@ def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.n
         "test_results": convert_test_results(test_results),
         "epochs": epochs
     }
-    
+
     with open(json_file, "w") as f:
         json.dump(data, f, indent=4)
 

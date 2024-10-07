@@ -1,13 +1,12 @@
 import sys
 import pygame
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from models.mlp.network_2 import MultilayerPerceptron
 from utils.config import Config
 import tensorflow as tf
 from io import BytesIO
-import gzip
-import pickle
 import numpy as np
 
 # Constants for the window
@@ -71,27 +70,8 @@ CONFIDENCE_COLOR_SOMEWHAT = (255, 255, 0)  # Yellow
 CONFIDENCE_COLOR_NOT = (255, 0, 0)  # Red
 
 
-def load_mnist(path):
-    with gzip.open(path, "rb") as f:
-        train_set, valid_set, test_set = pickle.load(f, encoding="latin1")
-    return train_set, valid_set, test_set
-
 
 def prepare_mnist_data(path):
-    """
-    Prepares the MNIST dataset for training.
-    """
-    train_set, valid_set, test_set = load_mnist(path)
-    x_train, y_train = train_set
-    x_valid, y_valid = valid_set
-    x_test, y_test = test_set
-
-    # Convert to numpy arrays if necessary
-    x_train = np.array(x_train)
-    y_train = np.array(y_train)
-    x_test = np.array(x_test)
-    y_test = np.array(y_test)
-
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
     x_train = x_train.reshape(-1, 28 * 28).astype("float32") / 255
@@ -110,7 +90,7 @@ def train_mnist_classifier(config, path):
     training_data, test_data = prepare_mnist_data(path)
     net = MultilayerPerceptron(
         seed=config.seed,
-        sizes=config.topology,
+        topology=config.topology,
         activation_function=config.activation_function,
         optimizer=config.optimizer,
     )
@@ -163,10 +143,6 @@ import matplotlib.ticker as ticker
 
 
 def plot_probability_distribution(probabilities):
-    """
-    Creates a smaller bar plot of the probability distribution of each digit (0-9).
-    Returns a Pygame surface of the plot.
-    """
     # Normalize the LIGHT color to [0, 1] range for Matplotlib
     light_color = [c / 255 for c in LIGHT]
 
@@ -494,19 +470,13 @@ def run_pygame_interface(net):
         pygame.display.flip()
         clock.tick(120)
 
-
-import os
-
-
 def main():
     if len(sys.argv) < 2:
         print("Usage: python script.py <config_file> [model_path]")
         sys.exit(1)
 
-    # Load the configuration
     config = Config().read_config(sys.argv[1])
 
-    # Get model path from CLI or use default
     model_path = sys.argv[2] if len(sys.argv) > 2 else "store/adam_95.npz"
 
     # Check if the model exists
@@ -522,7 +492,6 @@ def main():
         net = train_mnist_classifier(config, "../res/mnist.pkl.gz")
         net.save_model(model_path)
 
-    # Run the interface
     run_pygame_interface(net)
 
 
