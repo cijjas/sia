@@ -38,11 +38,14 @@ class ActivationFunction:
         return np.maximum(0, z)
 
     def relu_prime(self, z: np.ndarray) -> np.ndarray:
-        return np.where(z >= 0, 1, 0)
+        return np.where(z > 0, 1, 0)
 
     def softmax(self, z: np.ndarray) -> np.ndarray:
-        exps = np.exp(z - np.max(z, axis=-1, keepdims=True))  
-        return exps / np.sum(exps, axis=-1, keepdims=True) 
+        exp_z = np.exp(z - np.max(z))
+        return exp_z / np.sum(exp_z, axis=0)
     
     def softmax_prime(self, z: np.ndarray) -> np.ndarray:
         return self.softmax(z) 
+    
+    def __str__(self) -> str:
+        return f"ActivationFunction(method={self.method}, beta={self.beta})"

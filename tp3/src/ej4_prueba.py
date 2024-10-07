@@ -2,7 +2,7 @@ import sys
 import pygame
 import numpy as np
 import matplotlib.pyplot as plt
-from models.mlp.network import MultilayerPerceptron
+from models.mlp.network_2 import MultilayerPerceptron
 from utils.config import Config
 import tensorflow as tf
 from io import BytesIO
@@ -21,14 +21,29 @@ GRID_OFFSET_X = LEFT_WIDTH  # Start drawing grid from here
 GRID_OFFSET_Y = (WINDOW_HEIGHT - (CELL_SIZE * GRID_SIZE)) // 2  # Center the grid vertically
 
 # Colors
-BACKGROUND_COLOR = (0, 0, 0)  # Black
-CELL_ON_COLOR = (255, 255, 255)  # White
-CELL_OFF_COLOR = (0, 0, 0)  # Black
-GRID_LINE_COLOR = (50, 50, 50)  # Dark gray lines for the grid
-BUTTON_COLOR = (0,101,107)  # Apple's blue color
-BUTTON_HOVER_COLOR = (10, 132, 255)
-TEXT_COLOR = (255, 255, 255)  # White
-PREDICTION_COLOR = (255, 255, 255)  # White
+
+TEXT = (255,255,255)
+BACKGROUND = (0,0,0)
+BACKGROUND_2 = (15, 15, 15)
+PRIMARY = (98, 149, 132)
+SECONDARY = (56, 116, 120)
+ACCENT = (255, 0, 0)
+GRID = (50, 50, 50)
+LIGHT = (234, 237, 228)
+
+BACKGROUND_COLOR = BACKGROUND  # Black
+
+CELL_OFF_COLOR = BACKGROUND_2  # Black
+CELL_ON_COLOR = LIGHT  # White
+GRID_LINE_COLOR = GRID  # Dark gray lines for the grid
+
+BUTTON_COLOR = LIGHT  # Apple's blue color
+BUTTON_HOVER_COLOR = PRIMARY
+
+TEXT_COLOR = TEXT  # White
+PREDICTION_COLOR = TEXT  # White
+
+BOREDER_COLOR = PRIMARY  # White
 
 
 # Fonts
@@ -38,7 +53,7 @@ FONT_SIZE_LARGE = 24
 
 font_small = pygame.font.Font('../res/fonts/NeueHaasDisplayRoman.ttf',FONT_SIZE_SMALL)  # Larger font for algorithm buttons and map name
 font_large = pygame.font.Font('../res/fonts/NeueHaasDisplayMediu.ttf',FONT_SIZE_LARGE)  # Larger font for algorithm buttons and map name
-
+font_larger = pygame.font.Font('../res/fonts/NeueHaasDisplayMediu.ttf', 32)  # Larger font for algorithm buttons and map name
 # Confidence Colors
 CONFIDENCE_COLOR_VERY = (0, 255, 0)        # Green
 CONFIDENCE_COLOR_SOMEWHAT = (255, 255, 0)  # Yellow
@@ -99,31 +114,62 @@ def preprocess_grid(grid_array):
     input_vector = blurred_grid_array.flatten().reshape(784, 1)
     return input_vector, blurred_grid_array
 
+
 def create_button(rect, text, font):
-    text_surface = font.render(text, True, TEXT_COLOR)
-    text_rect = text_surface.get_rect(center=rect.center)
-    return {'rect': rect, 'text_surface': text_surface, 'text_rect': text_rect}
+    text_surface = font.render(text, True, TEXT_COLOR)  # Default text color
+    # Right-align the text within the rectangle (for hover detection)
+    text_rect = text_surface.get_rect(midright=rect.midright)
+    return {
+        'rect': rect, 
+        'text_surface': text_surface, 
+        'text_rect': text_rect, 
+        'text': text, 
+        'font': font
+        }
+
+
+import matplotlib.ticker as ticker
 
 def plot_probability_distribution(probabilities):
     """
     Creates a smaller bar plot of the probability distribution of each digit (0-9).
     Returns a Pygame surface of the plot.
     """
+    # Normalize the LIGHT color to [0, 1] range for Matplotlib
+    light_color = [c / 255 for c in LIGHT]
+    
     # Generate the plot using Matplotlib
     custom_colors = [
-        [c / 255 for c in BUTTON_COLOR]   # Normalize BUTTON_COLOR
-        
+        [c / 255 for c in PRIMARY]   # Normalize BUTTON_COLOR
     ]
-    plt.figure(figsize=(2, 1))  # Reduced size of plot
-    plt.bar(range(10), probabilities, tick_label=range(10), color=custom_colors)
-    plt.ylabel("Probability", fontsize=8)
-    plt.title("Probability Distribution", fontsize=10)
-    plt.xticks(fontsize=8)
-    plt.yticks(fontsize=8)
+    
+    fig, ax = plt.subplots(figsize=(2, 1))  # Reduced size of plot
+    
+    # Plot the bar chart
+    ax.bar(range(10), probabilities, tick_label=range(10), color=custom_colors)
+    
+    # Set the labels and title
+    ax.set_ylabel("Probability", fontsize=8, color=light_color)
+    ax.set_title("Probability Distribution", fontsize=10, color=light_color)
+    
+    # Set the tick parameters color
+    ax.tick_params(axis='x', colors=light_color, labelsize=8)
+    ax.tick_params(axis='y', colors=light_color, labelsize=8)
+    
+    # Set the spines (borders) color to LIGHT
+    ax.spines['bottom'].set_color(light_color)
+    ax.spines['left'].set_color(light_color)
+    
+    # Remove the top and right spines (optional)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
-    # Save the plot to an in-memory buffer
+    # Format the y-axis to show two decimal places
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.2f'))
+
+    # Save the plot to an in-memory buffer with transparent background
     buf = BytesIO()
-    plt.savefig(buf, format="png", bbox_inches='tight')  # `bbox_inches='tight'` ensures the plot fits snugly
+    plt.savefig(buf, format="png", bbox_inches='tight', transparent=True)
     buf.seek(0)
     plt.close()
 
@@ -131,6 +177,8 @@ def plot_probability_distribution(probabilities):
     plot_surface = pygame.image.load(buf)
     buf.close()
     return plot_surface
+
+
 
 def run_pygame_interface(net):
     pygame.init()
@@ -143,31 +191,31 @@ def run_pygame_interface(net):
 
     # Buttons
     button_width = 200  # Fixed button width
-    button_height = 50
-    button_x = LEFT_WIDTH // 2 - button_width // 2
+    button_height = 40
+    button_x = LEFT_WIDTH // 2 - button_width // 2 + 25
     button_y_start = 30
-    button_spacing = 20
+    button_spacing = 5
 
     predict_button_rect = pygame.Rect(
         button_x, button_y_start, button_width, button_height)
     clear_button_rect = pygame.Rect(
         button_x, button_y_start + button_height + button_spacing, button_width, button_height)
 
-    predict_button = create_button(predict_button_rect, 'Predict', font_large)
-    clear_button = create_button(clear_button_rect, 'Clear', font_large)
+    predict_button = create_button(predict_button_rect, 'Predict', font_larger)
+    clear_button = create_button(clear_button_rect, 'Clear', font_larger)
 
     buttons = [predict_button, clear_button]
 
     # Processed image display parameters
-    processed_image_width = 150  # Adjusted size
-    processed_image_height = 150
+    processed_image_width = 200  # Adjusted size
+    processed_image_height = 200
     processed_image_x = LEFT_WIDTH // 2 - processed_image_width // 2
     processed_image_y = None  # Will be set after rendering prediction text
 
     # Probability distribution plot
     prob_plot_surface = None
 
-    prediction_text = 'Draw a digit ->'
+    prediction_text = ''
     processed_image_surface = None
 
     while True:
@@ -215,7 +263,7 @@ def run_pygame_interface(net):
 
                             elif button == clear_button:
                                 grid_array.fill(0)
-                                prediction_text = 'Draw a digit ->'
+                                prediction_text = ''
                                 processed_image_surface = None
                                 prob_plot_surface = None
                             break  # Break after handling button click
@@ -265,15 +313,21 @@ def run_pygame_interface(net):
                              (GRID_OFFSET_X + GRID_SIZE * CELL_SIZE, GRID_OFFSET_Y + i * CELL_SIZE))
 
         # Draw buttons with rounded rectangles
+        # Draw buttons with right-aligned text
         for button in buttons:
-            # Change color on hover
+            # Change text color on hover
             if button['rect'].collidepoint(mouse_pos):
-                color = BUTTON_HOVER_COLOR
+                text_surface = button['font'].render(button['text'], True, BUTTON_HOVER_COLOR)  # Change text color on hover
             else:
-                color = BUTTON_COLOR
-            pygame.draw.rect(screen, color, button['rect'], border_radius=10)
-            screen.blit(button['text_surface'], button['text_rect'])
+                text_surface = button['font'].render(button['text'], True, BUTTON_COLOR)  # Default text color
 
+            # Right-align the text inside the button rect
+            text_rect = text_surface.get_rect(midright=button['rect'].midright)
+            screen.blit(text_surface, text_rect)
+
+
+        pygame.draw.line(screen, BOREDER_COLOR, (0, clear_button_rect.bottom + 20), (LEFT_WIDTH, clear_button_rect.bottom + 20), 1)
+        
         # Calculate prediction text position below buttons
         prediction_text_y = clear_button_rect.bottom + 40
 
@@ -281,14 +335,17 @@ def run_pygame_interface(net):
 
         if processed_image_surface:
             processed_image_rect = screen.blit(processed_image_surface, (processed_image_x, processed_image_y))
-            # Draw border around the processed image
-            border_thickness = 5  # Adjust thickness to your liking
-            pygame.draw.rect(screen, BUTTON_COLOR, processed_image_rect.inflate(border_thickness * 2, border_thickness * 2), border_thickness)
+            
+            border_thickness = 2  # Adjust thickness to your liking
+            pygame.draw.rect(screen, BOREDER_COLOR, processed_image_rect.inflate(border_thickness * 2, border_thickness * 2), border_thickness)
 
-            # Label for the processed image
+            # Label for the processed image (tag in the top-left corner)
             processed_image_label = font_small.render("Input Image", True, PREDICTION_COLOR)
-            label_rect = processed_image_label.get_rect(
-                center=(processed_image_x + processed_image_width // 2, processed_image_y - 20))
+            label_padding = 5  # Small padding for the tag
+            label_rect = processed_image_label.get_rect(topleft=(processed_image_rect.left + label_padding, processed_image_rect.top + label_padding))
+            
+            # Draw the label on the top-left corner as a small tag
+            pygame.draw.rect(screen, BOREDER_COLOR, label_rect.inflate(10, 5))  # Optional: draw background for the tag
             screen.blit(processed_image_label, label_rect)
 
             # Draw the probability distribution plot below the processed image
@@ -299,7 +356,7 @@ def run_pygame_interface(net):
 
         # Calculate prediction text position below the probability plot
         if prob_plot_surface:
-            prediction_text_y = prob_plot_y + 180  # Or any suitable offset
+            prediction_text_y = prob_plot_y + 150  # Or any suitable offset
         else:
             prediction_text_y = processed_image_y + processed_image_height + 20  # Fallback position
 
@@ -308,7 +365,7 @@ def run_pygame_interface(net):
         # Render prediction text
         if prediction_text:
             lines = prediction_text.split('\n')
-            right_align_x = LEFT_WIDTH - 20  # Right margin, adjust as needed
+            right_align_x = LEFT_WIDTH - 30  # Right margin, adjust as needed
             for i, line in enumerate(lines):
                 if line.startswith("Model is"):
                     # Split the line into words
@@ -348,7 +405,7 @@ def run_pygame_interface(net):
 
 
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(120)
 
 def main():
     if len(sys.argv) < 2:
@@ -358,7 +415,7 @@ def main():
     config = Config().read_config(sys.argv[1])
 
     import os
-    model_path = "store/model_.npz"
+    model_path = "store/adam_95.npz"
 
     if os.path.exists(model_path):
         net = MultilayerPerceptron.load_model(
