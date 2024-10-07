@@ -14,6 +14,7 @@ def call_noise(data, noise, output_noise):
 
 # we get the noise type and the output file path from the config file
 def main():
+    np.random.seed(42)
     with open(CONFIG_PATH, 'r') as file:
         data = json.load(file)
     noise = data.get('noise', None)
