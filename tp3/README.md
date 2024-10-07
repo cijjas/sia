@@ -3,6 +3,7 @@
 Este proyecto tiene implementaciones básicas de perceptrones lineales, no lineales y perceptrones multicapa (MLP). Las implementaciones se pueden encontrar en [el directorio de modelos](./src/models/).
 
 ![mlp-interface-demo](./res/assets/adam_95.gif)
+Para ejecutar lo que se ve en el gif, ver el [ejercicio 4](#ejercicio-4)
 
 En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para analizar los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#archivos).
 
@@ -255,6 +256,16 @@ net.feedforward(X)
 ### `ej1.py`
 Este script implementa un perceptrón simple para resolver problemas de lógica como AND y XOR. Utiliza visualizaciones 2D para mostrar la evolución del límite de decisión a lo largo del entrenamiento, y genera un GIF animado que muestra las diferentes etapas de aprendizaje del modelo a través de las épocas.
 
+Ejemplo de ejecución:
+
+```bash
+cd src
+```
+
+```bash
+python3 ej1.py ../config/ej1.json
+```
+
 ## Ejercicio 2
 
 ### `ej2_analysis.ipynb`
@@ -290,3 +301,17 @@ Script que carga el conjunto de datos MNIST y entrena un MLP para clasificar los
 
 ### `ej4_interface.py`
 Este script implementa una interfaz gráfica con Pygame para dibujar dígitos y predecirlos usando un modelo entrenado de MLP (Multilayer Perceptron). Permite al usuario dibujar un dígito y recibir una predicción en tiempo real sobre el dígito dibujado, mostrando también la distribución de probabilidades para cada posible dígito.
+
+#### Cómo ejecutar
+
+Para ejecutar el script `ej4_interface.py`, utilizar el siguiente comando:
+
+```bash
+cd src
+python ej4_interface.py <config_file> [model_path]
+```
+
+- `<config_file>`: Esta es la ruta al archivo de configuración que contiene todos los parámetros necesarios para entrenar el modelo tal como se exlicó en [Configuración del perceptrón multicapa](#configuration-2). En caso de ya tener un modelo entrenado se requiere igual para poder hacer la carga del modelo (esto es así por la naturaleza de las función load que fue pensada para más casos que sólo la interface como por ejemplo seguir entrenando un modelo con otra función de activación y otro optimizador).
+- `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 95.12% en el set de testeo.
+
+El script comenzará cargando el modelo o entrenando uno nuevo, y luego lanzará una interfaz gráfica basada en Pygame donde los usuarios pueden dibujar un dígito en la pantalla. El modelo intentará reconocer el dígito dibujado, mostrando el número predicho junto con una distribución de probabilidad que indica la confianza del modelo.
