@@ -1,7 +1,8 @@
 {
     "problem": {
-        "type": "number_identifier",
-        "data": "../res/ej3/big/TP3-ej3-digitos.txt"
+        "type": "number_identifier_2",
+        "data": "../res/ej3/TP3-ej3-digitos.txt",
+        "testing_data": "../res/ej3/big/100_xor_mean_0_stddev_0.75.txt"
     },
     "network": {
         "topology": [35,20,10],
@@ -15,11 +16,10 @@
     },
     "training": {
         "seed": 23,
-        "epochs": 20,
+        "epochs": 1000,
         "mini_batch_size": 50,
         "learning_rate": 16,
         "epsilon": 0.01,
-        "path_to_weights_and_biases": "output/ej3/noisy1_noisy2/cross_val_res_digit.json", "CONSIDER": "We want to take into consideration what we learnt from the clean_clean training",
         "n_splits": 10, "REMEMBER":"currently, the training set is big/TP3-ej3-digitos.txt, which has 1000 digits"
     }
   
