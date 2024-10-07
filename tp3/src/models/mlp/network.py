@@ -1,9 +1,14 @@
-import random
 import numpy as np
 from typing import Optional
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import KFold
-
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import imageio
+import os
+from sklearn.metrics import confusion_matrix
+from typing import Optional, List, Tuple
 from utils.optimizer import Optimizer
 from utils.activation_function import ActivationFunction
 
@@ -69,7 +74,7 @@ class MultilayerPerceptron(object):
         n: int = len(training_data)
 
         for j in range(epochs):
-            random.shuffle(training_data)
+            np.random.shuffle(training_data)
             mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
                 training_data[k:k+mini_batch_size]
                 for k in range(0, n, mini_batch_size)]
@@ -88,43 +93,8 @@ class MultilayerPerceptron(object):
                 print("Epoch {0} complete".format(j))
             if training_results is not None:
                 training_result = []
-                self.evaluate(test_data=training_data[:10], epsilon=epsilon, test_results=training_result)
+                self.evaluate(test_data=training_data[-mini_batch_size:], epsilon=epsilon, test_results=training_result)
                 training_results.append(training_result)
-            
-    def fit_with_cross_validation(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, eta: float, mini_batch_size: int,
-                                epsilon: float, n_splits: int, test_results: list[tuple[int, int]]) -> None:
-        if len(training_data) % n_splits != 0:
-            raise ValueError("The number of splits must be a divisor of the number of training samples")
-
-        k_fold_size = len(training_data) // n_splits
-        if mini_batch_size > k_fold_size * (n_splits - 1):
-            print(f"Warning: mini_batch_size (={mini_batch_size}) is larger than the number of samples used for training \
-                  ({n_splits-1} groups of {k_fold_size} samples each, which equals a training set of {k_fold_size*(n_splits-1)} samples)\
-                  . (which means the training is done with one big mini batch instead of many smaller ones)")
-
-        if epochs%n_splits != 0:
-            epochs = epochs + n_splits - epochs%n_splits
-            print(f"Epochs were adjusted to {epochs} to match the number of splits")
-
-        for i in range(0, epochs, n_splits):
-            random.shuffle(training_data)
-            kf = KFold(n_splits=n_splits, shuffle=True, random_state=None)
-            for train_index, test_index in kf.split(training_data):
-                training_data_cv = [training_data[i] for i in train_index]
-                test_data_cv = [training_data[i] for i in test_index]
-                mini_batches: list[list[tuple[np.ndarray, np.ndarray]]] = [
-                    training_data_cv[k:k + mini_batch_size]
-                    for k in range(0, len(training_data_cv), mini_batch_size)]
-                for mini_batch in mini_batches:
-                    self.update_weights_and_biases(mini_batch, eta)
-
-                
-                test_result = []
-                self.evaluate(test_data=test_data_cv, epsilon=epsilon, test_results=test_result)
-                test_results.append(test_result)
-
-            print(f"Epoch {i}")
-
 
     def update_weights_and_biases(self, mini_batch: list[tuple[np.ndarray, np.ndarray]], eta: float) -> None:
         """Update the network's weights and biases by applying
@@ -141,12 +111,11 @@ class MultilayerPerceptron(object):
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
-        self.weights, self.biases = self.optimizer.update(
+        self.weights, self.biases = self.optimizer.update_parameters(
             weights=self.weights,
             biases=self.biases,
             grads_w=nabla_w,
-            grads_b=nabla_b,
-            mini_batch_size=len(mini_batch)
+            grads_b=nabla_b
         )
 
     def backprop(self, input:np.ndarray, expected:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
@@ -201,7 +170,6 @@ class MultilayerPerceptron(object):
         else:
             return self.multi_output_evaluation(test_data, epsilon, test_results)
 
-
     def single_output_evaluation(self, test_data: list[tuple[np.ndarray, np.ndarray]], epsilon: float, test_results: list[tuple[np.ndarray, np.ndarray]] = None) -> float:
         """Return the number of test inputs for which the neural
         network outputs the correct result."""
@@ -249,3 +217,135 @@ class MultilayerPerceptron(object):
 
         accuracy = accuracy_score(y_true, y_pred)
         return accuracy
+
+    #################################################################################################################################
+
+    def fit_with_cross_validation(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, eta: float, mini_batch_size: int,
+                                epsilon: float, n_splits: int, test_results: list[tuple[int, int]]) -> None:
+        if len(training_data) % n_splits != 0:
+            raise ValueError("The number of splits must be a divisor of the number of training samples")
+
+        k_fold_size = len(training_data) // n_splits
+        if mini_batch_size > k_fold_size * (n_splits - 1):
+            print(f"Warning: mini_batch_size (={mini_batch_size}) is larger than the number of samples used for training \
+                  ({n_splits-1} groups of {k_fold_size} samples each, which equals a training set of {k_fold_size*(n_splits-1)} samples)\
+                  . (which means the training is done with one big mini batch instead of many smaller ones)")
+
+        if epochs%n_splits != 0:
+            epochs = epochs + n_splits - epochs%n_splits
+            print(f"Epochs were adjusted to {epochs} to match the number of splits")
+
+        for i in range(0, epochs, n_splits):
+            np.random.shuffle(training_data)
+            kf = KFold(n_splits=n_splits, shuffle=True, random_state=None)
+            for train_index, test_index in kf.split(training_data):
+                training_data_cv = [training_data[i] for i in train_index]
+                test_data_cv = [training_data[i] for i in test_index]
+                mini_batches: list[list[tuple[np.ndarray, np.ndarray]]] = [
+                    training_data_cv[k:k + mini_batch_size]
+                    for k in range(0, len(training_data_cv), mini_batch_size)]
+                for mini_batch in mini_batches:
+                    self.update_weights_and_biases(mini_batch, eta)
+
+
+                test_result = []
+                self.evaluate(test_data=test_data_cv, epsilon=epsilon, test_results=test_result)
+                test_results.append(test_result)
+
+            print(f"Epoch {i}")
+
+    def fit_with_matrix_confusion(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, mini_batch_size: int, eta: float,
+            epsilon: float, test_data: Optional[list[tuple[np.ndarray, np.ndarray]]] = None,
+            test_results: Optional[list[tuple[int, int]]] = None,
+            training_results: Optional[list[tuple[int, int]]] = None) -> None:
+        """
+        Train the neural network using mini-batch stochastic gradient descent and create a GIF of confusion matrices.
+
+        The ``training_data`` is a list of tuples ``(x, y)``
+        representing the training inputs and the desired outputs.
+
+        If ``test_data`` is provided then the network will be
+        evaluated against the test data after each epoch, and
+        partial progress printed out.
+        """
+
+        if test_data is not None:
+            n_test = len(test_data)
+
+        n: int = len(training_data)
+        images = []  # To store file paths of confusion matrix images for GIF
+
+        for j in range(epochs):
+            np.random.shuffle(training_data)
+            mini_batches: List[List[tuple[np.ndarray, np.ndarray]]] = [
+                training_data[k:k + mini_batch_size]
+                for k in range(0, n, mini_batch_size)
+            ]
+            for mini_batch in mini_batches:
+                self.update_weights_and_biases(mini_batch, eta)
+
+            # Logic for when test_data is provided
+            if test_data is not None:
+                if test_results is not None:
+                    test_result = []
+                    self.evaluate(test_data=test_data, epsilon=epsilon, test_results=test_result)
+                    test_results.append(test_result)
+                else:
+                    print("Epoch {0}: {1}".format(j, self.evaluate(test_data=test_data, epsilon=epsilon)))
+
+                # Plot and save confusion matrix after every epoch
+                self.plot_confusion_matrix(test_data, epoch=j, images=images)
+
+            else:
+                print("Epoch {0} complete".format(j))
+
+            if training_results is not None:
+                training_result = []
+                self.evaluate(test_data=training_data[-mini_batch_size:], epsilon=epsilon, test_results=training_result)
+                training_results.append(training_result)
+
+        # Create GIF after training completes
+        self.create_gif(images, gif_name='confusion_matrix_evolution.gif')
+
+    def plot_confusion_matrix(self, test_data: list[tuple[np.ndarray, np.ndarray]], epoch: int, images: List[str]) -> None:
+        """
+        Compute and plot the confusion matrix after each epoch.
+
+        Save the matrix as an image.
+        """
+        X_test = np.array([x for x, _ in test_data])
+        y_true = np.array([np.argmax(y) for _, y in test_data])
+
+        # Predict the outputs
+        y_pred = np.array([np.argmax(self.feedforward(x)) for x in X_test])
+
+        # Generate confusion matrix
+        cm = confusion_matrix(y_true, y_pred)
+
+        # Plot confusion matrix
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False,
+                    xticklabels=np.arange(10), yticklabels=np.arange(10))
+        plt.title(f'Confusion Matrix at Epoch {epoch + 1}')
+        plt.xlabel('Predicted')
+        plt.ylabel('True')
+
+        # Save the figure as an image
+        img_name = f'confusion_matrix_epoch_{epoch + 1}.png'
+        plt.savefig(img_name)
+        images.append(img_name)  # Add image path to list
+        plt.close()
+
+    def create_gif(self, images: List[str], gif_name: str) -> None:
+        """
+        Create a GIF from a list of image file paths.
+        """
+        with imageio.get_writer(gif_name, mode='I', duration=1) as writer:
+            for img in images:
+                image = imageio.imread(img)
+                writer.append_data(image)
+        print(f"GIF saved as {gif_name}")
+
+        # Optional: Clean up the individual image files after creating the GIF
+        for img in images:
+            os.remove(img)

@@ -90,7 +90,9 @@ def number_identifier(config: Config):
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
-        optimizer=config.optimizer  
+        optimizer=config.optimizer,
+        weights=weights,
+        biases=biases
     )
     net.fit(
         training_data=training_data,
@@ -115,6 +117,107 @@ def number_identifier(config: Config):
     print(f"Accuracy: {net.evaluate(test_data, epsilon=config.epsilon)}")
     return 1
 
+def number_identifier_noisy1_noisy2(config: Config):
+    """ Trains a network with noisy digits and test it with noisy digits with another distribution.
+      The weights and biases that the network uses are taken from the clean_clean training.
+       It then saves the results of the test in a json file """
+    x = convert_file_to_numpy(config.data, bits_per_element=35)
+
+    y = np.array([
+        [[1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1]],
+    ])
+
+    while len(y) < len(x):
+        y = np.append(y, y, axis=0)
+
+    training_data = list(zip(x, y))
+
+    weights, biases = parse_weights_and_biases(config.path_to_weights_and_biases)
+
+    net = MultilayerPerceptron(
+        seed=config.seed,
+        topology=config.topology,
+        activation_function=config.activation_function,
+        optimizer=config.optimizer,
+        weights=weights,
+        biases=biases
+    )
+
+    test_results: list[tuple[int, int]] = []
+
+    net.fit_with_cross_validation(
+        training_data=training_data,
+        epochs=config.epochs,
+        eta=config.learning_rate,
+        mini_batch_size=config.mini_batch_size,
+        epsilon=config.epsilon,
+        n_splits=config.n_splits,
+        test_results=test_results,
+    ) # ! learning rate is divided by the mini_batch_update
+
+    persist_results(f'{RESULTS_DIR}/{NOISY1_NOISY2_DIR}/cross_val_{DIGIT_TEST_FILE}', net.weights, net.biases, test_results, config.epochs)
+
+    return 1
+
+def number_identifier_second_train_salt_pepper(config: Config):
+    """ Trains a network with noisy digits and test it with noisy digits with another distribution.
+      The weights and biases that the network uses are taken from the clean_clean training.
+       It then saves the results of the test in a json file """
+    x = convert_file_to_numpy(config.data, bits_per_element=35)
+
+    y = np.array([
+        [[1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1],  [0]],
+        [[0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [0],  [1]],
+    ])
+
+    while len(y) < len(x):
+        y = np.append(y, y, axis=0)
+
+    training_data = list(zip(x, y))
+
+    weights, biases = parse_weights_and_biases(config.path_to_weights_and_biases)
+
+    net = MultilayerPerceptron(
+        seed=config.seed,
+        topology=config.topology,
+        activation_function=config.activation_function,
+        optimizer=config.optimizer,
+        weights=weights,
+        biases=biases
+    )
+
+    test_results: list[tuple[int, int]] = []
+
+    net.fit_with_cross_validation(
+        training_data=training_data,
+        epochs=config.epochs,
+        eta=config.learning_rate,
+        mini_batch_size=config.mini_batch_size,
+        epsilon=config.epsilon,
+        n_splits=config.n_splits,
+        test_results=test_results,
+    ) # ! learning rate is divided by the mini_batch_update
+
+    persist_results(f'{RESULTS_DIR}/{SECOND_TRAIN_SALT_PEPPER}/cross_val_{DIGIT_TEST_FILE}', net.weights, net.biases, test_results, config.epochs)
+
+    return 1
 
 
 ############################################################################################################
