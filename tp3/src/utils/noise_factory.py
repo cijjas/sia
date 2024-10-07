@@ -23,19 +23,14 @@ class NoiseFactory:
 
     @staticmethod
     def add_salt_and_pepper_noise(binary_matrix, salt_prob=0.05, pepper_prob=0.05):
-        noisy_matrix = binary_matrix.copy()
-        total_elements = binary_matrix.size
-        num_salt = np.ceil(salt_prob * total_elements).astype(int)
-        num_pepper = np.ceil(pepper_prob * total_elements).astype(int)
-        
-        # Add salt noise
-        coords = [np.random.randint(0, i - 1, num_salt) for i in binary_matrix.shape]
-        noisy_matrix[coords] = 1
-
-        # Add pepper noise
-        coords = [np.random.randint(0, i - 1, num_pepper) for i in binary_matrix.shape]
-        noisy_matrix[coords] = 0
-        
+        noisy_matrix = np.copy(binary_matrix)
+        for row in range(binary_matrix.shape[0]):
+            for col in range(binary_matrix.shape[1]):
+                rand = random.random()
+                if rand < salt_prob:
+                    noisy_matrix[row, col] = 1
+                elif rand > 1 - pepper_prob:
+                    noisy_matrix[row, col] = 0
         return noisy_matrix
     
     @staticmethod

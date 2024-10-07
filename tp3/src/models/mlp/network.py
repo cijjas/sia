@@ -1,4 +1,3 @@
-import random
 import numpy as np
 from typing import Optional
 from sklearn.metrics import accuracy_score
@@ -69,7 +68,7 @@ class MultilayerPerceptron(object):
         n: int = len(training_data)
 
         for j in range(epochs):
-            random.shuffle(training_data)
+            np.random.shuffle(training_data)
             mini_batches:list[list[tuple[np.ndarray, np.ndarray]]] = [
                 training_data[k:k+mini_batch_size]
                 for k in range(0, n, mini_batch_size)]
@@ -88,7 +87,7 @@ class MultilayerPerceptron(object):
                 print("Epoch {0} complete".format(j))
             if training_results is not None:
                 training_result = []
-                self.evaluate(test_data=training_data[:10], epsilon=epsilon, test_results=training_result)
+                self.evaluate(test_data=training_data[-mini_batch_size:], epsilon=epsilon, test_results=training_result)
                 training_results.append(training_result)
             
     def fit_with_cross_validation(self, training_data: list[tuple[np.ndarray, np.ndarray]], epochs: int, eta: float, mini_batch_size: int,
@@ -107,7 +106,7 @@ class MultilayerPerceptron(object):
             print(f"Epochs were adjusted to {epochs} to match the number of splits")
 
         for i in range(0, epochs, n_splits):
-            random.shuffle(training_data)
+            np.random.shuffle(training_data)
             kf = KFold(n_splits=n_splits, shuffle=True, random_state=None)
             for train_index, test_index in kf.split(training_data):
                 training_data_cv = [training_data[i] for i in train_index]
@@ -141,12 +140,11 @@ class MultilayerPerceptron(object):
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
 
-        self.weights, self.biases = self.optimizer.update(
+        self.weights, self.biases = self.optimizer.update_parameters(
             weights=self.weights,
             biases=self.biases,
             grads_w=nabla_w,
-            grads_b=nabla_b,
-            mini_batch_size=len(mini_batch)
+            grads_b=nabla_b
         )
 
     def backprop(self, input:np.ndarray, expected:np.ndarray) -> tuple[list[np.ndarray], list[np.ndarray]]:
