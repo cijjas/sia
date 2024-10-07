@@ -2,7 +2,7 @@
 
 Este proyecto tiene implementaciones básicas de perceptrones lineales, no lineales y perceptrones multicapa (MLP). Las implementaciones se pueden encontrar en [el directorio de modelos](./src/models/).
 
-![mlp-interface-demo](./assets/adam_95.gif)
+![mlp-interface-demo](./res/assets/adam_95.gif)
 
 En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para analizar los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#archivos).
 
