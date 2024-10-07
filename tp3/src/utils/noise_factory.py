@@ -11,9 +11,8 @@ class NoiseType(Enum):
 class NoiseFactory:
     
     @staticmethod
-    def generate_numbers(size=(7, 5)) -> np.ndarray:
-        # Generates a 7x5 matrix of random 0s and 1s
-        return np.random.choice([0, 1], size=size)
+    def generate_zeros(size=(7, 5)) -> np.ndarray:
+        return np.zeros(size, dtype=int)
     
     @staticmethod
     def add_gaussian_noise(binary_matrix, noise_mean=0, noise_std=0.5):
@@ -24,19 +23,14 @@ class NoiseFactory:
 
     @staticmethod
     def add_salt_and_pepper_noise(binary_matrix, salt_prob=0.05, pepper_prob=0.05):
-        noisy_matrix = binary_matrix.copy()
-        total_elements = binary_matrix.size
-        num_salt = np.ceil(salt_prob * total_elements).astype(int)
-        num_pepper = np.ceil(pepper_prob * total_elements).astype(int)
-        
-        # Add salt noise
-        coords = [np.random.randint(0, i - 1, num_salt) for i in binary_matrix.shape]
-        noisy_matrix[coords] = 1
-
-        # Add pepper noise
-        coords = [np.random.randint(0, i - 1, num_pepper) for i in binary_matrix.shape]
-        noisy_matrix[coords] = 0
-        
+        noisy_matrix = np.copy(binary_matrix)
+        for row in range(binary_matrix.shape[0]):
+            for col in range(binary_matrix.shape[1]):
+                rand = random.random()
+                if rand < salt_prob:
+                    noisy_matrix[row, col] = 1
+                elif rand > 1 - pepper_prob:
+                    noisy_matrix[row, col] = 0
         return noisy_matrix
     
     @staticmethod
@@ -45,15 +39,17 @@ class NoiseFactory:
 
     @classmethod
     def generate_noisy_numbers(cls, noise_type: NoiseType, file_path: str, config=None):
-        binary_matrix = cls.generate_numbers()
+        binary_matrix = cls.generate_zeros()
         
         if noise_type == NoiseType.GAUSSIAN:
             noisy_matrix = cls.add_gaussian_noise(binary_matrix, noise_mean=config.get('mean', 0), noise_std=config.get('stddev', 0.5))
-            for _ in range(NUMBERS-1):
+            numbers = int(config.get('numbers', NUMBERS))
+            for _ in range(numbers-1):
                 noisy_matrix = np.append(noisy_matrix, cls.add_gaussian_noise(binary_matrix, noise_mean=config.get('mean', 0), noise_std=config.get('stddev', 0.5)), axis=0)
         elif noise_type == NoiseType.SALT_AND_PEPPER:
             noisy_matrix = cls.add_salt_and_pepper_noise(binary_matrix, salt_prob=config.get('salt_prob', 0.05), pepper_prob=config.get('pepper_prob', 0.05))
-            for _ in range(NUMBERS-1):
+            numbers = int(config.get('numbers', NUMBERS))
+            for _ in range(numbers-1):
                 noisy_matrix = np.append(noisy_matrix, cls.add_salt_and_pepper_noise(binary_matrix, salt_prob=config.get('salt_prob', 0.05), pepper_prob=config.get('pepper_prob', 0.05)), axis=0)
         else:
             raise ValueError('Invalid noise type')

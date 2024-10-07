@@ -1,0 +1,27 @@
+{
+    "problem": {
+        "type": "number_identifier_1",
+        "data": "../res/ej3/TP3-ej3-digitos.txt",
+        "output": "output/ej3/parity.csv",
+        "testing_data": "../res/ej3/TP3-ej3-digitos.txt"
+    },
+    "network": {
+        "topology": [35,20,10],
+        "activation_function": {
+            "method": "sigmoid",
+            "beta": 1
+        },
+        "optimizer": {
+            "method": "gradient_descent"
+        }
+    },
+    "training": {
+        "seed": 23,
+        "epochs": 1000,
+        "mini_batch_size": 5,
+        "learning_rate": 8,
+        "epsilon": 0.01
+    }
+  
+}
+

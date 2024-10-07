@@ -4,8 +4,17 @@ from utils.noise_factory import NoiseFactory, NoiseType
 
 CONFIG_PATH = "../config/ej3_noise.json"
 
+def call_noise(data, noise, output_noise):
+    if noise == 'gaussian':
+        NoiseFactory.generate_noisy_numbers(NoiseType.GAUSSIAN, output_noise, data)
+    elif noise == 'salt_and_pepper':
+        NoiseFactory.generate_noisy_numbers(NoiseType.SALT_AND_PEPPER, output_noise, data)
+    else:
+        raise ValueError("Invalid noise type")
+
 # we get the noise type and the output file path from the config file
 def main():
+    np.random.seed(42)
     with open(CONFIG_PATH, 'r') as file:
         data = json.load(file)
     noise = data.get('noise', None)
@@ -14,12 +23,7 @@ def main():
     if noise is None or output_noise is None:
         raise ValueError("Invalid config file")
     
-    if noise == 'gaussian':
-        NoiseFactory.generate_noisy_numbers(NoiseType.GAUSSIAN, output_noise, data)
-    elif noise == 'salt_and_pepper':
-        NoiseFactory.generate_noisy_numbers(NoiseType.SALT_AND_PEPPER, output_noise, data)
-    else:
-        raise ValueError("Invalid noise type")
+    call_noise(data, noise, output_noise)
     
     print(f"Noisy numbers saved to {output_noise}")
 
@@ -45,6 +49,41 @@ def main():
     np.savetxt(output_xor, xor, fmt='%d')
 
     print(f"XOR applied to noisy numbers saved to {output_xor}")
+
+    test_noise_path = data.get('test-noise', None)
+    # we now generate a small test file with the first 10 numbers of the noisy numbers
+    
+    # we set the 'numbers' field in data to 10
+    data['numbers'] = 10
+    if test_noise_path is None:
+        raise ValueError("Invalid config file")
+    
+    call_noise(data, noise, test_noise_path)
+    # now we just created noise for a small sample
+
+    # we apply the xor to the test file
+
+    test_file_path = data.get('test-file', None)
+
+    if test_file_path is None:
+        raise ValueError("Invalid config file")
+    
+    with open(test_noise_path, 'r') as file:
+        noisy_test = np.loadtxt(file)
+        
+    original_digits_path = data.get('original-digits', None)
+
+    if original_digits_path is None:
+        raise ValueError("Invalid config file")
+    
+    with open(original_digits_path, 'r') as file:
+        original_digits = np.loadtxt(file)
+
+    xor_test = np.logical_xor(noisy_test, original_digits)
+
+    np.savetxt(test_file_path, xor_test, fmt='%d')
+
+    print(f"XOR applied to noisy test numbers saved to {test_file_path}")
 
 
 if __name__ == "__main__":
