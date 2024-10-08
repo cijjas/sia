@@ -22,7 +22,7 @@ class Config(NamedTuple):
 
     def get_json(self, data):
         return Config(
-            type=data['problem'].get("type", None),  
+            type=data['problem'].get("type", None),
             data=data['problem'].get("data", None),
             testing_data=data['problem'].get("testing_data", None),
             output=data['problem'].get("output", None),
@@ -45,12 +45,13 @@ class Config(NamedTuple):
             n_splits=data['training'].get('n_splits', None),
             learning_rate=data['training'].get('learning_rate', None),
             epsilon=data['training'].get('epsilon', None),
+            seed=data['training'].get('seed', None),
             path_to_weights_and_biases=data['training'].get('path_to_weights_and_biases', None)
         )
-        
+
 
     def read_config(self, config_path: str) -> 'Config':
         with open(config_path, 'r') as file:
             data = json.load(file)
-        
+
         return self.get_json(data)

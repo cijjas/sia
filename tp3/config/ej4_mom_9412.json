@@ -1,8 +1,8 @@
 {
     "problem": {
-        "type": "mnist",
-        "data": "../res/ej3/mnist.txt",
-        "output": "output/ej3/mnist.csv"
+        "type": "mnist_digits",
+        "data": "../res/ej4/xor.txt",
+        "output": "output/ej4/xor.csv"
     },
     "network": {
         "topology": [
@@ -15,7 +15,8 @@
             "beta": 1
         },
         "optimizer": {
-            "method": "gradient_descent"
+            "method": "momentum",
+            "alpha": 0.9
         }
     },
     "training": {
