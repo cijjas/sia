@@ -480,7 +480,7 @@ def main():
 
     config = Config().read_config(sys.argv[1])
 
-    model_path = sys.argv[2] if len(sys.argv) > 2 else "store/new_model.npz"
+    model_path = sys.argv[2] if len(sys.argv) > 2 else "store/adam_9756.npz"
 
     # Check if the model exists
     if os.path.exists(model_path):
