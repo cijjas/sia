@@ -1,4 +1,5 @@
-from models.mlp.network_2 import MultilayerPerceptron
+from models.mlp.network_2 import MultilayerPerceptron as MLP2
+from models.mlp.network import MultilayerPerceptron
 from utils.activation_function import ActivationFunction
 from utils.optimizer import Optimizer
 import numpy as np
@@ -46,7 +47,7 @@ def logic_xor(config: Config):
     y_selected = np.array([[0], [1], [1], [0]])
     training_data = list(zip(X_logical, y_selected))
 
-    net = MultilayerPerceptron(
+    net = MLP2(
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
@@ -90,7 +91,7 @@ def parity(config: Config):
     # Second layer hopefully identifies likelyhood of being each number (0, 1, 2...)
     # Last layer simply activates taking into account only the neurons that represent the even numbers
 
-    net = MultilayerPerceptron(
+    net = MLP2(
         seed=config.seed,
         topology=config.topology,
         activation_function=config.activation_function,
