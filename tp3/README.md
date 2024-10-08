@@ -442,7 +442,6 @@ Este script implementa una interfaz gráfica con Pygame para dibujar dígitos y 
 #### Cómo ejecutar
 Si se quiere usar un modelo ya entrenado de ejemplo usar:
 ```bash
-cd src
 python3 ej4_interface.py ../config/mnist_interface.json
 ```
 
@@ -454,7 +453,7 @@ python ej4_interface.py <config_file> [model_path]
 ```
 
 - `<config_file>`: Esta es la ruta al archivo de configuración que contiene todos los parámetros necesarios para entrenar el modelo tal como se exlicó en [Configuración del perceptrón multicapa](#perceptrón-multicapa). En caso de ya tener un modelo entrenado se requiere igual para poder hacer la carga del modelo (esto es así por la naturaleza de las función load que fue pensada para más casos que sólo la interface como por ejemplo seguir entrenando un modelo con otra función de activación y otro optimizador).
-- `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 95.12% en el set de testeo.
+- `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 97.56% en el set de testeo.
 
 El script comenzará cargando el modelo o entrenando uno nuevo, y luego lanzará una interfaz gráfica basada en Pygame donde los usuarios pueden dibujar un dígito en la pantalla. El modelo intentará reconocer el dígito dibujado, mostrando el número predicho junto con una distribución de probabilidad que indica la confianza del modelo.
 
