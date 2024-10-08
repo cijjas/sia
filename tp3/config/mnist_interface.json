@@ -1,12 +1,13 @@
 {
     "problem": {
-        "type": "number_identifier",
-        "data": "../res/ej3/TP3-ej3-digitos.txt"
+        "type": "mnist_digits",
+        "data": "../res/ej4/xor.txt",
+        "output": "output/ej4/xor.csv"
     },
     "network": {
         "topology": [
-            35,
-            20,
+            784,
+            30,
             10
         ],
         "activation_function": {
@@ -18,10 +19,10 @@
         }
     },
     "training": {
-        "seed": 23,
-        "epochs": 200,
-        "mini_batch_size": 4,
-        "learning_rate": 16,
+        "seed": 42,
+        "epochs": 20,
+        "mini_batch_size": 16,
+        "learning_rate": 0.5,
         "epsilon": 0.01
     }
 }

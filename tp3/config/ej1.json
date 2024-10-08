@@ -1,6 +1,6 @@
 {
-    "function": "XOR",
-    "learning_rate": 0.0001,
+    "function": "AND",
+    "learning_rate": 0.001,
     "epochs": 100,
     "epsilon": 1e-5
 }

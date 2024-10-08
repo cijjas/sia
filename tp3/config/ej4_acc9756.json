@@ -7,7 +7,7 @@
     "network": {
         "topology": [
             784,
-            30,
+            128,
             10
         ],
         "activation_function": {
@@ -23,7 +23,7 @@
     },
     "training": {
         "seed": 42,
-        "epochs": 30,
+        "epochs": 200,
         "mini_batch_size": 16,
         "learning_rate": 0.1,
         "epsilon": 0.01

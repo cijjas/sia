@@ -5,7 +5,11 @@
         "output": "output/ej3/parity.csv"
     },
     "network": {
-        "topology": [35,10,1],
+        "topology": [
+            35,
+            10,
+            1
+        ],
         "activation_function": {
             "method": "sigmoid",
             "beta": 1
@@ -21,6 +25,4 @@
         "learning_rate": 8,
         "epsilon": 0.01
     }
-  
 }
-
