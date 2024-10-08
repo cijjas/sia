@@ -2,7 +2,7 @@
     "problem": {
         "type": "number_identifier_2",
         "data": "../res/ej3/TP3-ej3-digitos.txt",
-        "testing_data": "../res/ej3/big/100_xor_mean_0_stddev_0.75.txt"
+        "testing_data": "../res/ej3/big/100_xor_mean_0_stddev_0.4.txt"
     },
     "network": {
         "topology": [35,20,10],
