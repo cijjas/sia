@@ -465,7 +465,7 @@ def persist_results(json_file: str, weights: list[np.ndarray], biases: list[np.n
         json.dump(data, f, indent=4)
 
 def parse_weights_and_biases(file_path: str) -> tuple[list[np.ndarray], list[np.ndarray]]:
-    if file_path is None:
+    if file_path is None or not os.path.exists(file_path):
         return None, None
     with open(file_path, 'r') as file:
         data = json.load(file)
