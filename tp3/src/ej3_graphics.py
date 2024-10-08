@@ -1,3 +1,4 @@
+import sys
 import json
 import numpy as np
 import matplotlib.pyplot as plt
@@ -324,30 +325,22 @@ def plot_precision(json_file: str, png_name: str):
     #plt.show()
     plt.close()  # Close the figure to free up memory
 
+
 def main():
-    
-    ##plot_multi_output_accuracy_vs_epochs("clean_clean/res_digit.json", "digit_accuracy_vs_epochs_clean_clean.png") TODO HECHO
-    
-    ##ESTE HAY QUE HACERLO DOS VECES. UNA PARA CADA STDDEV: 0.4 y 0.75
-    #several_plot_multi_output_accuracy_vs_epochs(["clean_noisy1/res_digit.json", "clean_noisy1/digit_train.json"], "digit_accuracy_vs_epochs_clean_noisy1.png")
-
-    ##plot_cross_validation_accuracy_vs_epochs("noisy1_noisy2/cross_val_res_digit.json", "noisy1_noisy2_cross_val.png") TODO HECHO PERO DEPENDE DE LO ANTERIOR
-    
-    ##plot_precision("noisy1_noisy2/cross_val_res_digit.json", "noisy1_noisy2_precision.png") TODO HECHO PERO DEPENDE DE LO ANTERIOR
-
-    plot_cross_validation_accuracy_vs_epochs("second_train_salt_pepper/cross_val_res_digit.json", "training_with_salt_and_pepper_cross_val.png")
-    
-    
-    #several_plot_multi_output_accuracy_vs_epochs(["clean_noisy1/2_res_digit.json", "clean_noisy1/2_digit_train.json"], "digit_accuracy_vs_epochs_clean_noisy1_3.png")
-
-    
-    #several_plot_multi_output_accuracy_vs_epochs(["noisy1_noisy1/res_digit.json", "noisy1_noisy1/digit_train.json"], "digit_accuracy_vs_epochs_noisy1_noisy1_with_mixed_xor_0_0.4_0.75.png")
-
-    #several_plot_multi_output_accuracy_vs_epochs(["noisy1_noisy2/res_digit.json", "noisy1_noisy2/digit_train.json"], "digit_accuracy_vs_epochs_noisy1_noisy2_mean_0_stddevdata_0.4_stddevtest_0.2.png")
-
-    #plot_cross_validation_accuracy_vs_epochs("noisy1_noisy2/cross_val_res_digit.json", "noisy1_noisy2_cross_val.png")
-
-    #("res_digit.json", "cake_for_original_digits.png")
+    # check for arguments
+    if len(sys.argv) != 2:
+        print("Usage: python ej3_graphics.py <option>")
+        sys.exit(1)
+    if sys.argv[1] == "clean":
+        plot_multi_output_accuracy_vs_epochs("clean_clean/res_digit.json", "digit_accuracy_vs_epochs_clean_clean.png") #TODO HECHO
+    elif sys.argv[1] == "clean_noisy":
+        several_plot_multi_output_accuracy_vs_epochs(["clean_noisy1/res_digit.json", "clean_noisy1/digit_train.json"], "digit_accuracy_vs_epochs_clean_noisy1.png")
+    elif sys.argv[1] == "noisy1_noisy2":
+        plot_cross_validation_accuracy_vs_epochs("noisy1_noisy2/cross_val_res_digit.json", "noisy1_noisy2_cross_val.png")
+    elif sys.argv[1] == "precision":
+        plot_precision("noisy1_noisy2/cross_val_res_digit.json", "noisy1_noisy2_precision.png")
+    elif sys.argv[1] == "second_train_salt_pepper":
+        plot_cross_validation_accuracy_vs_epochs("second_train_salt_pepper/cross_val_res_digit.json", "training_with_salt_and_pepper_cross_val.png")
 
 
 if __name__ == "__main__":
