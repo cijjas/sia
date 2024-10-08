@@ -104,7 +104,7 @@ class MultilayerPerceptron(object):
         test_results = [
             (np.argmax(self.feedforward(x)), np.argmax(y)) for (x, y) in test_data
         ]
-        return sum(int(abs(x - y) < epsilon) for (x, y) in test_results)
+        return sum(int(abs(x - y) < epsilon) for (x, y) in test_results) / len(test_data)
 
     # Derivative of the error function (Squared Error) with respect to the activatio
     def cost_derivative(self, output_activations, y):
