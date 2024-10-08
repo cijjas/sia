@@ -94,12 +94,15 @@ def train_mnist_classifier(config, path):
         activation_function=config.activation_function,
         optimizer=config.optimizer,
     )
+
     net.fit(
         training_data=training_data,
         epochs=config.epochs,
         mini_batch_size=config.mini_batch_size,
-        eta=config.learning_rate,
     )
+
+    print(f"Model Trained with Accuracy: {net.evaluate(test_data=test_data, epsilon=config.epsilon)}")
+
     return net
 
 
@@ -477,7 +480,7 @@ def main():
 
     config = Config().read_config(sys.argv[1])
 
-    model_path = sys.argv[2] if len(sys.argv) > 2 else "store/adam_95.npz"
+    model_path = sys.argv[2] if len(sys.argv) > 2 else "store/new_model.npz"
 
     # Check if the model exists
     if os.path.exists(model_path):
