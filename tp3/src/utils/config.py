@@ -22,7 +22,7 @@ class Config(NamedTuple):
 
     def get_json(self, data):
         return Config(
-            type=data['problem'].get("type", None),  # Uses None if 'type' is missing
+            type=data['problem'].get("type", None),  
             data=data['problem'].get("data", None),
             testing_data=data['problem'].get("testing_data", None),
             output=data['problem'].get("output", None),
