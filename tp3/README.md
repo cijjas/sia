@@ -5,7 +5,7 @@ Este proyecto tiene implementaciones básicas de perceptrones lineales, no linea
 ![mlp-interface-demo](./res/assets/adam_95.gif)
 Para ejecutar lo que se ve en el gif, ver el [ejercicio 4](#ejercicio-4)
 
-En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para analizar los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#archivos).
+En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para analizar los perceptrones y graficar conclusiones o pruebas. Estos archivos se explican más [adelante](#archivos-y-ejemplos-de-ejecucion).
 
 ## Índice
 
@@ -23,11 +23,13 @@ En la carpeta [`./src`](./src) se encuentran varios archivos utilizados para ana
     - [Configuración](#configuración-2)
     - [Instanciación y entrenamiento](#instanciación-y-entrenamiento-2)
     - [Predicción](#predicción-2)
-- [Archivos](#archivos)
+- [Archivos y Ejemplos de Ejecución](#archivos-y-ejemplos-de-ejecucion)
   - [Ejercicio 1](#ejercicio-1)
   - [Ejercicio 2](#ejercicio-2)
   - [Ejercicio 3](#ejercicio-3)
   - [Ejercicio 4](#ejercicio-4)
+
+---
 
 ## Cómo usarlos
 
@@ -139,7 +141,7 @@ non_linear_perceptron = PerceptronNonLinear(
 )
 ```
 
-y para entrenar el modelo es idéntico al [entrenamiento del perceptrón lineal](#instanciación-y-entrenamiento-1).
+y para entrenar el modelo es idéntico al [entrenamiento del perceptrón lineal](#instanciación-y-entrenamiento).
 
 ##### Predicción
 
@@ -241,7 +243,7 @@ net.fit(
 
 #### Predicción
 
-Similar a los otros perceptrones, se predice de la siguiente manera:
+Similar a los otros perceptrones, se predice de la siguiente manera sobre un conjunto de datos X previamente confeccionados o normalizados:
 
 ```python
 net.feedforward(X)
@@ -249,7 +251,14 @@ net.feedforward(X)
 
 ---
 
-# Archivos
+# Archivos y Ejemplos de Ejecución
+
+
+Proporcionamos algunos ejemplos para ejecutar algunos de estos archivos,  ubicarse en la carpeta `src` para poder ejecurarlos:
+
+```bash
+cd src
+```
 
 ## Ejercicio 1
 
@@ -259,14 +268,24 @@ Este script implementa un perceptrón simple para resolver problemas de lógica 
 Ejemplo de ejecución:
 
 ```bash
-cd src
-```
-
-```bash
 python3 ej1.py ../config/ej1.json
 ```
 
 ## Ejercicio 2
+### `ej2_linear.py`
+Implementa un perceptrón lineal para resolver problemas de regresión logística. Carga un conjunto de datos CSV y utiliza un perceptrón lineal para entrenar y evaluar el modelo.
+
+```
+python3 ej2_linear.py ../config/ej2_linear.json
+```
+
+### `ej2_non_linear.py`
+Implementa un perceptrón no lineal utilizando funciones de activación como `sigmoid` o `tanh` para resolver un problema de regresión logística sobre un conjunto de datos. Los datos se normalizan según la función de activación seleccionada.
+
+```
+python3 ej2_non_linear.py ../config/ej2_non_linear.json
+```
+
 
 ### `ej2_analysis.ipynb`
 Análisis de resultados y visualizaciones relacionados con perceptrones lineales y no lineales, evaluando métricas de rendimiento y explorando diferencias entre los métodos.
@@ -278,12 +297,29 @@ Implementación y análisis de validación cruzada para evaluar la robustez de m
 Este script compara la evolución de la pérdida entre perceptrones lineales y no lineales a lo largo de varias épocas, mostrando los resultados mediante gráficos para activaciones como Sigmoid, Tanh y ReLU.
 
 ### `ej2_n_vs_l.py`
-Este script realiza una comparación entre perceptrones lineales y no lineales utilizando métricas de regresión como MSE, MAE, R2 y RMSE. Emplea validación cruzada para evaluar el rendimiento de cada modelo, mostrando los resultados a través de gráficos.
+Este script realiza una comparación entre perceptrones lineales y no lineales utilizando métricas de regresión como MSE, MAE, R2 . Emplea validación cruzada para evaluar el rendimiento de cada modelo, mostrando los resultados a través de gráficos.
 
 ## Ejercicio 3
 
 ### `ej3.py`
-Este script entrena un MLP (Multilayer Perceptron) para varias tareas lógicas, como XOR, paridad y reconocimiento de números. Incluye diferentes configuraciones de entrenamiento que involucran datos limpios y ruidosos, aplicando validación cruzada y evaluando la precisión del modelo en distintos conjuntos de pruebas.
+Este archivo contiene tres ejercicios que implementan redes neuronales multicapa para resolver problemas como lógica XOR, paridad y reconocimiento de dígitos numéricos. Cada ejercicio entrena un perceptrón multicapa con configuraciones específicas.
+
+Cómo ejecutar los distintos ejercicios
+
+- XOR
+```
+python3 ej3-py ../config/ej3_xor.json
+```
+
+- PARIDAD
+```
+python3 ej3-py ../config/ej3_parity.json
+```
+
+- RECONOCIMIENTO DE DÍGITOS
+```
+python3 ej3-py ../config/ej3_digit.json
+```
 
 ### `ej3_gen_noisy_nums.py`
 Este script genera números con ruido aplicando técnicas como ruido Gaussiano y Salt and Pepper. Luego realiza una operación XOR entre los números originales y los ruidosos, y guarda los resultados en archivos específicos para pruebas y análisis posteriores.
@@ -294,13 +330,23 @@ Script que genera gráficos para evaluar la precisión de modelos entrenados en 
 ### `ej3z5_optimizers.ipynb`
 Notebook para el análisis y comparación de optimizadores en el entrenamiento de modelos, explorando sus efectos en el rendimiento y la convergencia del aprendizaje. En realidad, se usó el dataset MNIST para esta comparación.
 
+### `ej3_noise_analysis.py`
+Evalúa mlps con diferentes tipos de datos: desde conjuntos limpios hasta aquellos que contienen ruido. Los experimentos incluyen los experimentos XOR, paridad y reconocimiento de dígitos. 
+
 ## Ejercicio 4
 
 ### `ej4.py`
 Script que carga el conjunto de datos MNIST y entrena un MLP para clasificar los dígitos escritos a mano. Realiza la normalización y preparación de datos, y evalúa la precisión del modelo sobre el conjunto de pruebas.
 
+```
+python3 ej3-py ../config/ej4.json
+```
+
 ### `ej4_interface.py`
 Este script implementa una interfaz gráfica con Pygame para dibujar dígitos y predecirlos usando un modelo entrenado de MLP (Multilayer Perceptron). Permite al usuario dibujar un dígito y recibir una predicción en tiempo real sobre el dígito dibujado, mostrando también la distribución de probabilidades para cada posible dígito.
+
+### `ej4_confusion_matrix.py`
+Similar al archivo `ej4.py`, este archivo entrena un perceptrón multicapa con el conjunto de datos MNIST, pero incluye la creación de una matriz de confusión para evaluar el rendimiento del modelo.
 
 #### Cómo ejecutar
 
@@ -311,7 +357,7 @@ cd src
 python ej4_interface.py <config_file> [model_path]
 ```
 
-- `<config_file>`: Esta es la ruta al archivo de configuración que contiene todos los parámetros necesarios para entrenar el modelo tal como se exlicó en [Configuración del perceptrón multicapa](#configuration-2). En caso de ya tener un modelo entrenado se requiere igual para poder hacer la carga del modelo (esto es así por la naturaleza de las función load que fue pensada para más casos que sólo la interface como por ejemplo seguir entrenando un modelo con otra función de activación y otro optimizador).
+- `<config_file>`: Esta es la ruta al archivo de configuración que contiene todos los parámetros necesarios para entrenar el modelo tal como se exlicó en [Configuración del perceptrón multicapa](#perceptrón-multicapa). En caso de ya tener un modelo entrenado se requiere igual para poder hacer la carga del modelo (esto es así por la naturaleza de las función load que fue pensada para más casos que sólo la interface como por ejemplo seguir entrenando un modelo con otra función de activación y otro optimizador).
 - `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 95.12% en el set de testeo.
 
 El script comenzará cargando el modelo o entrenando uno nuevo, y luego lanzará una interfaz gráfica basada en Pygame donde los usuarios pueden dibujar un dígito en la pantalla. El modelo intentará reconocer el dígito dibujado, mostrando el número predicho junto con una distribución de probabilidad que indica la confianza del modelo.
