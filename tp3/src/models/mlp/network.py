@@ -340,7 +340,7 @@ class MultilayerPerceptron(object):
         """
         Create a GIF from a list of image file paths.
         """
-        with imageio.get_writer(gif_name, mode='I', duration=1) as writer:
+        with imageio.get_writer(gif_name, mode='I', duration=1, loop=0) as writer:
             for img in images:
                 image = imageio.imread(img)
                 writer.append_data(image)
