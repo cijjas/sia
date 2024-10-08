@@ -438,10 +438,12 @@ python3 ej3-py ../config/ej4.json
 ### `ej4_interface.py`
 Este script implementa una interfaz gráfica con Pygame para dibujar dígitos y predecirlos usando un modelo entrenado de MLP (Multilayer Perceptron). Permite al usuario dibujar un dígito y recibir una predicción en tiempo real sobre el dígito dibujado, mostrando también la distribución de probabilidades para cada posible dígito.
 
-### `ej4_confusion_matrix.py`
-Similar al archivo `ej4.py`, este archivo entrena un perceptrón multicapa con el conjunto de datos MNIST, pero incluye la creación de una matriz de confusión para evaluar el rendimiento del modelo.
 
 #### Cómo ejecutar
+Si se quiere usar un modelo ya entrenado de ejemplo usar:
+```bash
+python3 ej4_interface.py ../config/mnist_interface.json
+```
 
 Para ejecutar el script `ej4_interface.py`, utilizar el siguiente comando:
 
@@ -451,6 +453,10 @@ python ej4_interface.py <config_file> [model_path]
 ```
 
 - `<config_file>`: Esta es la ruta al archivo de configuración que contiene todos los parámetros necesarios para entrenar el modelo tal como se exlicó en [Configuración del perceptrón multicapa](#perceptrón-multicapa). En caso de ya tener un modelo entrenado se requiere igual para poder hacer la carga del modelo (esto es así por la naturaleza de las función load que fue pensada para más casos que sólo la interface como por ejemplo seguir entrenando un modelo con otra función de activación y otro optimizador).
-- `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 95.12% en el set de testeo.
+- `[model_path]` (opcional): Esta es la ruta donde se guarda un modelo preentrenado. Si se proporciona esta ruta, el script cargará el modelo preentrenado. Si no se proporciona, se usará el modelo default entrenado con 20 epocas, función de activación sigmoide y optimizador adam que logró una exactitud de 97.56% en el set de testeo.
 
 El script comenzará cargando el modelo o entrenando uno nuevo, y luego lanzará una interfaz gráfica basada en Pygame donde los usuarios pueden dibujar un dígito en la pantalla. El modelo intentará reconocer el dígito dibujado, mostrando el número predicho junto con una distribución de probabilidad que indica la confianza del modelo.
+
+
+### `ej4_confusion_matrix.py`
+Similar al archivo `ej4.py`, este archivo entrena un perceptrón multicapa con el conjunto de datos MNIST, pero incluye la creación de una matriz de confusión para evaluar el rendimiento del modelo.
