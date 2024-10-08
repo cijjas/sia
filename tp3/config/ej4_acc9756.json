@@ -1,0 +1,31 @@
+{
+    "problem": {
+        "type": "mnist",
+        "data": "../res/ej3/mnist.txt",
+        "output": "output/ej3/mnist.csv"
+    },
+    "network": {
+        "topology": [
+            784,
+            128,
+            10
+        ],
+        "activation_function": {
+            "method": "sigmoid",
+            "beta": 1
+        },
+        "optimizer": {
+            "method": "adam",
+            "beta_1": 0.9,
+            "beta_2": 0.999,
+            "epsilon": 1e-8
+        }
+    },
+    "training": {
+        "seed": 42,
+        "epochs": 200,
+        "mini_batch_size": 16,
+        "learning_rate": 0.1,
+        "epsilon": 0.01
+    }
+}
