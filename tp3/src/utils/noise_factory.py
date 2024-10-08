@@ -1,5 +1,4 @@
 import numpy as np
-import random
 from enum import Enum
 
 NUMBERS = 10
@@ -26,7 +25,7 @@ class NoiseFactory:
         noisy_matrix = np.copy(binary_matrix)
         for row in range(binary_matrix.shape[0]):
             for col in range(binary_matrix.shape[1]):
-                rand = random.random()
+                rand = np.random.random()
                 if rand < salt_prob:
                     noisy_matrix[row, col] = 1
                 elif rand > 1 - pepper_prob:
