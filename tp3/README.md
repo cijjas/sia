@@ -322,7 +322,20 @@ python3 ej3-py ../config/ej3_digit.json
 ```
 
 ### `ej3_gen_noisy_nums.py`
-Este script genera números con ruido aplicando técnicas como ruido Gaussiano y Salt and Pepper. Luego realiza una operación XOR entre los números originales y los ruidosos, y guarda los resultados en archivos específicos para pruebas y análisis posteriores.
+Este script genera números con ruido aplicando técnicas como ruido Gaussiano y Salt and Pepper. Luego realiza una operación XOR entre los números originales y los ruidosos, y guarda los resultados en archivos específicos para pruebas y análisis posteriores. El siguiente es un ejemplo de archivo de configuración para generar números con ruido gaussiano de media 0 y desvío estándar 0.4, para un total de 100 números:
+
+```json
+{
+    "noise": "gaussian",
+    "output_noise": "../res/ej3/big/100_noise_mean_0_stddev_0.4.txt",
+    "output_xor": "../res/ej3/big/100_xor_mean_0_stddev_0.4.txt",
+    "nums_path": "../res/ej3/big/100_nums.txt",
+
+    "mean": 0,
+    "stddev": 0.4,
+    "numbers": 100
+}
+```
 
 ### `ej3_graphics.py`
 Script que genera gráficos para evaluar la precisión de modelos entrenados en términos de la evolución de la precisión a lo largo de las épocas. Incluye funciones para graficar la precisión de salida única y múltiple, así como comparaciones entre varias configuraciones de modelos.
@@ -332,6 +345,86 @@ Notebook para el análisis y comparación de optimizadores en el entrenamiento d
 
 ### `ej3_noise_analysis.py`
 Evalúa mlps con diferentes tipos de datos: desde conjuntos limpios hasta aquellos que contienen ruido. Los experimentos incluyen los experimentos XOR, paridad y reconocimiento de dígitos. 
+
+
+# Entrenamiento y testeo sin ruido
+Se puede ejecutar esta opción corriendo en el directorio src el comando:
+
+```python
+python ej3_noise_analysis.py ../config/ej3_digit_train_clean_clean.json
+```
+
+Esto generará un output el directorio `output/ej3/clean_clean`. Luego se puede generar el gráfico ejecutando:
+    
+```python
+python ej3_graphics.py clean
+```
+
+Y el path para el gráfico será `tp3/src/output/ej3/digit_accuracy_vs_epochs_clean_clean.png`.
+
+# Entrenamiento sin ruido y testeo con ruido
+
+Se puede ejecutar esta opción corriendo en el directorio src el comando:
+
+```python
+python ej3_noise_analysis.py ../config/ej3_digit_train_clean_noisy1.json
+```
+
+El parámetro testing_data indica el path al archivo que contiene los números con ruido. Este mismo se puede generar con el script `ej3_gen_noisy_nums.py` como se explicó anteriormente.
+
+Esto generará dos output el directorio `output/ej3/clean_noisy1`: uno json para los resultados del training y otro para los resultados de los tests. Luego se puede generar el gráfico de accuracy vs epochs ejecutando:
+
+```python
+python ej3_graphics.py clean_noisy1
+```
+
+Y el path para el gráfico será `tp3/src/output/ej3/digit_accuracy_vs_epochs_clean_noisy1.png`.
+
+# Entrenamiento con ruido y testeo con ruido
+
+Se puede ejecutar esta opción corriendo en el directorio src el comando:
+
+```python
+python ej3_noise_analysis.py ../config/ej3_digit_train_noisy1_noisy2.json
+```
+
+Ahora el parámetro data indica el path al archivo que contiene los números con ruido. Este mismo se puede generar con el script `ej3_gen_noisy_nums.py` como se explicó anteriormente.
+Además, se está utilizando el parámetro path_to_weights_and_biases para utilizar los pesos y bias obtenidos en el entrenamiento con números sin ruido.
+
+Esto generará dos output el directorio `output/ej3/noisy1_noisy2`: uno json para los resultados del training y otro para los resultados de los tests. Luego se puede generar el gráfico de accuracy vs epochs ejecutando:
+
+```python
+python ej3_graphics.py noisy1_noisy2
+```
+
+Y el path para el gráfico será `tp3/src/output/ej3/digit_accuracy_vs_epochs_noisy1_noisy2.png`.
+
+Ahora se puede generar el gráfico de precisión para cada dígitos ejecutando:
+
+```python
+python ej3_graphics.py precision
+```
+
+Y el path para el gráfico será `tp3/src/output/ej3/training_with_salt_and_pepper_cross_val.png`.
+
+# Entrenamiento con ruido salt and pepper en base a lo aprendido con ruido gaussiano
+
+Se puede ejecutar esta opción corriendo en el directorio src el comando:
+
+```python
+python ej3_noise_analysis.py ../config/ej3_digit_second_train_salt_papper.json
+```
+
+Ahora el parámetro data indica el path al archivo que contiene los números con ruido salt and pepper. Este mismo se puede generar con el script `ej3_gen_noisy_nums.py` como se explicó anteriormente, utilizando `"noise": "salt_and_pepper"` en el archivo de configuración.
+Además, se está utilizando el parámetro path_to_weights_and_biases para utilizar los pesos y bias obtenidos en el entrenamiento con números con ruido gaussiano.
+
+Esto generará dos output el directorio `output/ej3/noisy1_noisy2`: uno json para los resultados del training y otro para los resultados de los tests. Luego se puede generar el gráfico de accuracy vs epochs ejecutando:
+
+```python
+python ej3_graphics.py second_train_salt_pepper
+```
+
+Y el path para el gráfico será `tp3/src/output/ej3/training_with_salt_and_pepper_cross_val.png`.
 
 ## Ejercicio 4
 
