@@ -51,6 +51,10 @@ def main():
     print(f"XOR applied to noisy numbers saved to {output_xor}")
 
     test_noise_path = data.get('test-noise', None)
+    if test_noise_path is None:
+        # no test noise file, we are done
+        print("No test file specified, we are done")
+        return
     # we now generate a small test file with the first 10 numbers of the noisy numbers
     
     # we set the 'numbers' field in data to 10
