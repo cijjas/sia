@@ -1,40 +1,44 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from utils.radius_function import constant_radius
+from utils.eta_function import constant_eta
+from utils.similarity_function import euclidean_distance
 
 class Kohonen:
 
     # grid_size = k
-    def __init__(self, data, grid_size, learning_rate=0.5, radius=1, seed=None):
+    def __init__(self, data, grid_size, learning_rate=0.5, eta_function:callable=constant_eta, radius=1, 
+                 radius_function=constant_radius, similarity_function=euclidean_distance, seed=None, weights:np.ndarray=None):
         if seed is not None:
             np.random.seed(seed)
         self.input_data = data
         self.grid_size = grid_size
         self.learning_rate = learning_rate
+        self.eta_function = eta_function
         self.radius = radius
+        self.radius_function = radius_function
+        self.similarity_function = similarity_function
 
-        self.weights = data[
-            np.random.choice(
-                range(data.shape[0]), size=(grid_size, grid_size)
-            )  # initialize a k*k matrix with random samples from training data
-        ]
+        if weights is not None:
+            self.weights = weights
+        else:
+            self.weights: np.ndarray = data[
+                np.random.choice(
+                    range(data.shape[0]), size=(grid_size, grid_size)
+                )  # initialize a k*k matrix with random samples from training data
+            ]
 
         self.bmu_count = np.zeros((grid_size, grid_size))
         self.bmu_count_history = []
         self.bmu_mapping = {}  # This will store data point indices mapped to each BMU
 
     def find_bmu(self, sample):
-        differences = self.weights - sample
-        distances = np.linalg.norm(
-            differences, axis=-1  # axis=-1 for each neuron and not a flattened matrix
-        )  # euclidean distance for each neuron
-        return np.unravel_index(np.argmin(distances, axis=None), distances.shape)
+        distances = self.similarity_function(self.weights, sample, axis=-1)
+        return np.unravel_index(np.argmin(distances, axis=None), self.bmu_count.shape)
 
     def get_neighborhood(self, bmu, iteration, max_iterations):
-        radius = self.radius * np.exp(
-            -iteration / max_iterations
-        )  # R(t) = R(0) * exp(-t/T)  exponential decay of the radius
+        radius = self.radius_function(self.radius, iteration, max_iterations)
         distances = np.linalg.norm(
             np.indices((self.grid_size, self.grid_size)).T - np.array(bmu), axis=-1
         )  # distance of each neuron to the BMU
@@ -42,9 +46,7 @@ class Kohonen:
 
     def update_weights(self, sample, bmu, iteration, max_iterations):
         neighborhood = self.get_neighborhood(bmu, iteration, max_iterations)
-        lr = self.learning_rate * np.exp(
-            -iteration / max_iterations
-        )  # lr(t) = lr(0) * exp(-t/T)
+        lr = self.eta_function(self.learning_rate, iteration, max_iterations)
 
         # add dimension to neighborhood
         # th shape of neighborhood is (k,k) and the shape of weights is (k,k,features)
