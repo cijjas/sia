@@ -22,6 +22,7 @@ class Kohonen:
 
         self.bmu_count = np.zeros((grid_size, grid_size))
         self.bmu_count_history = []
+        self.bmu_mapping = {}  # This will store data point indices mapped to each BMU
 
     def find_bmu(self, sample):
         differences = self.weights - sample
@@ -56,13 +57,18 @@ class Kohonen:
     def train(self, num_iterations):
         for iteration in range(num_iterations):
             # select a random sample from the training data
-            sample = self.input_data[np.random.randint(self.input_data.shape[0])]
+            sample_index = np.random.randint(self.input_data.shape[0])
+            sample = self.input_data[sample_index]
             # find the winning neuron such that the weights of the neuron are closest to the sample
             # BMU can be defined in many ways, here we use the Euclidean distance
             bmu = self.find_bmu(sample)
 
             self.bmu_count[bmu] += 1
             self.bmu_count_history.append(self.bmu_count.copy())
+
+            if bmu not in self.bmu_mapping:
+                self.bmu_mapping[bmu] = []
+            self.bmu_mapping[bmu].append(sample_index)
 
             # Update neighbouring neurons based on Kohonen learning rule
             self.update_weights(sample, bmu, iteration, num_iterations)
@@ -106,3 +112,16 @@ class Kohonen:
                     u_matrix[i, j] = np.mean(distances)
 
         return u_matrix
+
+    def calculate_variable_matrix(self, feature_column):
+        # Initialize matrix to store average values for each BMU
+        variable_matrix = np.zeros((self.grid_size, self.grid_size))
+
+        # Iterate over each BMU and calculate the average value for the mapped data points
+        for bmu, indices in self.bmu_mapping.items():
+            # Extract the values of the feature column for all points mapped to the BMU
+            feature_values = self.input_data[indices, feature_column]
+            # Calculate the average value for this BMU
+            variable_matrix[bmu] = np.mean(feature_values)
+
+        return variable_matrix
