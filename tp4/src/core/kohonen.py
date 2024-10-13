@@ -33,7 +33,7 @@ class Kohonen:
         self.bmu_count_history = []
         self.bmu_mapping = {}  # This will store data point indices mapped to each BMU
 
-    def find_bmu(self, sample):
+    def find_bmu(self, sample) -> tuple[int, int]:
         distances = self.similarity_function(self.weights, sample, axis=-1)
         return np.unravel_index(np.argmin(distances, axis=None), self.bmu_count.shape)
 
