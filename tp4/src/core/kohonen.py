@@ -1,24 +1,36 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from utils.radius_function import constant_radius
-from utils.eta_function import constant_eta
-from utils.similarity_function import euclidean_distance
+from utils.radius_function import str_to_radius_function
+from utils.eta_function import str_to_eta_function
+from utils.similarity_function import str_to_similarity_function
+
 
 class Kohonen:
 
     # grid_size = k
-    def __init__(self, data, grid_size, learning_rate=0.5, eta_function:callable=constant_eta, radius=1, 
-                 radius_function=constant_radius, similarity_function=euclidean_distance, seed=None, weights:np.ndarray=None):
+    def __init__(
+        self,
+        data,
+        grid_size,
+        learning_rate=0.5,
+        eta_function="constant",
+        radius=1,
+        radius_function="exponential_decay",
+        similarity_function="euclidean",
+        seed=None,
+        weights: np.ndarray = None,
+    ):
         if seed is not None:
             np.random.seed(seed)
         self.input_data = data
         self.grid_size = grid_size
         self.learning_rate = learning_rate
-        self.eta_function = eta_function
         self.radius = radius
-        self.radius_function = radius_function
-        self.similarity_function = similarity_function
+
+        self.eta_function = str_to_eta_function(eta_function)
+        self.radius_function = str_to_radius_function(radius_function)
+        self.similarity_function = str_to_similarity_function(similarity_function)
 
         if weights is not None:
             self.weights = weights
@@ -34,7 +46,7 @@ class Kohonen:
         self.bmu_mapping = {}  # This will store data point indices mapped to each BMU
 
     def find_bmu(self, sample) -> tuple[int, int]:
-        distances = self.similarity_function(self.weights, sample, axis=-1)
+        distances = self.similarity_function(self.weights, sample)
         return np.unravel_index(np.argmin(distances, axis=None), self.bmu_count.shape)
 
     def get_neighborhood(self, bmu, iteration, max_iterations):
@@ -45,6 +57,7 @@ class Kohonen:
         return np.exp(-(distances**2) / (2 * (radius**2)))  # gaussian function
 
     def update_weights(self, sample, bmu, iteration, max_iterations):
+        # neighborhood is matrix of shape (k,k) with values between 0 and 1 representing a gaussian function
         neighborhood = self.get_neighborhood(bmu, iteration, max_iterations)
         lr = self.eta_function(self.learning_rate, iteration, max_iterations)
 
@@ -57,23 +70,27 @@ class Kohonen:
         self.weights += lr * neighborhood * (sample - self.weights)
 
     def train(self, num_iterations):
-        for iteration in range(num_iterations):
-            # select a random sample from the training data
-            sample_index = np.random.randint(self.input_data.shape[0])
-            sample = self.input_data[sample_index]
-            # find the winning neuron such that the weights of the neuron are closest to the sample
-            # BMU can be defined in many ways, here we use the Euclidean distance
-            bmu = self.find_bmu(sample)
+        num_samples = self.input_data.shape[0]
+        for epoch in range(num_iterations // num_samples):
+            # Shuffle the input data at the beginning of each epoch
+            shuffled_indices = np.random.permutation(num_samples)
 
-            self.bmu_count[bmu] += 1
-            self.bmu_count_history.append(self.bmu_count.copy())
+            for iteration in range(num_samples):
+                sample = self.input_data[shuffled_indices[iteration]]
+                bmu = self.find_bmu(sample)
 
-            if bmu not in self.bmu_mapping:
-                self.bmu_mapping[bmu] = []
-            self.bmu_mapping[bmu].append(sample_index)
+                # --------- graph data --------------
+                self.bmu_count[bmu] += 1
+                self.bmu_count_history.append(self.bmu_count.copy())
 
-            # Update neighbouring neurons based on Kohonen learning rule
-            self.update_weights(sample, bmu, iteration, num_iterations)
+                if bmu not in self.bmu_mapping:
+                    self.bmu_mapping[bmu] = []
+                self.bmu_mapping[bmu].append(shuffled_indices[iteration])
+                # -----------------------------------
+
+                self.update_weights(
+                    sample, bmu, epoch * num_samples + iteration, num_iterations
+                )
 
     def calculate_average_neighbor_distances(self):
         distances = []
