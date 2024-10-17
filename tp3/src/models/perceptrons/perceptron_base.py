@@ -38,7 +38,7 @@ class PerceptronBase:
         pass
 
     # exactamente copiado de lo que nos dio la catedra
-    def train(self, X, y, num_epochs):
+    def fit(self, X, y, num_epochs):
         converged = False
         n = X.shape[0] # number of training examples
         for epoch in range(num_epochs):
