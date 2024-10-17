@@ -83,7 +83,7 @@ step_perceptron = PerceptronSimple(
 y para entrenar el modelo instanciado:
 
 ```python
-perceptron.train(X, y, config_file.get('epochs', 50))
+perceptron.fit(X, y, config_file.get('epochs', 50))
 ```
 
 ##### Predicción

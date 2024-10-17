@@ -67,9 +67,11 @@ class Kohonen:
         # sample has shape (features,)
         # sample - self.weights has shape (k,k,features)
         neighborhood = neighborhood[..., np.newaxis]
-        self.weights += lr * neighborhood * (sample - self.weights)
+        np.add(
+            self.weights, lr * neighborhood * (sample - self.weights), out=self.weights
+        )
 
-    def train(self, num_iterations):
+    def fit(self, num_iterations):
         num_samples = self.input_data.shape[0]
         for epoch in range(num_iterations // num_samples):
             # Shuffle the input data at the beginning of each epoch
@@ -80,7 +82,9 @@ class Kohonen:
                 bmu = self.find_bmu(sample)
 
                 # --------- graph data --------------
-                self.bmu_count[bmu] += 1
+                # Increment BMU count in place
+
+                np.add(self.bmu_count[bmu], 1, out=self.bmu_count[bmu])
                 self.bmu_count_history.append(self.bmu_count.copy())
 
                 if bmu not in self.bmu_mapping:

@@ -1,12 +1,12 @@
 {
     "kohonen": {
         "seed": 42,
-        "grid_size": 5,
+        "grid_size": 10,
         "learning_rate": 0.5,
         "eta_function": "exponential_decay",
-        "initial_radius": 5,
+        "initial_radius": 3,
         "radius_function": "exponential_decay",
-        "number_of_iterations": 195,
+        "number_of_iterations": 10000,
         "similarity_function": "euclidean"
     },
     "data": {
