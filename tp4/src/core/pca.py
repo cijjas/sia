@@ -19,7 +19,7 @@ class PCA:
         self.expl_variance = None
 
     def normalize_data(self):
-        self.data = self.data.to_numpy()  # Convert DataFrame to NumPy array
+
         self.mean = np.mean(self.data, axis=0)
         self.std = np.std(self.data, axis=0)
 
@@ -37,7 +37,11 @@ class PCA:
         return np.cov(self.data, rowvar=False)
 
     def fit(self, data):
-        self.data = data
+        if isinstance(data, pd.DataFrame):
+            self.data = data.to_numpy()
+        else:
+            self.data = data
+
         if self.normalize:
             self.normalize_data()
 
