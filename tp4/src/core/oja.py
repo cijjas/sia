@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Callable
+from utils.eta_function import constant_eta
 
 # Algunos modelos de redes neuronales permiten calcular las componentes principales
 # en forma iterativa. Uno de estos métodos es la regla de Oja.
@@ -9,7 +10,7 @@ from typing import Callable
 class Oja:
 
     def __init__(
-        self, seed, num_features, weights=None, learning_rate=0.01, epsilon=1e-5
+        self, seed, num_features, weights=None, learning_rate=0.01, eta_function=constant_eta, epsilon=1e-5
     ):
         if seed is not None:
             np.random.seed(seed)
@@ -18,6 +19,7 @@ class Oja:
             np.random.normal(0, 1, num_features) if weights is None else weights
         )
         self.learning_rate = learning_rate
+        self.eta_function: callable = eta_function
         self.epsilon = epsilon
         self.weights_history = [self.weights.copy()]
 
@@ -37,6 +39,9 @@ class Oja:
                     self.learning_rate * (O_h_mu * X[mu] - O_h_mu**2 * self.weights),
                     out=self.weights,
                 )
+
+            # Actualizar la tasa de aprendizaje
+            self.learning_rate = self.eta_function(self.learning_rate, epoch, epochs)
 
             # Almacenar el historial de pesos después de cada época
             self.weights_history.append(self.weights.copy())

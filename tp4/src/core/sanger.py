@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
-
+from utils.eta_function import constant_eta
 
 class Sanger:
 
     def __init__(
-        self, seed, num_features, num_components, learning_rate=0.01, epsilon=1e-5
+        self, seed, num_features, num_components, learning_rate=0.01, eta_function=constant_eta, epsilon=1e-5
     ):
         """
         Sanger's rule to find multiple principal components.
@@ -22,6 +22,7 @@ class Sanger:
         # Initialize weight matrix for the desired number of components
         self.weights = np.random.normal(0, 1, (num_components, num_features))
         self.learning_rate = learning_rate
+        self.eta_function = eta_function
         self.epsilon = epsilon
         self.weights_history = [self.weights.copy()]
 
@@ -51,6 +52,9 @@ class Sanger:
                         self.learning_rate * outputs[i] * (X[mu] - correction),
                         out=self.weights[i],
                     )
+
+            # Update learning rate
+            self.learning_rate = self.eta_function(self.learning_rate, mu, n)
 
             self.weights_history.append(self.weights.copy())
 
