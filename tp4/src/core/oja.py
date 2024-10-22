@@ -31,12 +31,19 @@ class Oja:
             for mu in range(n):  # Para cada ejemplo de entrenamiento
 
                 # 1. Output of wxx^T
-                O_h_mu = self.weights @ X[mu]
+                O_h_mu = np.matmul(self.weights, X[mu])
 
+                delta = np.multiply(
+                    self.learning_rate,
+                    np.subtract(
+                        np.multiply(O_h_mu, X[mu]),
+                        np.multiply(O_h_mu ** 2, self.weights),
+                    ),
+                )
                 # 2. Oja's rule
                 np.add(
                     self.weights,
-                    self.learning_rate * (O_h_mu * X[mu] - O_h_mu**2 * self.weights),
+                    delta,
                     out=self.weights,
                 )
 
