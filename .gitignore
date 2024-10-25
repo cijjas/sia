@@ -167,3 +167,7 @@ cython_debug/
 
 # big txt
 tp3/res/ej3/big/*.txt
+
+# results
+tp4/results
+tp4/results/*
