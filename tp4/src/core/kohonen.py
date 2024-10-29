@@ -41,11 +41,12 @@ class Kohonen:
                 )
             ]
 
+        ######## Varibles used for graphs and further analysis
+
         self.bmu_count = np.zeros((grid_size, grid_size))
         self.bmu_count_history = []
         self.bmu_mapping = {}
 
-        # New lists to store errors
         self.quantization_errors = []
         self.topographic_errors = []
 
@@ -91,9 +92,9 @@ class Kohonen:
                 )
 
                 ######## Varibles used for graphs and further analysis
+
                 self.bmu_count[bmu] += 1
                 self.bmu_count_history.append(self.bmu_count.copy())
-
 
                 self.quantization_errors.append(self.calculate_quantization_error())
                 self.topographic_errors.append(self.calculate_topology_error())
