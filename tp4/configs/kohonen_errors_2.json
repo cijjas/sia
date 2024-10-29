@@ -1,0 +1,25 @@
+{
+    "kohonen": {
+        "seed": 42,
+        "grid_size": 10,
+        "learning_rate": 0.5,
+        "eta_function": "constant",
+        "initial_radius": 3,
+        "radius_function": "constant",
+        "number_of_iterations": 5600,
+        "similarity_function": "euclidean"
+    },
+    "data": {
+        "source": "../data/europe.csv",
+        "scaling": "standard",
+        "features": [
+            "Area",
+            "GDP",
+            "Inflation",
+            "Life.expect",
+            "Military",
+            "Pop.growth",
+            "Unemployment"
+        ]
+    }
+}
