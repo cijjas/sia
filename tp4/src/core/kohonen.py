@@ -83,15 +83,15 @@ class Kohonen:
                 sample = self.input_data[shuffled_indices[iteration]]
                 bmu = self.find_bmu(sample)
 
-                if bmu not in self.bmu_mapping:
-                    self.bmu_mapping[bmu] = []
-                self.bmu_mapping[bmu].append(shuffled_indices[iteration])
-
                 self.update_weights(
                     sample, bmu, epoch * num_samples + iteration, num_iterations
                 )
 
                 ######## Varibles used for graphs and further analysis
+
+                if bmu not in self.bmu_mapping:
+                    self.bmu_mapping[bmu] = []
+                self.bmu_mapping[bmu].append(shuffled_indices[iteration])
 
                 self.bmu_count[bmu] += 1
                 self.bmu_count_history.append(self.bmu_count.copy())

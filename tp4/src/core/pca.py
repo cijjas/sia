@@ -72,9 +72,6 @@ class PCA:
         self.expl_variance = eigenvalues
 
     def transform(self, data):
-        if self.components is None:
-            raise ValueError("The model must be fitted before transforming the data.")
-
         data_transformed = np.copy(data)
 
         # Normalize the data using the stored mean and standard deviation
