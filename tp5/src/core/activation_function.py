@@ -2,7 +2,6 @@ import numpy as np
 
 
 class ActivationFunction:
-
     def __init__(self, method: str, beta: float = 1.0):
         self.method = method.lower()
         self.beta = beta
@@ -20,33 +19,56 @@ class ActivationFunction:
         return functions[self.method]
 
     def _sigmoid(self, z: np.ndarray) -> np.ndarray:
-        return 1.0 / (1.0 + np.exp(-self.beta * z))
+        """
+        Sigmoid activation: 1 / (1 + exp(-beta * z))
+        """
+        return np.divide(1.0, np.add(1.0, np.exp(np.multiply(-self.beta, z))))
 
-    def _sigmoid_prime(self, z: np.ndarray) -> np.ndarray:
-        a = self._sigmoid(z)
-        return self.beta * a * (1 - a)
+    def _sigmoid_prime(self, a: np.ndarray) -> np.ndarray:
+        """
+        Derivative of sigmoid using activation output a: beta * a * (1 - a)
+        """
+        return np.multiply(self.beta, np.multiply(a, np.subtract(1, a)))
 
     def _tanh(self, z: np.ndarray) -> np.ndarray:
-        return np.tanh(self.beta * z)
+        """
+        Tanh activation: tanh(beta * z)
+        """
+        return np.tanh(np.multiply(self.beta, z))
 
-    def _tanh_prime(self, z: np.ndarray) -> np.ndarray:
-        return self.beta * (1 - np.tanh(self.beta * z) ** 2)
+    def _tanh_prime(self, a: np.ndarray) -> np.ndarray:
+        """
+        Derivative of tanh using activation output a: beta * (1 - a^2)
+        """
+        return np.multiply(self.beta, np.subtract(1, np.square(a)))
 
     def _relu(self, z: np.ndarray) -> np.ndarray:
+        """
+        ReLU activation: max(0, z)
+        """
         return np.maximum(0, z)
 
     def _relu_prime(self, z: np.ndarray) -> np.ndarray:
+        """
+        Derivative of ReLU: 1 if z > 0 else 0
+        """
         return np.where(z > 0, 1.0, 0.0)
 
     def _softmax(self, z: np.ndarray) -> np.ndarray:
-        exp_z = np.exp(z - np.max(z, axis=0, keepdims=True))
-        return exp_z / np.sum(exp_z, axis=0, keepdims=True)
+        """
+        Softmax activation: exp(z) / sum(exp(z)) along the last axis
+        """
+        exp_z = np.exp(np.subtract(z, np.max(z, axis=-1, keepdims=True)))
+        return np.divide(exp_z, np.sum(exp_z, axis=-1, keepdims=True))
 
-    def _softmax_prime(self, z: np.ndarray) -> np.ndarray:
-        # La derivada del softmax es más compleja y normalmente se utiliza en combinación con la función de pérdida de entropía cruzada.
-        # Para fines prácticos, esta implementación sirve como un placeholder.
-        s = self._softmax(z)
-        return s * (1 - s)
+    def _softmax_prime(self, a: np.ndarray) -> np.ndarray:
+        """
+        Placeholder for derivative of softmax.
+        Note: Typically used in combination with cross-entropy loss.
+        """
+        raise NotImplementedError(
+            "The derivative of softmax is complex and context-specific. Use cross-entropy for simplicity."
+        )
 
     def __str__(self) -> str:
-        return f"ActivationFunction(method='{self.method}', beta={self.beta})"
+        return f"ActivationFunction(method='{self.method}', beta={self.beta}')"

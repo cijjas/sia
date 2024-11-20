@@ -1,7 +1,7 @@
 import numpy as np
 
-class Optimizer:
 
+class Optimizer:
     def __init__(
         self,
         method: str = "gradient_descent",
@@ -26,6 +26,10 @@ class Optimizer:
         self.m_w, self.m_b = None, None  # Moments
         self.t = 0  # Time step for Adam
 
+        # Store exponential decay rates to avoid recomputing
+        self.beta_1_pow = 1.0
+        self.beta_2_pow = 1.0
+
         # Validate optimization method
         valid_methods = ["gradient_descent", "momentum", "adam"]
         if self.method not in valid_methods:
@@ -33,8 +37,9 @@ class Optimizer:
 
     def update_parameters(self, weights, biases, grads_w, grads_b, mini_batch_size):
         # Adjust the grads_w with weight decay
-        if self.weight_decay != 0:
-            grads_w = [gw + self.weight_decay * w for gw, w in zip(grads_w, weights)]
+        if self.weight_decay != 0 and self.method != "adam":
+            for gw, w in zip(grads_w, weights):
+                gw += self.weight_decay * w
 
         if self.method == "gradient_descent":
             return self._gradient_descent(
@@ -47,9 +52,11 @@ class Optimizer:
 
     def _gradient_descent(self, weights, biases, grads_w, grads_b, mini_batch_size):
         lr = self.eta / mini_batch_size
-        new_weights = [w - lr * gw for w, gw in zip(weights, grads_w)]
-        new_biases = [b - lr * gb for b, gb in zip(biases, grads_b)]
-        return new_weights, new_biases
+        for w, gw in zip(weights, grads_w):
+            w -= lr * gw
+        for b, gb in zip(biases, grads_b):
+            b -= lr * gb
+        return weights, biases
 
     def _momentum(self, weights, biases, grads_w, grads_b, mini_batch_size):
         if self.v_w is None:
@@ -60,14 +67,18 @@ class Optimizer:
         lr = self.eta / mini_batch_size
         alpha = self.alpha
 
-        # Update velocities
-        self.v_w = [alpha * vw - lr * gw for vw, gw in zip(self.v_w, grads_w)]
-        self.v_b = [alpha * vb - lr * gb for vb, gb in zip(self.v_b, grads_b)]
+        # Update velocities and parameters
+        for vw, w, gw in zip(self.v_w, weights, grads_w):
+            vw *= alpha
+            vw -= lr * gw
+            w += vw
 
-        # Update parameters
-        new_weights = [w + vw for w, vw in zip(weights, self.v_w)]
-        new_biases = [b + vb for b, vb in zip(biases, self.v_b)]
-        return new_weights, new_biases
+        for vb, b, gb in zip(self.v_b, biases, grads_b):
+            vb *= alpha
+            vb -= lr * gb
+            b += vb
+
+        return weights, biases
 
     def _adam(self, weights, biases, grads_w, grads_b, mini_batch_size):
         if self.m_w is None:
@@ -81,40 +92,43 @@ class Optimizer:
         lr_t = self.eta / mini_batch_size
         beta_1, beta_2, epsilon = self.beta_1, self.beta_2, self.epsilon
 
-        # Update moments for weights
-        self.m_w = [
-            beta_1 * mw + (1 - beta_1) * gw for mw, gw in zip(self.m_w, grads_w)
-        ]
-        self.v_w = [
-            beta_2 * vw + (1 - beta_2) * (gw ** 2) for vw, gw in zip(self.v_w, grads_w)
-        ]
-        m_w_hat = [mw / (1 - beta_1 ** self.t) for mw in self.m_w]
-        v_w_hat = [vw / (1 - beta_2 ** self.t) for vw in self.v_w]
+        # Update exponential decay rates
+        self.beta_1_pow *= beta_1
+        self.beta_2_pow *= beta_2
 
-        # Update moments for biases
-        self.m_b = [
-            beta_1 * mb + (1 - beta_1) * gb for mb, gb in zip(self.m_b, grads_b)
-        ]
-        self.v_b = [
-            beta_2 * vb + (1 - beta_2) * (gb ** 2) for vb, gb in zip(self.v_b, grads_b)
-        ]
-        m_b_hat = [mb / (1 - beta_1 ** self.t) for mb in self.m_b]
-        v_b_hat = [vb / (1 - beta_2 ** self.t) for vb in self.v_b]
+        for i in range(len(weights)):
+            # Update biased first moment estimate for weights
+            self.m_w[i] *= beta_1
+            self.m_w[i] += (1 - beta_1) * grads_w[i]
 
-        # Update parameters
-        new_weights = [
-            w - lr_t * mwh / (np.sqrt(vwh) + epsilon)
-            for w, mwh, vwh in zip(weights, m_w_hat, v_w_hat)
-        ]
-        new_biases = [
-            b - lr_t * mbh / (np.sqrt(vbh) + epsilon)
-            for b, mbh, vbh in zip(biases, m_b_hat, v_b_hat)
-        ]
+            # Update biased second raw moment estimate for weights
+            self.v_w[i] *= beta_2
+            np.add(self.v_w[i], (1 - beta_2) * np.square(grads_w[i]), out=self.v_w[i])
 
-        # Apply weight decay (AdamW)
-        if self.weight_decay != 0:
-            new_weights = [
-                nw - lr_t * self.weight_decay * w for nw, w in zip(new_weights, weights)
-            ]
+            # Compute bias-corrected first and second moment estimates for weights
+            m_w_hat = self.m_w[i] / (1 - self.beta_1_pow)
+            v_w_hat = self.v_w[i] / (1 - self.beta_2_pow)
 
-        return new_weights, new_biases
+            # Update weights
+            weights[i] -= lr_t * m_w_hat / (np.sqrt(v_w_hat) + epsilon)
+
+            # Apply weight decay (AdamW)
+            if self.weight_decay != 0:
+                weights[i] -= lr_t * self.weight_decay * weights[i]
+
+            # Update biased first moment estimate for biases
+            self.m_b[i] *= beta_1
+            self.m_b[i] += (1 - beta_1) * grads_b[i]
+
+            # Update biased second raw moment estimate for biases
+            self.v_b[i] *= beta_2
+            np.add(self.v_b[i], (1 - beta_2) * np.square(grads_b[i]), out=self.v_b[i])
+
+            # Compute bias-corrected first and second moment estimates for biases
+            m_b_hat = self.m_b[i] / (1 - self.beta_1_pow)
+            v_b_hat = self.v_b[i] / (1 - self.beta_2_pow)
+
+            # Update biases
+            biases[i] -= lr_t * m_b_hat / (np.sqrt(v_b_hat) + epsilon)
+
+        return weights, biases

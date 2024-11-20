@@ -71,7 +71,6 @@ class VAE(object):
         # Last layer to compute mu and log_var (no activation function)
         z = np.dot(self.weights_encoder[-1], activation) + self.biases_encoder[-1]
         zs.append(z)
-        # z is of shape (2 * latent_dim, 1)
         # Split z into mu and log_var
         mu = z[: self.latent_dim, :]
         log_var = z[self.latent_dim :, :]
@@ -149,11 +148,11 @@ class VAE(object):
         decoder_zs,
     ):
         # Initialize gradients
-        nabla_b_encoder = [np.zeros(b.shape) for b in self.biases_encoder]
-        nabla_w_encoder = [np.zeros(w.shape) for w in self.weights_encoder]
+        nabla_b_encoder = [np.zeros_like(b) for b in self.biases_encoder]
+        nabla_w_encoder = [np.zeros_like(w) for w in self.weights_encoder]
 
-        nabla_b_decoder = [np.zeros(b.shape) for b in self.biases_decoder]
-        nabla_w_decoder = [np.zeros(w.shape) for w in self.weights_decoder]
+        nabla_b_decoder = [np.zeros_like(b) for b in self.biases_decoder]
+        nabla_w_decoder = [np.zeros_like(w) for w in self.weights_decoder]
 
         # Compute derivative of loss w.r.t recon_x
         delta = recon_x - x  # For binary cross-entropy loss
@@ -168,26 +167,29 @@ class VAE(object):
                 delta *= activation_prime
             else:
                 z = decoder_zs[l]
-                activation_prime = self.activation_function.activation_prime(z)
+                a = decoder_activations[l + 1]
+                activation_prime = self.activation_function.activation_prime(a)
                 delta = np.dot(self.weights_decoder[l + 1].T, delta) * activation_prime
 
-            nabla_b_decoder[l] = delta
-            nabla_w_decoder[l] = np.dot(delta, decoder_activations[l].T)
+            nabla_b_decoder[l] += np.sum(delta, axis=1, keepdims=True)
+            nabla_w_decoder[l] += np.dot(delta, decoder_activations[l].T)
 
         # Compute the gradient of the latent variable z
-        delta_z = np.dot(self.weights_decoder[0].T, delta)  # Shape (latent_dim,1)
-
-        # Now compute gradients w.r.t mu and log_var
-        std = np.exp(0.5 * log_var)
+        delta_z = np.dot(
+            self.weights_decoder[0].T, delta
+        )  # Shape (latent_dim, batch_size)
 
         # Gradients w.r.t mu and log_var
-        delta_mu = delta_z + mu  # Shape (latent_dim, 1)
-        delta_log_var = (delta_z * epsilon * 0.5 * std) + 0.5 * (
+        std = np.exp(0.5 * log_var)
+        delta_mu = delta_z + mu  # Shape (latent_dim, batch_size)
+        delta_log_var = delta_z * epsilon * 0.5 * std + 0.5 * (
             np.exp(log_var) - 1
-        )  # Shape (latent_dim, 1)
+        )  # Shape (latent_dim, batch_size)
 
         # Stack gradients
-        delta_z_full = np.vstack([delta_mu, delta_log_var])  # Shape (2 * latent_dim, 1)
+        delta_z_full = np.vstack(
+            [delta_mu, delta_log_var]
+        )  # Shape (2 * latent_dim, batch_size)
 
         # Backpropagate through encoder
         num_layers_encoder = len(self.weights_encoder)
@@ -196,76 +198,78 @@ class VAE(object):
         for l in reversed(range(num_layers_encoder)):
             if l == num_layers_encoder - 1:
                 # Last layer (mu and log_var layer, no activation function)
-                nabla_b_encoder[l] = delta
-                nabla_w_encoder[l] = np.dot(delta, encoder_activations[l].T)
+                nabla_b_encoder[l] += np.sum(delta, axis=1, keepdims=True)
+                nabla_w_encoder[l] += np.dot(delta, encoder_activations[l].T)
             else:
                 z = encoder_zs[l]
-                activation_prime = self.activation_function.activation_prime(z)
+                a = encoder_activations[l + 1]
+                activation_prime = self.activation_function.activation_prime(a)
                 delta = np.dot(self.weights_encoder[l + 1].T, delta) * activation_prime
-                nabla_b_encoder[l] = delta
-                nabla_w_encoder[l] = np.dot(delta, encoder_activations[l].T)
+                nabla_b_encoder[l] += np.sum(delta, axis=1, keepdims=True)
+                nabla_w_encoder[l] += np.dot(delta, encoder_activations[l].T)
 
         return nabla_b_encoder, nabla_w_encoder, nabla_b_decoder, nabla_w_decoder
 
     def update_weights_and_biases(self, mini_batch):
         # Initialize cumulative gradients
-        nabla_b_encoder = [np.zeros(b.shape) for b in self.biases_encoder]
-        nabla_w_encoder = [np.zeros(w.shape) for w in self.weights_encoder]
+        nabla_b_encoder = [np.zeros_like(b) for b in self.biases_encoder]
+        nabla_w_encoder = [np.zeros_like(w) for w in self.weights_encoder]
 
-        nabla_b_decoder = [np.zeros(b.shape) for b in self.biases_decoder]
-        nabla_w_decoder = [np.zeros(w.shape) for w in self.weights_decoder]
+        nabla_b_decoder = [np.zeros_like(b) for b in self.biases_decoder]
+        nabla_w_decoder = [np.zeros_like(w) for w in self.weights_decoder]
 
         # Total loss
         total_loss = 0
 
-        for x, _ in mini_batch:
-            (
-                recon_x,
-                mu,
-                log_var,
-                z,
-                epsilon,
-                encoder_activations,
-                encoder_zs,
-                decoder_activations,
-                decoder_zs,
-            ) = self.feedforward(x)
-            loss, recon_loss, kl_div = self.compute_loss(x, recon_x, mu, log_var)
-            total_loss += loss
+        # Prepare batch data
+        x_batch = np.hstack([x for x, _ in mini_batch])
 
-            # Backpropagation
-            (
-                delta_nabla_b_encoder,
-                delta_nabla_w_encoder,
-                delta_nabla_b_decoder,
-                delta_nabla_w_decoder,
-            ) = self.backpropagation(
-                x,
-                recon_x,
-                mu,
-                log_var,
-                z,
-                epsilon,
-                encoder_activations,
-                encoder_zs,
-                decoder_activations,
-                decoder_zs,
-            )
+        (
+            recon_x,
+            mu,
+            log_var,
+            z,
+            epsilon,
+            encoder_activations,
+            encoder_zs,
+            decoder_activations,
+            decoder_zs,
+        ) = self.feedforward(x_batch)
+        loss, recon_loss, kl_div = self.compute_loss(x_batch, recon_x, mu, log_var)
+        total_loss += loss
 
-            # Accumulate gradients
-            nabla_b_encoder = [
-                nb + dnb for nb, dnb in zip(nabla_b_encoder, delta_nabla_b_encoder)
-            ]
-            nabla_w_encoder = [
-                nw + dnw for nw, dnw in zip(nabla_w_encoder, delta_nabla_w_encoder)
-            ]
+        # Backpropagation
+        (
+            delta_nabla_b_encoder,
+            delta_nabla_w_encoder,
+            delta_nabla_b_decoder,
+            delta_nabla_w_decoder,
+        ) = self.backpropagation(
+            x_batch,
+            recon_x,
+            mu,
+            log_var,
+            z,
+            epsilon,
+            encoder_activations,
+            encoder_zs,
+            decoder_activations,
+            decoder_zs,
+        )
 
-            nabla_b_decoder = [
-                nb + dnb for nb, dnb in zip(nabla_b_decoder, delta_nabla_b_decoder)
-            ]
-            nabla_w_decoder = [
-                nw + dnw for nw, dnw in zip(nabla_w_decoder, delta_nabla_w_decoder)
-            ]
+        # Accumulate gradients
+        nabla_b_encoder = [
+            nb + dnb for nb, dnb in zip(nabla_b_encoder, delta_nabla_b_encoder)
+        ]
+        nabla_w_encoder = [
+            nw + dnw for nw, dnw in zip(nabla_w_encoder, delta_nabla_w_encoder)
+        ]
+        nabla_b_decoder = [
+            nb + dnb for nb, dnb in zip(nabla_b_decoder, delta_nabla_b_decoder)
+        ]
+        nabla_w_decoder = [
+            nw + dnw for nw, dnw in zip(nabla_w_decoder, delta_nabla_w_decoder)
+        ]
 
         # Update weights and biases using optimizer
         self.weights_encoder, self.biases_encoder = (
