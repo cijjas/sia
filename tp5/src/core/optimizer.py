@@ -1,18 +1,17 @@
 import numpy as np
 
-
 class Optimizer:
 
     def __init__(
         self,
         method: str = "gradient_descent",
         eta: float = 0.01,
-        weight_decay: float = 0.0,  # Add weight decay as a parameter
+        weight_decay: float = 0.0,
         **kwargs,
     ):
         self.method = method.lower()
         self.eta = eta
-        self.weight_decay = weight_decay  # Store weight decay value
+        self.weight_decay = weight_decay
 
         # Parameters for Momentum
         self.alpha = kwargs.get("alpha", 0.9)
@@ -33,6 +32,10 @@ class Optimizer:
             raise ValueError(f"Unknown optimization method: {self.method}")
 
     def update_parameters(self, weights, biases, grads_w, grads_b, mini_batch_size):
+        # Adjust the grads_w with weight decay
+        if self.weight_decay != 0:
+            grads_w = [gw + self.weight_decay * w for gw, w in zip(grads_w, weights)]
+
         if self.method == "gradient_descent":
             return self._gradient_descent(
                 weights, biases, grads_w, grads_b, mini_batch_size
@@ -42,14 +45,8 @@ class Optimizer:
         elif self.method == "adam":
             return self._adam(weights, biases, grads_w, grads_b, mini_batch_size)
 
-    def _apply_weight_decay(self, weights):
-        return [w - self.weight_decay * w for w in weights]
-
     def _gradient_descent(self, weights, biases, grads_w, grads_b, mini_batch_size):
         lr = self.eta / mini_batch_size
-
-        weights = self._apply_weight_decay(weights)
-
         new_weights = [w - lr * gw for w, gw in zip(weights, grads_w)]
         new_biases = [b - lr * gb for b, gb in zip(biases, grads_b)]
         return new_weights, new_biases
@@ -62,9 +59,6 @@ class Optimizer:
 
         lr = self.eta / mini_batch_size
         alpha = self.alpha
-
-        # Apply weight decay to weights
-        weights = self._apply_weight_decay(weights)
 
         # Update velocities
         self.v_w = [alpha * vw - lr * gw for vw, gw in zip(self.v_w, grads_w)]
@@ -87,28 +81,25 @@ class Optimizer:
         lr_t = self.eta / mini_batch_size
         beta_1, beta_2, epsilon = self.beta_1, self.beta_2, self.epsilon
 
-        # Apply weight decay to weights
-        weights = self._apply_weight_decay(weights)
-
         # Update moments for weights
         self.m_w = [
             beta_1 * mw + (1 - beta_1) * gw for mw, gw in zip(self.m_w, grads_w)
         ]
         self.v_w = [
-            beta_2 * vw + (1 - beta_2) * (gw**2) for vw, gw in zip(self.v_w, grads_w)
+            beta_2 * vw + (1 - beta_2) * (gw ** 2) for vw, gw in zip(self.v_w, grads_w)
         ]
-        m_w_hat = [mw / (1 - beta_1**self.t) for mw in self.m_w]
-        v_w_hat = [vw / (1 - beta_2**self.t) for vw in self.v_w]
+        m_w_hat = [mw / (1 - beta_1 ** self.t) for mw in self.m_w]
+        v_w_hat = [vw / (1 - beta_2 ** self.t) for vw in self.v_w]
 
         # Update moments for biases
         self.m_b = [
             beta_1 * mb + (1 - beta_1) * gb for mb, gb in zip(self.m_b, grads_b)
         ]
         self.v_b = [
-            beta_2 * vb + (1 - beta_2) * (gb**2) for vb, gb in zip(self.v_b, grads_b)
+            beta_2 * vb + (1 - beta_2) * (gb ** 2) for vb, gb in zip(self.v_b, grads_b)
         ]
-        m_b_hat = [mb / (1 - beta_1**self.t) for mb in self.m_b]
-        v_b_hat = [vb / (1 - beta_2**self.t) for vb in self.v_b]
+        m_b_hat = [mb / (1 - beta_1 ** self.t) for mb in self.m_b]
+        v_b_hat = [vb / (1 - beta_2 ** self.t) for vb in self.v_b]
 
         # Update parameters
         new_weights = [
@@ -119,7 +110,11 @@ class Optimizer:
             b - lr_t * mbh / (np.sqrt(vbh) + epsilon)
             for b, mbh, vbh in zip(biases, m_b_hat, v_b_hat)
         ]
-        return new_weights, new_biases
 
-    def __str__(self) -> str:
-        return f"Optimizer(method='{self.method}', eta={self.eta})"
+        # Apply weight decay (AdamW)
+        if self.weight_decay != 0:
+            new_weights = [
+                nw - lr_t * self.weight_decay * w for nw, w in zip(new_weights, weights)
+            ]
+
+        return new_weights, new_biases
