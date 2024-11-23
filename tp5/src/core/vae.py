@@ -9,9 +9,9 @@ from .initialization import WeightInitializer
 class VAE(object):
     def __init__(
         self,
-        seed,
-        encoder_topology,
-        decoder_topology,
+        seed: int,
+        encoder_topology: list,
+        decoder_topology: list,
         activation_function: ActivationFunction,
         encoder_optimizer: Optimizer,
         decoder_optimizer: Optimizer,
@@ -20,41 +20,53 @@ class VAE(object):
         weights_decoder=None,
         biases_decoder=None,
     ):
+        # Set the random seed if provided
         if seed is not None:
             np.random.seed(seed)
 
+        # Assign core components
         self.activation_function = activation_function
         self.encoder_optimizer = encoder_optimizer
         self.decoder_optimizer = decoder_optimizer
-
-        # Initialize encoder weights and biases
-        if weights_encoder is not None and biases_encoder is not None:
-            self.weights_encoder = weights_encoder
-            self.biases_encoder = biases_encoder
-        else:
-            weight_initializer = WeightInitializer(seed)
-            self.weights_encoder = weight_initializer.initialize_weights(
-                encoder_topology, activation_function.method
-            )
-            self.biases_encoder = weight_initializer.initialize_biases(encoder_topology)
-
-        # Initialize decoder weights and biases
-        if weights_decoder is not None and biases_decoder is not None:
-            self.weights_decoder = weights_decoder
-            self.biases_decoder = biases_decoder
-        else:
-            weight_initializer = WeightInitializer(seed)
-            self.weights_decoder = weight_initializer.initialize_weights(
-                decoder_topology, activation_function.method
-            )
-            self.biases_decoder = weight_initializer.initialize_biases(decoder_topology)
-
-        # Store topologies
         self.encoder_topology = encoder_topology
         self.decoder_topology = decoder_topology
+        self.latent_dim = decoder_topology[
+            0
+        ]  # Latent dimension derived from decoder topology
 
-        # Latent dimension
-        self.latent_dim = decoder_topology[0]
+        # Initialize encoder weights and biases
+        self.weights_encoder, self.biases_encoder = self._initialize_parameters(
+            weights_encoder,
+            biases_encoder,
+            encoder_topology,
+            activation_function.method,
+            seed,
+        )
+
+        # Initialize decoder weights and biases
+        self.weights_decoder, self.biases_decoder = self._initialize_parameters(
+            weights_decoder,
+            biases_decoder,
+            decoder_topology,
+            activation_function.method,
+            seed,
+        )
+
+    def _initialize_parameters(
+        self, weights, biases, topology, activation_method, seed
+    ):
+        """
+        Helper function to initialize weights and biases.
+        """
+        if weights is not None and biases is not None:
+            return weights, biases
+
+        # Use a weight initializer to generate weights and biases
+        initializer = WeightInitializer(seed)
+        return (
+            initializer.initialize_weights(topology, activation_method),
+            initializer.initialize_biases(topology),
+        )
 
     def encode(self, x):
         activation = x

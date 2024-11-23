@@ -48,11 +48,11 @@ class ActivationFunction:
         """
         return np.maximum(0, z)
 
-    def _relu_prime(self, z: np.ndarray) -> np.ndarray:
+    def _relu_prime(self, a: np.ndarray) -> np.ndarray:
         """
-        Derivative of ReLU: 1 if z > 0 else 0
+        Derivative of ReLU: 1 if a > 0 else 0
         """
-        return np.where(z > 0, 1.0, 0.0)
+        return np.where(a > 0, 1.0, 0.0)
 
     def _softmax(self, z: np.ndarray) -> np.ndarray:
         """

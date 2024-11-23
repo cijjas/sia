@@ -44,20 +44,6 @@ class MultilayerPerceptron(object):
             return a
 
     # Trains the neural network with mini batches of the training data for the an amount of epochs
-    # def fit(self, training_data, epochs, mini_batch_size):
-    #     n = len(training_data)
-
-    #     for j in range(epochs):
-    #         np.random.shuffle(training_data)
-    #         mini_batches = [
-    #             training_data[k : k + mini_batch_size]
-    #             for k in range(0, n, mini_batch_size)
-    #         ]
-    #         for mini_batch in mini_batches:
-    #             self.update_weights_and_biases(mini_batch, mini_batch_size)
-
-    #         print(f"Epoch {j} complete")
-
     def fit(self, training_data, epochs, mini_batch_size, patience=10, min_delta=1e-4):
         n = len(training_data)
         pixel_error_history = []
@@ -137,14 +123,14 @@ class MultilayerPerceptron(object):
         # Backward pass
         # Special treatment for output layer
         delta = self.cost_derivative(activations[-1], y) * self.sigma.activation_prime(
-            zs[-1]
+            activations[-1]
         )
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].T)
 
         for l in range(2, self.num_layers):
             delta = np.dot(self.weights[-l + 1].T, delta) * self.sigma.activation_prime(
-                zs[-l]
+                activations[-l]
             )
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l - 1].T)
