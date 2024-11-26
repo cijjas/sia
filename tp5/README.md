@@ -18,9 +18,11 @@ El proyecto toma como inspiración la implementación de las redes neuronales pr
 │   └── SIATP5.pdf                   # Informe del proyecto
 ├── README.md                        # Archivo de documentación
 └── src
-    ├── autoencoder.ipynb            # Análisis y experimentos con AE
+    ├── autoencoder.ipynb                   # Análisis y experimentos con AE y DAE
+    ├── autoencoder_benchmarking.ipynb      # Benchmarking de configuraciones de AE (ejecutado en colab previamente)
     ├── vae.ipynb                    # Experimentos básicos con VAE
     ├── vae_custom.ipynb             # Experimentos avanzados con VAE
+    ├── vae_custom_faces.ipynb       # Experimentos con imagenes propias con VAE
     ├── vae_emoji.ipynb              # Experimentos con emojis en VAE
     ├── latent_space_slow_smooth_path.gif    # Visualización del espacio latente (GIF)
     ├── latent_space_smooth_large_sine.gif   # Visualización de trayectorias suaves
@@ -35,7 +37,7 @@ El proyecto toma como inspiración la implementación de las redes neuronales pr
 
 ```
 
-El archivo VAE custom provee un notebook que está configurado para hacer un entrenamiento default de un VAE para generación y experimentación con caras; se puede muy facilmente agregar una carpeta a `/data` por ejemplo `/data/mis_imagenes` y el notebook creará una nueva carpeta que recorte las imagenes, detecte caras y las deje preparadas para ser usadas en el VAE. Hacemos esta mención para el futuro donde querramos vovler a correr esto y sepamos por donde arrancar.
+El archivo de [custom faces](./src/vae_custom_faces.ipynb) provee un notebook que está configurado para hacer un entrenamiento default de un VAE para generación y experimentación con caras; se puede muy facilmente agregar una carpeta a `/data` por ejemplo `/data/mis_imagenes` y el notebook creará una nueva carpeta que recorte las imagenes, detecte caras y las deje preparadas para ser usadas en el VAE. Hacemos esta mención para el futuro donde querramos vovler a correr esto y sepamos por donde arrancar.
 
 
 
